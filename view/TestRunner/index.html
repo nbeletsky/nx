@@ -1,0 +1,11 @@
+<a href='/'>Back</a>
+<div>
+    <? if (count($tests) > 0) { ?>
+        <div><a href='/TestRunner/run_all'>Run All</a>
+        <? foreach($tests as $test) { ?>
+            <div><a href='/TestRunner/run?t=<?=$test?>'><?=$test?></a></div>
+        <? }?>
+    <? } else { ?>
+        No tests found! 
+    <? } ?>
+</div>
