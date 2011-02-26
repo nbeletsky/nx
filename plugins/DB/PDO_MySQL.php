@@ -28,14 +28,6 @@ class PDO_MySQL extends core\PluginInterfaceDB
     private $_statement;
 
    /**
-    *  Controls how the rows will be returned.
-    *
-    *  @var string
-    *  @access private
-    */
-    private $_fetch_style = 'assoc';
-
-   /**
     *  Connects and selects database.
     *
     *  @access public
@@ -77,27 +69,41 @@ class PDO_MySQL extends core\PluginInterfaceDB
         $this->_dbh = null;
     }
     
+    public function delete_object($obj)
+    {
+        $this->query('DELETE FROM `' . basename(get_class($obj)) . '` WHERE `' . PRIMARY_KEY . '`=:' . PRIMARY_KEY); 
+        $id = PRIMARY_KEY;
+        $params = array(PRIMARY_KEY => $obj->$id);
+        return $this->_db->query($sql, $params);
+    }
+    
    /**
     *  Fetches the next row from the result set in memory (i.e., the one
     *  that was created after running query()).
     *
+    *  @param string $fetch_style        Controls how the rows will be returned.
+    *  @param obj $obj                   The object to be fetched into for use with FETCH_INTO.
     *  @access public
     *  @return mixed
     */
-    public function fetch() 
+    public function fetch($fetch_style, $obj=null) 
     {
-        return $this->_statement->fetch($this->_fetch_style);
+        $this->_set_fetch_mode($fetch_style, $obj);
+        return $this->_statement->fetch();
     }
 
    /**
     *  Returns an array containing all of the result set rows.
     *
+    *  @param string $fetch_style        Controls how the rows will be returned.
+    *  @param obj $obj                   The object to be fetched into for use with FETCH_INTO.
     *  @access public
     *  @return mixed
     */
-    public function fetch_all() 
+    public function fetch_all($fetch_style, $obj=null) 
     {
-        return $this->_statement->fetchAll($this->_fetch_style);
+        $this->_set_fetch_mode($fetch_style, $obj);
+        return $this->_statement->fetchAll();
     }
 
    /**
@@ -121,7 +127,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     */
     public function insert($obj) 
     {
-        $table = $this->classname_only($obj);
+        $table = basename(get_class(($obj)));
         $properties = get_object_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
@@ -157,6 +163,15 @@ class PDO_MySQL extends core\PluginInterfaceDB
     public function insert_id()
     {
         return $this->_dbh->lastInsertId();
+    }
+
+    public function load_object($obj, $id)
+    {
+        $this->query('SELECT * FROM `' . basename(get_class($obj)) . '` WHERE `' . PRIMARY_KEY . '`=:' . PRIMARY_KEY); 
+        $params = array(PRIMARY_KEY => $id);
+        $query = $this->_db->query($sql, $params);
+        return $this->fetch('into', $obj);
+
     }
 
    /**
@@ -217,46 +232,42 @@ class PDO_MySQL extends core\PluginInterfaceDB
     public function query_first($sql, $parameters=null) 
     {
         $this->query($sql . ' LIMIT 1', $parameters);
-        return $this->fetch();
     }
 
    /**
     *  Sets the fetch mode.
     *
     *  @param string $fetch_style        Controls how the rows will be returned.
+    *  @param obj $obj                   The object to be fetched into for use with FETCH_INTO.
     *  @access private
     *  @return int 
     */
-    public function set_fetch_mode($fetch_style) 
+    private function _set_fetch_mode($fetch_style, $obj=null) 
     {
         switch ( $fetch_style ) 
         {
             case 'assoc':
-                $fetch_style = PDO::FETCH_ASSOC;
+                $this->_statement->setFetchMode(PDO::FETCH_ASSOC);
                 break;
             case 'both':
-                $fetch_style = PDO::FETCH_BOTH;
-                break;
-            case 'class':
-                $fetch_style = PDO::FETCH_CLASS;
+                $this->_statement->setFetchMode(PDO::FETCH_BOTH);
                 break;
             case 'into':
-                $fetch_style = PDO::FETCH_INTO;
+                $this->_statement->setFetchMode(PDO::FETCH_INTO, $obj);
                 break;
             case 'lazy':
-                $fetch_style = PDO::FETCH_LAZY;
+                $this->_statement->setFetchMode(PDO::FETCH_LAZY);
                 break;
             case 'num':
-                $fetch_style = PDO::FETCH_NUM;
+                $this->_statement->setFetchMode(PDO::FETCH_NUM);
                 break;
             case 'obj':
-                $fetch_style = PDO::FETCH_OBJ;
+                $this->_statement->setFetchMode(PDO::FETCH_OBJ);
                 break;
             default:
-                $fetch_style = PDO::FETCH_ASSOC;
+                $this->_statement->setFetchMode(PDO::FETCH_ASSOC);
                 break;
         }
-        $this->_fetch_style = $fetch_style;
     }
 
    /**
@@ -269,7 +280,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     */
     public function update($obj, $where = '1') 
     {
-        $table = $this->classname_only($obj);
+        $table = basename(get_class(($obj)));
         $properties = get_object_vars($obj);
 
     	$sql = 'UPDATE `' . $table . '` SET ';
@@ -306,7 +317,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     */
     public function upsert($obj) 
     {
-        $table = $this->classname_only($obj);
+        $table = basename(get_class(($obj)));
         $properties = get_object_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';

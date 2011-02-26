@@ -68,6 +68,11 @@ class Repository implements PluginInterfaceDB, PluginInterfaceCache
         return $this->_db->close();
      }
 
+     public function delete_object($obj)
+     {
+        return $this->_db->delete_object($obj);
+     }
+
      public function fetch()
      {
         return $this->_db->fetch();
@@ -86,6 +91,11 @@ class Repository implements PluginInterfaceDB, PluginInterfaceCache
      public function insert_id()
      {
         return $this->_db->insert_id();
+     }
+
+     public function load_object($obj, $id)
+     {
+        return $this->_db->load_object($obj, $id);
      }
 
      public function num_rows()
