@@ -97,8 +97,8 @@ class Model
      */
     function is_foreign($field_name)
     {
-        return ($this->is_has_many($field_name) || $this->is_has_one($field_name) 
-            || $this->is_habtm($field_name) || $this->is_belongs_to($field_name));
+        return ( $this->is_has_many($field_name) || $this->is_has_one($field_name) || 
+                 $this->is_habtm($field_name) || $this->is_belongs_to($field_name) );
     }
     
     /**
@@ -106,9 +106,7 @@ class Model
      */
     function is_belongs_to($field_name)
     {
-        if (count($this->belongs_to) > 0 and array_search($field_name, $this->belongs_to) !== false)
-            return true;
-        return false;
+        return ( count($this->belongs_to) && in_array($field_name, $this->belongs_to) );
     }
     
     /**
@@ -116,9 +114,7 @@ class Model
      */
     function is_has_many($field_name)
     {
-        if (count($this->has_many) > 0 and array_search($field_name, $this->has_many) !== false)
-            return true;
-        return false;
+        return ( count($this->has_many) && in_array($field_name, $this->has_many) );
     }
     
     /**
@@ -126,9 +122,7 @@ class Model
      */
     function is_has_one($field_name)
     {
-        if (count($this->has_one) > 0 and array_search($field_name, $this->has_one) !== false)
-            return true;
-        return false;
+        return ( count($this->has_one) && in_array($field_name, $this->has_one) );
     }
     
     /**
@@ -136,9 +130,7 @@ class Model
      */
     function is_habtm($field_name)
     {
-        if (count($this->has_and_belongs_to_many) > 0 and array_search($field_name, $this->has_and_belongs_to_many) !== false)
-            return true;
-        return false;        
+        return ( count($this->has_and_belongs_to_many) && in_array($field_name, $this->has_and_belongs_to_many) );
     }
     
     /**
