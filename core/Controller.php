@@ -9,30 +9,10 @@ class Controller
 
     protected $_data = array();
 
-    private $_assignments = array();
-
-
-    public function assign($var, $value=null)
-    {
-        if ( is_array($var) && is_null($value) )
-        {
-            $this->_assignments = array_merge($this->_assignments, $var);
-        }
-        else
-        {
-            $this->_assignments[$var]= $value;
-        }
-    }
-
-    public function call($action, $assignments=null)
+    public function call($action)
     {
         $this->_data = $_REQUEST["data"];
 
-        if ( $assignments )
-        {
-            $this->_assignments = $assignments;
-        }
-        
         try
         {
             if ( $this->is_protected($action) )
@@ -44,12 +24,10 @@ class Controller
             {
                 $this->preload($action);
                 
-                $this->$action();
+                $assignments = $this->$action();
             }   
             
-            // assignments should be handled after the call check
-            //  so that pass-thru assigns can still be assigned downwards.
-            foreach($this->_assignments as $name=>$value)
+            foreach($assignments as $name=>$value)
             {
                 $$name = $value;
             }
@@ -115,7 +93,7 @@ class Controller
         exit();
     }
     
-    public function render($query_string, $assignments=null)
+    public function render($query_string)
     {
         // TODO: URL layout?
         // foobar.com/controller
@@ -138,7 +116,7 @@ class Controller
         //include "../view/" . $template . '/' . $page . VIEW_EXTENSION;
 
         $controller_obj = new $controller();
-        $controller_obj->call($action, $assignments);
+        $controller_obj->call($action);
     }
 }
 
