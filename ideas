@@ -1,0 +1,36 @@
+User
+    - id
+    - name
+    - password
+    - preferences etc.
+        
+            Entry
+                - id
+                - title
+                - content
+                - date
+      <======== - User_id 
+
+
+
+
+User
+    - id
+    - name
+    - password
+    - preferences etc.
+
+            Listing
+                - id
+                - title
+                - tags
+                - categories etc.
+      <======== - User_id 
+            
+                    Bid
+                        - id
+                        - amount
+                        - quality
+                        - quantity etc.
+      <================ - User_id 
+                <====== - Listing_id 
