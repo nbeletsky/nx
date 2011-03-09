@@ -165,6 +165,12 @@ class PDO_MySQL extends core\PluginInterfaceDB
         return $this->_dbh->lastInsertId();
     }
 
+    // TODO: Fix
+    public function find_object($where='1')
+    {
+        
+    }
+
     public function load_object($obj, $id)
     {
         $this->query('SELECT * FROM `' . basename(get_class($obj)) . '` WHERE `' . PRIMARY_KEY . '`=:' . PRIMARY_KEY); 
