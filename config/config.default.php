@@ -1,4 +1,4 @@
-<?
+<?php
    /*
     * Default base install is the directory above where this config file is stored
     */
@@ -19,7 +19,7 @@
     */
     function autoload($class_name) 
     {
-        include_once str_replace("\\", "/", $class_name).".php";
+        include_once str_replace("\\", "/", $class_name) . ".php";
     }
 
     spl_autoload_register('autoload');

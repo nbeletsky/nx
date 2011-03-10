@@ -1,7 +1,7 @@
 <?php
-namespace core;
+namespace lib;
 
-class Encrypt extends Ploof 
+class Encrypt 
 {
     /**
      *  Encrypts the password.  First, we create a salt based on the user's information.

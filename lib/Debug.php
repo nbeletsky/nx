@@ -1,5 +1,5 @@
 <?php
-namespace core;    
+namespace lib;
 
 class Debug
 {
@@ -7,7 +7,10 @@ class Debug
     {
         if ($level <= DEBUG_LEVEL)
         {
-            print_r("<pre>" . get_called_class() . "($level): " . $msg . "</pre>");
+            echo("<pre>" . get_called_class() . "($level): ");
+            print_r($msg);
+            echo "</pre>
+            ";
         }
     }
     

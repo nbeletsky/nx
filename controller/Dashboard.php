@@ -4,11 +4,12 @@ class Dashboard extends core\Controller
 {
     function index()
     {
-        $this->assign("contact_email", "andrew@frugalprogrammer.com");
+        return array("contact_email"=>"test@test.com");
     }   
-    
-    static function classname()
+
+    function edit()
     {
-        return __CLASS__;
+        return null;
     }
+    
 }

@@ -11,7 +11,10 @@ class Controller
 
     public function call($action, $id=null)
     {
-        $this->_data = $_POST["data"];
+        if ( isset($_POST['data']) )
+        {
+            $this->_data = $_POST['data'];
+        }
 
         try
         {
@@ -27,9 +30,12 @@ class Controller
                 $assignments = $this->$action($id);
             }   
             
-            foreach( $assignments as $name=>$value )
+            if ( is_array($assignments) )
             {
-                $$name = $value;
+                foreach( $assignments as $name=>$value )
+                {
+                    $$name = $value;
+                }
             }
             
             $view_action = "../view/" . get_class($this) . "/" . $action . VIEW_EXTENSION;
@@ -93,11 +99,21 @@ class Controller
     public function render($query_string)
     {
         // TODO: URL layout?
+        // foobar.com/
         // foobar.com/controller
         // foobar.com/controller/id
         // foobar.com/controller/action/id
         // foobar.com/controller/action/id/arg
         // foobar.com/controller/action/id/arg[0]/arg[1] - etc...
+        /* 
+        url.rewrite-once = (
+            "^/$"=>"/public/index.php",
+            "^/([A-Za-z0-9\.\-]+)$"=>"/public/index.php?controller=$1",
+            "^/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)$"=>"/public/index.php?controller=$1&$id=$2",
+            "^/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)$"=>"/public/index.php?controller=$1&action=$2&id=$3",
+            "^/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)$"=>"/public/index.php?controller=$1&action=$2&id=$3&arg=$4"
+        )
+        */
 
         parse_str($query_string, $query);
 
