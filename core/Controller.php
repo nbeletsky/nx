@@ -4,14 +4,14 @@ namespace core;
 class Controller
 {
     public $protected            = null; // array of blacklist protected actions
-    public $protected_exceptions = null; // array of whitelist unprotected actions)
+    public $protected_exceptions = null; // array of whitelist unprotected actions
     public $handler              = null; // handler for errors, array('controller'=>foo, 'action'=>bar)
 
     protected $_data = array();
 
-    public function call($action)
+    public function call($action, $id=null)
     {
-        $this->_data = $_REQUEST["data"];
+        $this->_data = $_POST["data"];
 
         try
         {
@@ -24,16 +24,16 @@ class Controller
             {
                 $this->preload($action);
                 
-                $assignments = $this->$action();
+                $assignments = $this->$action($id);
             }   
             
-            foreach($assignments as $name=>$value)
+            foreach( $assignments as $name=>$value )
             {
                 $$name = $value;
             }
             
-            $view_action = "../view/".classname_only(static::classname())."/".$action.VIEW_EXTENSION;
-            if (file_exists($view_action))
+            $view_action = "../view/" . get_class($this) . "/" . $action . VIEW_EXTENSION;
+            if ( file_exists($view_action) )
             {
                 include($view_action);
             }
@@ -41,15 +41,12 @@ class Controller
         // TODO: Fix exceptions
         catch (\Exception $e)
         {
-            if ($this->handler)
+            if ( $this->handler )
             {
-                render("/".$this->handler['controller']."/".$this->handler['action']."/".$this->id);
+                render("/" . $this->handler['controller'] . "/" . $this->handler['action'] . "/" .$this->id);
             }
             
-            print_r("Controller caught a message it didn't know how to handle:<br><pre>");
-            print_r($e->getMessage());
-            print_r($e->getTraceAsString());
-            print_r('</pre>');
+            print_r("<pre>" . $e->getMessage() . $e->getTraceAsString() . '</pre>');
             exit;
         }  
 
@@ -90,7 +87,7 @@ class Controller
         {
             header("Location: $url");
         }
-        exit();
+        exit;
     }
     
     public function render($query_string)
@@ -116,7 +113,7 @@ class Controller
         //include "../view/" . $template . '/' . $page . VIEW_EXTENSION;
 
         $controller_obj = new $controller();
-        $controller_obj->call($action);
+        $controller_obj->call($action, $id);
     }
 }
 

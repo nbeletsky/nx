@@ -63,65 +63,75 @@ class Repository implements PluginInterfaceDB, PluginInterfaceCache
         return $this->_db->affected_rows();
     }
 
-     public function close()
-     {
+    public function close()
+    {
         return $this->_db->close();
-     }
+    }
 
-     public function delete_object($obj)
-     {
+    public function delete_object($obj)
+    {
         return $this->_db->delete_object($obj);
-     }
+    }
 
-     public function fetch()
-     {
+    public function fetch()
+    {
         return $this->_db->fetch();
-     }
+    }
 
-     public function fetch_all()
-     {
+    public function fetch_all()
+    {
         return $this->_db->fetch_all();
-     }
+    }
 
-     public function insert($obj)
-     {
+    public function find_all_objects($obj, $where=null)
+    {
+        return $this->_db->find_all_objects($obj, $where);
+    }
+
+    public function find_object($obj, $where=null)
+    {
+        return $this->_db->find_object($obj, $where);
+    }
+
+    public function insert($obj)
+    {
         return $this->_db->insert($obj);
-     }
+    }
 
-     public function insert_id()
-     {
+    public function insert_id()
+    {
         return $this->_db->insert_id();
-     }
+    }
 
-     public function load_object($obj, $id)
-     {
+    public function load_object($obj, $id)
+    {
         return $this->_db->load_object($obj, $id);
-     }
+    }
 
-     public function num_rows()
-     {
+    public function num_rows()
+    {
         return $this->_db->num_rows();
-     }
+    }
 
-     public function query($sql, $parameters=null)
-     {
+    public function query($sql, $parameters=null)
+    {
         return $this->_db->query($sql, $parameters);
-     }
+    }
 
-     public function query_first($sql, $parameters=null)
-     {
+    public function query_first($sql, $parameters=null)
+    {
         return $this->_db->query_first($sql, $parameters);
-     }
+    }
 
-     public function update($obj, $where = '1')
-     {
+    public function update($obj, $where = '1')
+    {
         return $this->_db->update($obj, $where);
-     }
+    }
 
-     public function upsert($obj)
-     {
+    public function upsert($obj)
+    {
         return $this->_db->upsert($obj);
-     }
+    }
     
 }
 

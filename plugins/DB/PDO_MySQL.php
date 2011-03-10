@@ -96,13 +96,12 @@ class PDO_MySQL extends core\PluginInterfaceDB
     *  Returns an array containing all of the result set rows.
     *
     *  @param string $fetch_style        Controls how the rows will be returned.
-    *  @param obj $obj                   The object to be fetched into for use with FETCH_INTO.
     *  @access public
     *  @return mixed
     */
-    public function fetch_all($fetch_style, $obj=null) 
+    public function fetch_all($fetch_style) 
     {
-        $this->_set_fetch_mode($fetch_style, $obj);
+        $this->_set_fetch_mode($fetch_style);
         return $this->_statement->fetchAll();
     }
 
@@ -116,6 +115,46 @@ class PDO_MySQL extends core\PluginInterfaceDB
     public function fetch_column($column_number=0) 
     {
         return $this->_statement->fetchColumn($column_number);
+    }
+
+    private function _find($obj, $where=null)
+    {
+        $sql = 'SELECT * FROM `' . basename(get_class($obj));
+
+        if ( !is_null($where) )
+        {
+    	    $sql .= ' WHERE ';
+            $field_names = array_keys($where);
+            foreach ( $field_names as $name ) 
+            {
+                $sql .= '`' . $name . '`=:' . $name . ', ';
+            }
+            $sql = rtrim($sql, ', ');
+        }
+        return $sql;
+    }
+
+    public function find_all_objects($obj, $where=null)
+    {
+        $results = array();
+        $id = PRIMARY_KEY;
+
+        $sql = $this->_find($obj, $where);
+        $this->query($sql, $where);
+        while ( $row = $this->fetch('into', $obj) )
+        {
+            $results[$row->$id] = $row;
+        }
+        return $results;
+    }
+
+    public function find_object($obj, $where=null)
+    {
+        $sql = $this->_find($obj, $where);
+        $sql .= ' LIMIT 1';
+
+        $this->query($sql, $where); 
+        return $this->fetch('into', $obj);
     }
 
    /**
@@ -163,12 +202,6 @@ class PDO_MySQL extends core\PluginInterfaceDB
     public function insert_id()
     {
         return $this->_dbh->lastInsertId();
-    }
-
-    // TODO: Fix
-    public function find_object($where='1')
-    {
-        
     }
 
     public function load_object($obj, $id)
@@ -284,9 +317,9 @@ class PDO_MySQL extends core\PluginInterfaceDB
     *  @access public
     *  @return bool 
     */
-    public function update($obj, $where = '1') 
+    public function update($obj, $where=null) 
     {
-        $table = basename(get_class(($obj)));
+        $table = basename(get_class($obj));
         $properties = get_object_vars($obj);
 
     	$sql = 'UPDATE `' . $table . '` SET ';
@@ -296,8 +329,18 @@ class PDO_MySQL extends core\PluginInterfaceDB
         {
             $sql .= '`' . $name . '`=:' . $name . ', ';
     	}
-    
-    	$sql = rtrim($sql, ', ') . ' WHERE ' . $where;
+
+        $sql = rtrim($sql, ', ');
+
+        if ( !is_null($where) )
+        {
+    	    $sql .= ' WHERE ';
+            foreach ( $where as $name => $val ) 
+            {
+                $sql .= '`' . $name . '`=:' . $name . '_where, ';
+                $properties[$name . '_where'] = $val;
+            }
+        }
     	$statement = $this->_dbh->prepare($sql);
 
         try 
@@ -344,7 +387,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
 
         try 
         {
-            $statement->execute($insert_data);
+            $statement->execute($properties);
     	}
         catch ( PDOException $e ) 
         {

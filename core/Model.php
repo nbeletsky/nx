@@ -5,19 +5,13 @@ class Model
 {
     protected $_repository;
     
-    // storage area for database field values 
-    protected $_fields= null;
-    
     protected $_has_one= null;
     protected $_has_many= null;
     protected $_belongs_to= null;
     protected $_has_and_belongs_to_many= null; 
     
-    // array of properties to NOT cache. 
-    //  these will be ignored by __get() and store().
     protected $_no_cache= array();
         
-    // TODO: Fix
     public function __construct($id, $repository)
     {
         $this->_repository = $repository;
@@ -25,186 +19,90 @@ class Model
         if ( $id )
         {
             // TODO: Check cache for object first!
-            $this->fields = $this->_repository->load_object($this, $id);
+            $pk_id = PRIMARY_KEY;
+            $this->$pk_id = $id;
+            return $this->_repository->load_object($this, $id);
         }
-        elseif ( count($this->fields) < 1 )
+    }
+    
+    public function __get($field_name)
+    {
+        $id = PRIMARY_KEY;
+
+        if ( $this->belongs_to($field_name) )
         {
-            $this->set_fields();
-        }   
-    }
-    
-    public function get_fields()
-    {
-        return $this->fields;
-    }
-    
-    public function has_field($var)
-    {
-        return array_key_exists($var, $this->fields);
-    }
-    
-    function is_belongs_to($field_name)
-    {
-        return ( in_array($field_name, $this->belongs_to) );
-    }
-
-    /**
-     *  Whether or not a field has _any_ foreign key characteristics (has_many, has_one, habtm) 
-     */
-    function is_foreign($field_name)
-    {
-        return ( $this->is_has_many($field_name) || $this->is_has_one($field_name) || 
-                 $this->is_habtm($field_name) || $this->is_belongs_to($field_name) );
-    }
-
-    function is_habtm($field_name)
-    {
-        return ( in_array($field_name, $this->has_and_belongs_to_many) );
-    }
-    
-    function is_has_one($field_name)
-    {
-        return ( in_array($field_name, $this->has_one) );
-    }
-
-    function is_has_many($field_name)
-    {
-        return ( in_array($field_name, $this->has_many) );
-    }
-    
-    /**
-     * Generic __get. All $obj->property calls come through here.
-     */
-    function __get($field_name)
-    {
-        // if no_cache, then get from the database directly:
-        if ( in_array($field_name, $this->no_cache) )
-        {
-            $fields = $this->_repository->load_object($this, $this->id);
-            return $fields[$field_name];
+            $lookup_id = $field_name.PK_SEPARATOR.PRIMARY_KEY;
+            $obj_id = $this->$lookup_id;
+            return new $field_name($obj_id, $this->_repository); 
         }
-        
-        $results = null;
-        
-        if ( $this->is_foreign($field_name) )
+        elseif ( $this->has_many($field_name) )
         {
-            if ( $this->is_belongs_to($field_name) )
-            {
-                $lookup_id = $this->fields[$field_name.PK_SEPARATOR.PRIMARY_KEY];
+            $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
 
-                $obj = new $field_name(); 
-                $results = $this->_repository->load_object($obj, $lookup_id);
-            }
-
-            if ( $this->is_has_many($field_name) )
-            {
-                // TODO: Return an array of all objects
-
-                /*
-                $lookup_id= $this->fields[PRIMARY_KEY];
-                $lookup_field= static::cname().PK_SEPARATOR.PRIMARY_KEY;
-                
-                // return a dummy object?
-                // TODO: andrew doesn't like this. 
-                $results= new $field_name();
-                */
-            }
-
-            if ($this->is_has_one($field_name))
-            {
-                $lookup_id= $this->fields[PRIMARY_KEY];
-                $lookup_field= static::cname().PK_SEPARATOR.PRIMARY_KEY;
-
-                $results= $field_name::find_object(array($lookup_field=>$lookup_id));
-            }
+            $obj = new $field_name(); 
+            $where = array($lookup_id => $this->$id);
+            return $this->_repository->find_all_objects($obj, $where);
         }
-
-        if ($results)
-            return $results;
-        else
-            return stripslashes($this->fields[$field_name]); // remove sanitized escape
-    }
-    
-    /**
-     * Generic __set. All $obj->property= $val calls come through here.
-     *  Note that Controller handles the weatherstripping of user input.
-     */
-    function __set($field_name, $value)
-    {
-        // if no_cache, then get from the database directly:
-        if (array_search($field_name, $this->no_cache) !== false)
+        elseif ( $this->has_one($field_name) )
         {
-            $this->fields[$field_name]= $value;
-            static::$repository->get_database()->store_row(static::cname(), $this->fields);
-            return; 
+            $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
+
+            $obj = new $field_name(); 
+            $where = array($lookup_id => $this->$id);
+            return $this->_repository->find_object($obj, $where);
         }
-        
-        if ($this->is_foreign($field_name))
+        elseif ( $this->habtm($field_name) )
         {
-            /*
-            if (is_object($this->fields[$field_name]) == false)
-            {
-                $this->debug(5, "Refreshing ".$field_name." for __set");
-                $this->refresh($field_name);
-            }
-            else
-                $this->debug(5, $field_name." already loaded for __set");
-
-            // now add to joiner:
-            $this->fields[$field_name]->add_object($value);
-            */
+            // TODO: Fix
+            return null;
         }
         else
         {
-            $this->fields[$field_name]= $value;
+            $field_name = '_' . $field_name;
+            return $this->$field_name;
         }
     }
     
-    /**
-     * Find and return an object. Anything after "select * from Foo where" can be in your query.
-     */
-    // TODO: Fix
-    public function find_object($query)
+    public function __set($field_name, $value)
     {
-        // Call $repository->find_object
+        $field_name = '_' . $field_name;
+        $this->$field_name = $value;
+    }
 
-        $classname= static::cname();
-        $results= $classname::find($query);
-
-        if ($results)
-            return array_pop($results);
-            
-        return false;
+    public function belongs_to($field_name)
+    {
+        return ( in_array($field_name, $this->_belongs_to) );
     }
 
     public function delete()
     {
         $this->_repository->delete_object($this);
     }
-    
-    public function find($query=null)
+
+    public function find_object($where)
     {
-        $returns= array();
-        $classname= static::cname();   
-        $results= static::$repository->find_rows(static::cname(), $query);
-        if (is_array($results))
-        {
-            foreach($results as $key=>$object_data)
-            {
-                $returns[]= new $classname($object_data[PRIMARY_KEY]);
-            }
-        }
-        return $returns;
+        return $this->_repository->find_object($this, $where);
     }
 
-    public function set_fields()
+    public function habtm($field_name)
     {
-        // TODO: Fix this
-        $columns = $this->repository->get_table_columns(get_called_class());
-        foreach( $columns as $col_name=>$col_type )
-        {
-            $this->fields[$col_name] = null;
-        }
+        return ( in_array($field_name, $this->_has_and_belongs_to_many) );
+    }
+    
+    public function has_many($field_name)
+    {
+        return ( in_array($field_name, $this->_has_many) );
+    }
+
+    public function has_one($field_name)
+    {
+        return ( in_array($field_name, $this->_has_one) );
+    }
+
+    public function is_foreign($field_name)
+    {
+        return ( $this->has_many($field_name) || $this->has_one($field_name) || 
+                 $this->habtm($field_name) || $this->belongs_to($field_name) );
     }
 
     public function store()
@@ -213,8 +111,6 @@ class Model
         $id = PRIMARY_KEY;
         $this->$id = $this->_repository->insert_id;
     }
-    
-    
 }
 
 ?>
