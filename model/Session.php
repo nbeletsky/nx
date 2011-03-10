@@ -1,16 +1,7 @@
 <?php
-namespace core;
 
-class Session
+class Session extends ApplicationModel
 {
-   /**
-    *  Contains the Database object.
-    *
-    *  @var object $_db
-    *  @access private
-    */
-    private $_db;
-
    /**
     *  The timestamp of the user's last activity.
     *
@@ -41,7 +32,6 @@ class Session
     */
     public function __construct($dbh) 
     {
-        $this->_db = $dbh;
         $this->_last_active = time();
 
         session_set_save_handler(array($this,'open'),
@@ -120,12 +110,7 @@ class Session
     */
     public function destroy($session_id) 
     {
-        $sql = 'DELETE FROM `' . $this->_db->get_table_name('session') . '` WHERE `session_id`=:session_id';
-        $params = array('session_id' => $session_id);
-        if ( !$this->_db->query($sql, $params) ) 
-        {
-            return false;
-        }
+        $this->delete();
         return true;
     } 
 
@@ -380,11 +365,18 @@ class Session
     */
     public function write($session_id, $data) 
     {
+        $this->_id = $session_id;
+        $this->_data = $data;
+        // TODO: This sucks.
+        /*
+        $this->_last_active = date('Y-m-d H:i:s', $this->_last_active);
+
         $insert = array('session_id'  => $session_id,
                         'user_id'     => $this->_user_id,
                         'data'        => $data,
                         'last_active' => date('Y-m-d H:i:s', $this->_last_active));
         return $this->_db->upsert('session', $insert, $insert);       
+        */
     }
 
    /**
