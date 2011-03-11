@@ -12,16 +12,22 @@ class Model
     
     protected $_no_cache= array();
         
+    // id can either be an unique identifier 
+    // or a WHERE relationship
     public function __construct($id, $repository)
     {
         $this->_repository = $repository;
         
-        if ( $id )
+        if ( is_numeric($id) )
         {
             // TODO: Check cache for object first!
             $pk_id = PRIMARY_KEY;
             $this->$pk_id = $id;
             return $this->_repository->load_object($this, $id);
+        }
+        elseif ( $id != '' )
+        {
+            return $this->find_object($id); 
         }
     }
     
@@ -74,9 +80,9 @@ class Model
         return ( in_array($field_name, $this->_belongs_to) );
     }
 
-    public function delete()
+    public function delete($where=null)
     {
-        $this->_repository->delete_object($this);
+        $this->_repository->delete($this, $where);
     }
 
     public function find_object($where)

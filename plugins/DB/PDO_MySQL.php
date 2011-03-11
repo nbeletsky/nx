@@ -43,7 +43,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
         }
         catch ( PDOException $e ) 
         {
-            // How to handle error reporting?
+            // TODO: How to handle error reporting?
         }
     }
 
@@ -69,12 +69,26 @@ class PDO_MySQL extends core\PluginInterfaceDB
         $this->_dbh = null;
     }
     
-    public function delete_object($obj)
+    public function delete($obj, $where=null)
     {
-        $this->query('DELETE FROM `' . basename(get_class($obj)) . '` WHERE `' . PRIMARY_KEY . '`=:' . PRIMARY_KEY); 
-        $id = PRIMARY_KEY;
-        $params = array(PRIMARY_KEY => $obj->$id);
-        return $this->_db->query($sql, $params);
+        $sql = 'DELETE FROM `' . basename(get_class($obj)) . '`';
+        if ( is_null($where) )
+        {
+            $id = PRIMARY_KEY;
+            $where = array(PRIMARY_KEY => $obj->$id);
+        }
+
+        $sql .= $this->_format_where($where);
+
+        if ( is_array($where) )
+        {
+            return $this->_db->query($sql, $where);
+        }
+        // $where is a string
+        else
+        {
+            return $this->_db->query($sql);
+        }
     }
     
    /**
@@ -119,18 +133,8 @@ class PDO_MySQL extends core\PluginInterfaceDB
 
     private function _find($obj, $where=null)
     {
-        $sql = 'SELECT * FROM `' . basename(get_class($obj));
-
-        if ( !is_null($where) )
-        {
-    	    $sql .= ' WHERE ';
-            $field_names = array_keys($where);
-            foreach ( $field_names as $name ) 
-            {
-                $sql .= '`' . $name . '`=:' . $name . ', ';
-            }
-            $sql = rtrim($sql, ', ');
-        }
+        $sql = 'SELECT * FROM `' . basename(get_class($obj)) . '`';
+        $sql .= $this->_format_where($where);
         return $sql;
     }
 
@@ -153,8 +157,36 @@ class PDO_MySQL extends core\PluginInterfaceDB
         $sql = $this->_find($obj, $where);
         $sql .= ' LIMIT 1';
 
-        $this->query($sql, $where); 
+        if ( !$this->query($sql, $where) )
+        {
+            return false;
+        }
         return $this->fetch('into', $obj);
+    }
+
+    private function _format_where($where=null)
+    {
+        $sql = '';
+        if ( !is_null($where) )
+        {
+            $sql = ' WHERE ';
+            if ( is_array($where) )
+            {
+                $field_names = array_keys($where);
+                foreach ( $field_names as $name ) 
+                {
+                    $sql .= '`' . $name . '`=:' . $name . ', ';
+                }
+                $sql = rtrim($sql, ', ');
+            }
+            // $where is a string
+            else
+            {
+                $sql .= $where;
+            }
+        }
+
+        return $sql;
     }
 
    /**
@@ -185,7 +217,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     	}
         catch ( PDOException $e ) 
         {
-            // How to handle error reporting?
+            // TODO: How to handle error reporting?
             return false;
         }
 
@@ -250,7 +282,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     	}
         catch ( PDOException $e ) 
         {
-            // How to handle error reporting?
+            // TODO: How to handle error reporting?
             $this->_affected_rows = 0;
             return false;
         }
@@ -349,7 +381,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     	}
         catch ( PDOException $e ) 
         {
-            // How to handle error reporting?
+            // TODO: How to handle error reporting?
             return false;
         }
     
@@ -391,7 +423,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     	}
         catch ( PDOException $e ) 
         {
-            // How to handle error reporting?
+            // TODO: How to handle error reporting?
             return false;
         }
 

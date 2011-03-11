@@ -3,6 +3,19 @@ namespace lib;
 
 class File
 {
+    public function get_filenames_within($directory)
+    {
+        $filenames = array();
+        foreach (new DirectoryIterator($directory) as $file) 
+        {
+            if ( $file->isDot() ) 
+            {
+                continue;
+            }
+            $filenames[] = $file->getFilename();
+        }
+        return $filenames;
+    }
 
    /**
     * Determines the Content-Type for a given file
@@ -43,5 +56,5 @@ class File
     	print($content);
     	exit;
     }
-    
+
 }

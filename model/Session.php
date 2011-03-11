@@ -6,17 +6,17 @@ class Session extends ApplicationModel
     *  The timestamp of the user's last activity.
     *
     *  @var int $_last_active
-    *  @access private
+    *  @access protected
     */
-    private $_last_active;
+    protected $_last_active;
 
    /**
     *  The user's id.
     *
     *  @var int $_user_id
-    *  @access private
+    *  @access protected
     */
-    private $_user_id = 0;
+    protected $_user_id = 0;
 
     const SESSION_LIFETIME    = 3600;            // 60 minutes
     const LOGIN_COOKIE_EXPIRE = 2592000;         // Cookie expiration date (30 days)
@@ -26,13 +26,12 @@ class Session extends ApplicationModel
    /**
     *  Constructor.
     * 
-    *  @param PDO object $dbh       The database handler.
     *  @access public
     *  @return void
     */
-    public function __construct($dbh) 
+    public function __construct() 
     {
-        $this->_last_active = time();
+        $this->_last_active = date('Y-m-d H:i:s', time());
 
         session_set_save_handler(array($this,'open'),
                                  array($this,'close'),
@@ -147,14 +146,9 @@ class Session extends ApplicationModel
     */
     public function gc($max_lifetime) 
     {
-        $expired = $this->_last_active - $max_lifetime;
-        $sql = 'DELETE FROM `' . $this->_db->get_table_name('session') . '` WHERE `last_active`<:expired';
-        $params = array('expired' => $expired);
-        if ( !$this->_db->query($sql, $params) ) 
-        {
-            return false;
-        }
-        return true;
+        $expired = strtotime($this->_last_active) - $max_lifetime;
+        $where = '`last_active`<' . $expired;
+        return $this->delete($where);
     }
 
    /**
@@ -197,7 +191,7 @@ class Session extends ApplicationModel
             $this->_user_id = 0;
             $this->kill();
         }
-        elseif ( (!isset($_SESSION['last_active'])) || ($_SESSION['last_active'] + self::SESSION_LIFETIME < time()) ) 
+        elseif ( (!isset($_SESSION['last_active'])) || (strtotime($_SESSION['last_active']) + self::SESSION_LIFETIME < time()) ) 
         {
             $this->_user_id = 0;
             $this->reset();
@@ -234,29 +228,28 @@ class Session extends ApplicationModel
     *  @return bool
     */
     public function login($username, $password, $ip) {
-        $sql = 'SELECT `user_id`, `password`, `join_date` FROM `' . $this->_db->get_table_name('user') . '` WHERE `username`=:username';  
-        $params = array('username' => $username);
-        $record = $this->_db->query_first($sql, $params, 'assoc');
-        if ( !$record ) 
+        $where = array('username' => $username);
+        $user = new User($where); 
+
+        if ( !$user ) 
         {
             return false; 
         }
         
         // Check that password matches
         $encrypt = new Encrypt();
-        $user_id = (int) $record['user_id'];
-        $hashed_pass = $encrypt->password($password, $user_id, $username, $record['join_date']);
-        if ( $record['password'] !== $hashed_pass ) 
+        $id = PRIMARY_KEY;
+        $user_id = $user->$id; 
+        $hashed_pass = $encrypt->password($password, $user_id, $username, $user->join_date);
+        if ( $user->password !== $hashed_pass ) 
         {
             return false;
         }
         
         // Format data
-        $data['ip'] = sprintf("%u", ip2long($ip));
-        $data['last_login'] = date('Y-m-d H:i:s');
-        if ( !$this->_db->update('user', $data, '`user_id`=' . $user_id) ) {
-            return false;
-        }
+        $user->ip = sprintf("%u", ip2long($ip));
+        $user->last_login = date('Y-m-d H:i:s');
+        $user->store();
        
         $this->_create($user_id); 
 
@@ -295,15 +288,7 @@ class Session extends ApplicationModel
     */
     public function read($session_id) 
     {
-        $sql = 'SELECT `data` FROM `' . $this->_db->get_table_name('session') . '` WHERE `session_id`=:session_id';  
-        $params = array('session_id' => $session_id);
-        $query = $this->_db->query($sql, $params);
-        $record = $query->fetch(PDO::FETCH_ASSOC); 
-        if ( !$record )
-        {
-            return '';
-        }
-        return $record['data'];
+        return $this->_data;
     }
 
    /**
@@ -367,16 +352,7 @@ class Session extends ApplicationModel
     {
         $this->_id = $session_id;
         $this->_data = $data;
-        // TODO: This sucks.
-        /*
-        $this->_last_active = date('Y-m-d H:i:s', $this->_last_active);
-
-        $insert = array('session_id'  => $session_id,
-                        'user_id'     => $this->_user_id,
-                        'data'        => $data,
-                        'last_active' => date('Y-m-d H:i:s', $this->_last_active));
-        return $this->_db->upsert('session', $insert, $insert);       
-        */
+        return $this->store();       
     }
 
    /**

@@ -121,15 +121,25 @@ class Controller
         $action =     ( isset($query["action"]) )     ? $query["action"]     : DEFAULT_ACTION;
         $id =         ( isset($query["id"]) )         ? $query["id"]         : null;
 
-        // TODO: Sanitize the controller!  Blacklist/whitelist?
+        $file = new File();
+        $whitelist = $file->get_filenames_within(BASEINSTALL . '/Controller');
+        $strip_ext = create_function('$val', 'return basename($val, "php");');
+        $whitelist = array_map($strip_ext, $whitelist);
 
         // TODO: Load user's template
         //$template = DEFAULT_TEMPLATE;
         //$page = 
         //include "../view/" . $template . '/' . $page . VIEW_EXTENSION;
 
-        $controller_obj = new $controller();
-        $controller_obj->call($action, $id);
+        if ( in_array($controller, $whitelist) )
+        {
+            $controller_obj = new $controller();
+            $controller_obj->call($action, $id);
+        }
+        else
+        {
+            // TODO: Throw exception!
+        }
     }
 }
 
