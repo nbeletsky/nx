@@ -199,7 +199,8 @@ class PDO_MySQL extends core\PluginInterfaceDB
     public function insert($obj) 
     {
         $table = basename(get_class(($obj)));
-        $properties = get_object_vars($obj);
+        $meta = new lib\Meta();
+        $properties = $meta->get_private_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
         
@@ -352,7 +353,8 @@ class PDO_MySQL extends core\PluginInterfaceDB
     public function update($obj, $where=null) 
     {
         $table = basename(get_class($obj));
-        $properties = get_object_vars($obj);
+        $meta = new lib\Meta();
+        $properties = $meta->get_private_vars($obj);
 
     	$sql = 'UPDATE `' . $table . '` SET ';
     
@@ -399,7 +401,8 @@ class PDO_MySQL extends core\PluginInterfaceDB
     public function upsert($obj) 
     {
         $table = basename(get_class(($obj)));
-        $properties = get_object_vars($obj);
+        $meta = new lib\Meta();
+        $properties = $meta->get_private_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
         

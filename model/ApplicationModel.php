@@ -1,5 +1,6 @@
-<?
-class ApplicationModel extends \core\Model
+<?php
+
+class ApplicationModel extends core\Model
 {
     protected $db= null;
 

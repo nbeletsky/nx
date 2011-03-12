@@ -1,15 +1,37 @@
-<?
+<?php
 
-class Dashboard extends core\Controller
+class Dashboard extends ApplicationController
 {
-    function index()
+    public function index()
     {
         return array("contact_email"=>"test@test.com");
     }   
 
-    function edit()
+    public function login()
     {
-        return null;
+        if ( $this->_user )
+        {
+            // TODO: Redirect somewhere
+        }
+
+        if ( count($this->_http_get) )    
+        {
+            $username = $this->_http_get['username'];
+            $where = array('username' => $username);
+            $user = new User($where); 
+            $encrypt = new Encrypt();
+
+            if ( $this->_session->login($username, $this->_http_get['password'], $_SERVER['REMOTE_ADDR'], $user, $encrypt) )
+            {
+                // TODO: Redirect somewhere
+            }
+            else
+            {
+                // TODO: Invalid credentials
+            }
+        }
+
+        // Display the login page
     }
     
 }

@@ -7,6 +7,7 @@ class Controller
     public $protected_exceptions = null; // array of whitelist unprotected actions
     public $handler              = null; // handler for errors, array('controller'=>foo, 'action'=>bar)
 
+    protected $_http_get = array();
     protected $_data = array();
 
     public function call($action, $id=null)
@@ -103,23 +104,32 @@ class Controller
         // foobar.com/controller
         // foobar.com/controller/id
         // foobar.com/controller/action/id
-        // foobar.com/controller/action/id/arg
-        // foobar.com/controller/action/id/arg[0]/arg[1] - etc...
+        // foobar.com/controller/action/id/args
         /* 
         url.rewrite-once = (
             "^/$"=>"/public/index.php",
             "^/([A-Za-z0-9\.\-]+)$"=>"/public/index.php?controller=$1",
             "^/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)$"=>"/public/index.php?controller=$1&$id=$2",
             "^/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)$"=>"/public/index.php?controller=$1&action=$2&id=$3",
-            "^/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)$"=>"/public/index.php?controller=$1&action=$2&id=$3&arg=$4"
+            "^/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-\&\=\_]+)$"=>"/public/index.php?controller=$1&action=$2&id=$3&args=$4"
         )
         */
 
         parse_str($query_string, $query);
 
-        $controller = ( isset($query["controller"]) ) ? $query["controller"] : DEFAULT_CONTROLLER;
-        $action =     ( isset($query["action"]) )     ? $query["action"]     : DEFAULT_ACTION;
-        $id =         ( isset($query["id"]) )         ? $query["id"]         : null;
+        $controller = ( isset($query['controller']) ) ? $query['controller'] : DEFAULT_CONTROLLER;
+        $action =     ( isset($query['action']) )     ? $query['action']     : DEFAULT_ACTION;
+        $id =         ( isset($query['id']) )         ? $query['id']         : null;
+
+        if ( isset($query['args']) )
+        {
+            $args = substr($query_string, strpos($query['args']));
+            parse_str($args, $this->_http_get);
+        }
+        else
+        {
+            $this->_http_get = array();
+        }
 
         $file = new File();
         $whitelist = $file->get_filenames_within(BASEINSTALL . '/Controller');

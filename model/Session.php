@@ -18,6 +18,8 @@ class Session extends ApplicationModel
     */
     protected $_user_id = 0;
 
+    private $_is_logged_in = false;
+
     const SESSION_LIFETIME    = 3600;            // 60 minutes
     const LOGIN_COOKIE_EXPIRE = 2592000;         // Cookie expiration date (30 days)
     const SESSION_SALT        = 'M^mc?(9%ZKx[';  // Session salt
@@ -175,33 +177,34 @@ class Session extends ApplicationModel
         return sha1(self::SESSION_SALT . $user_id . $_SERVER['HTTP_USER_AGENT']);
     }
 
-   /**
-    *  Returns the user's ID based on whether or not their session is
-    *  still valid.
-    *       
-    *  @access public
-    *  @return int
-    */
     public function get_user_id() 
+    {
+        return $this->_user_id;
+    }
+
+    public function is_logged_in()
     {
         if ( (!isset($_SESSION['uid'])) || (!isset($_COOKIE[self::COOKIE_ID_NAME])) ||
              ($_SESSION['uid'] !== $this->_decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME])) || 
              (!isset($_SESSION['fingerprint'])) || ($_SESSION['fingerprint'] !== $this->_get_fingerprint($_SESSION['uid'])) ) 
              {
             $this->_user_id = 0;
+            $this->_is_logged_in = false;
             $this->kill();
         }
         elseif ( (!isset($_SESSION['last_active'])) || (strtotime($_SESSION['last_active']) + self::SESSION_LIFETIME < time()) ) 
         {
             $this->_user_id = 0;
+            $this->_is_logged_in = false;
             $this->reset();
         }
         else 
         {
             $this->_user_id = $_SESSION['uid'];
+            $this->_is_logged_in = true;
             $_SESSION['last_active'] = $this->_last_active;
         }
-        return $this->_user_id;
+        return $this->_is_logged_in;
     }
 
    /**
@@ -221,37 +224,35 @@ class Session extends ApplicationModel
    /**
     *  Logs a user in.
     *
-    *  @param string $username    The user's username.
-    *  @param string $password    The user's password.
+    *  @param string $username    The supplied username.
+    *  @param string $password    The supplied password.
     *  @param string $ip          The user's IP address.
+    *  @param obj $user           The user object to check against.
+    *  @param obj $encrypt        The encryption object to use.
     *  @access public
     *  @return bool
     */
-    public function login($username, $password, $ip) {
-        $where = array('username' => $username);
-        $user = new User($where); 
-
+    public function login($username, $password, $ip, $user, $encrypt) 
+    {
         if ( !$user ) 
         {
             return false; 
         }
-        
+
         // Check that password matches
-        $encrypt = new Encrypt();
         $id = PRIMARY_KEY;
-        $user_id = $user->$id; 
-        $hashed_pass = $encrypt->password($password, $user_id, $username, $user->join_date);
+        $hashed_pass = $encrypt->password($password, $user->$id, $username, $user->join_date);
         if ( $user->password !== $hashed_pass ) 
         {
             return false;
         }
-        
+
         // Format data
         $user->ip = sprintf("%u", ip2long($ip));
         $user->last_login = date('Y-m-d H:i:s');
         $user->store();
        
-        $this->_create($user_id); 
+        $this->_create($user->$id); 
 
         return true;
     }
