@@ -1,7 +1,7 @@
 <?php
 namespace plugins\DB;
 
-class PDO_MySQL extends core\PluginInterfaceDB 
+class PDO_MySQL implements \core\PluginInterfaceDB 
 {
    /**
     *  The db handle. 
@@ -35,11 +35,16 @@ class PDO_MySQL extends core\PluginInterfaceDB
     */
     public function __construct($host, $database, $username, $password) 
     {
+        $this->connect($host, $database, $username, $password);
+    }
+
+    public function connect($host, $database, $username, $password) 
+    {
         $dsn = 'mysql:host=' . $host . ';dbname=' . $database; 
         try 
         {
-            $this->_dbh = new PDO($dsn, $username, $password);
-            $this->_dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->_dbh = new \PDO($dsn, $username, $password);
+            $this->_dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
         catch ( PDOException $e ) 
         {
@@ -82,12 +87,12 @@ class PDO_MySQL extends core\PluginInterfaceDB
 
         if ( is_array($where) )
         {
-            return $this->_db->query($sql, $where);
+            return $this->query($sql, $where);
         }
         // $where is a string
         else
         {
-            return $this->_db->query($sql);
+            return $this->query($sql);
         }
     }
     
@@ -100,7 +105,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     *  @access public
     *  @return mixed
     */
-    public function fetch($fetch_style, $obj=null) 
+    public function fetch($fetch_style=null, $obj=null) 
     {
         $this->_set_fetch_mode($fetch_style, $obj);
         return $this->_statement->fetch();
@@ -113,7 +118,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     *  @access public
     *  @return mixed
     */
-    public function fetch_all($fetch_style) 
+    public function fetch_all($fetch_style=null) 
     {
         $this->_set_fetch_mode($fetch_style);
         return $this->_statement->fetchAll();
@@ -199,7 +204,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     public function insert($obj) 
     {
         $table = basename(get_class(($obj)));
-        $meta = new lib\Meta();
+        $meta = new \lib\Meta();
         $properties = $meta->get_private_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
@@ -216,8 +221,9 @@ class PDO_MySQL extends core\PluginInterfaceDB
         {
             $statement->execute($properties);
     	}
-        catch ( PDOException $e ) 
+        catch ( \PDOException $e ) 
         {
+            die($e->getMessage());
             // TODO: How to handle error reporting?
             return false;
         }
@@ -241,7 +247,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     {
         $this->query('SELECT * FROM `' . basename(get_class($obj)) . '` WHERE `' . PRIMARY_KEY . '`=:' . PRIMARY_KEY); 
         $params = array(PRIMARY_KEY => $id);
-        $query = $this->_db->query($sql, $params);
+        $query = $this->query($sql, $params);
         return $this->fetch('into', $obj);
 
     }
@@ -281,8 +287,9 @@ class PDO_MySQL extends core\PluginInterfaceDB
         {
             $statement->execute();
     	}
-        catch ( PDOException $e ) 
+        catch ( \PDOException $e ) 
         {
+            die($e->getMessage());
             // TODO: How to handle error reporting?
             $this->_affected_rows = 0;
             return false;
@@ -381,8 +388,9 @@ class PDO_MySQL extends core\PluginInterfaceDB
         {
             $statement->execute($properties);
     	}
-        catch ( PDOException $e ) 
+        catch ( \PDOException $e ) 
         {
+            die($e->getMessage());
             // TODO: How to handle error reporting?
             return false;
         }
@@ -401,7 +409,7 @@ class PDO_MySQL extends core\PluginInterfaceDB
     public function upsert($obj) 
     {
         $table = basename(get_class(($obj)));
-        $meta = new lib\Meta();
+        $meta = new \lib\Meta();
         $properties = $meta->get_private_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
@@ -424,8 +432,9 @@ class PDO_MySQL extends core\PluginInterfaceDB
         {
             $statement->execute($properties);
     	}
-        catch ( PDOException $e ) 
+        catch ( \PDOException $e ) 
         {
+            die($e->getMessage());
             // TODO: How to handle error reporting?
             return false;
         }

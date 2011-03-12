@@ -24,7 +24,7 @@ class ApplicationController extends core\Controller
         return new Session(); 
     }
 
-    private function _get_default_user($user_id);
+    private function _get_default_user($user_id)
     {
         return new User($user_id);
     }

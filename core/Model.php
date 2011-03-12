@@ -5,12 +5,12 @@ class Model
 {
     protected $_repository;
     
-    protected $_has_one= null;
-    protected $_has_many= null;
-    protected $_belongs_to= null;
-    protected $_has_and_belongs_to_many= null; 
+    protected $_has_one = array();
+    protected $_has_many = array();
+    protected $_belongs_to = array();
+    protected $_has_and_belongs_to_many = array(); 
     
-    protected $_no_cache= array();
+    protected $_no_cache = array();
         
     // id can either be an unique identifier 
     // or a WHERE relationship
@@ -23,11 +23,11 @@ class Model
             // TODO: Check cache for object first!
             $pk_id = PRIMARY_KEY;
             $this->$pk_id = $id;
-            return $this->_repository->load_object($this, $id);
+            $this->_repository->load_object($this, $id);
         }
         elseif ( $id != '' )
         {
-            return $this->find_object($id); 
+            $this->find_object($id); 
         }
     }
     
@@ -64,7 +64,6 @@ class Model
         }
         else
         {
-            $field_name = '_' . $field_name;
             return $this->$field_name;
         }
     }

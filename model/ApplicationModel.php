@@ -2,7 +2,6 @@
 
 class ApplicationModel extends core\Model
 {
-    protected $db= null;
 
     public function __construct($id=null, $repository=null) 
     {
@@ -15,9 +14,9 @@ class ApplicationModel extends core\Model
 
     private function _get_default_repository()
     {
-        $db = new PDO_MySQL(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASS);
-        $cache = new MemcachedCache();
-        return new Repository($db, $cache); 
+        $db = new plugins\DB\PDO_MySQL(DATABASE_HOST, DATABASE_NAME, DATABASE_USER, DATABASE_PASS);
+        $cache = new plugins\cache\MemcachedCache();
+        return new core\Repository($db, $cache); 
     }
 
 }

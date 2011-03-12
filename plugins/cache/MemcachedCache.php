@@ -22,7 +22,7 @@ class MemcachedCache implements \core\PluginInterfaceCache
     */
     public function __construct($persistent_id='')
     {
-        $this->_cache = new Memcached($persistent_id);
+        $this->_cache = new \Memcached($persistent_id);
     }
 
    /**

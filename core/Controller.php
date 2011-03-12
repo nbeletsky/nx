@@ -131,16 +131,15 @@ class Controller
             $this->_http_get = array();
         }
 
-        $file = new File();
-        $whitelist = $file->get_filenames_within(BASEINSTALL . '/Controller');
-        $strip_ext = create_function('$val', 'return basename($val, "php");');
+        $file = new \lib\File();
+        $whitelist = $file->get_filenames_within(BASE_INSTALL . '/controller');
+        $strip_ext = create_function('$val', 'return basename($val, ".php");');
         $whitelist = array_map($strip_ext, $whitelist);
 
         // TODO: Load user's template
         //$template = DEFAULT_TEMPLATE;
         //$page = 
         //include "../view/" . $template . '/' . $page . VIEW_EXTENSION;
-
         if ( in_array($controller, $whitelist) )
         {
             $controller_obj = new $controller();

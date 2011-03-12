@@ -1,0 +1,21 @@
+CREATE TABLE  `journal`.`User` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    `username` VARCHAR( 16 ) NOT NULL ,
+    `password` VARCHAR( 255 ) NOT NULL ,
+    `ip` INT UNSIGNED NOT NULL ,
+    `join_date` DATE NOT NULL ,
+    `last_login` DATETIME NOT NULL ,
+    UNIQUE (
+    `username`
+    )
+);
+
+CREATE TABLE  `journal`.`Session` (
+    `id` varchar(255) NOT NULL PRIMARY KEY ,
+    `User_id` INT UNSIGNED NOT NULL ,
+    `data` MEDIUMBLOB NOT NULL ,
+    `last_active` DATETIME NOT NULL ,
+    UNIQUE (
+    `User_id`
+    )
+);

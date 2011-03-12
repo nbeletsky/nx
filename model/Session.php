@@ -2,23 +2,26 @@
 
 class Session extends ApplicationModel
 {
+    protected $id;
+
+    protected $data = "";
+
    /**
     *  The timestamp of the user's last activity.
     *
-    *  @var int $_last_active
+    *  @var string $last_active
     *  @access protected
     */
-    protected $_last_active;
+    protected $last_active;
+
 
    /**
     *  The user's id.
     *
-    *  @var int $_user_id
+    *  @var int $User_id
     *  @access protected
     */
-    protected $_user_id = 0;
-
-    private $_is_logged_in = false;
+    protected $User_id = 0;
 
     const SESSION_LIFETIME    = 3600;            // 60 minutes
     const LOGIN_COOKIE_EXPIRE = 2592000;         // Cookie expiration date (30 days)
@@ -33,7 +36,9 @@ class Session extends ApplicationModel
     */
     public function __construct() 
     {
-        $this->_last_active = date('Y-m-d H:i:s', time());
+        parent::__construct();
+
+        $this->last_active = date('Y-m-d H:i:s', time());
 
         session_set_save_handler(array($this,'open'),
                                  array($this,'close'),
@@ -42,7 +47,7 @@ class Session extends ApplicationModel
                                  array($this,'destroy'),
                                  array($this,'gc'));
 
-        register_shutdown_function('session_write_close');
+        //register_shutdown_function('session_write_close');
 
         session_start();
     }
@@ -67,12 +72,12 @@ class Session extends ApplicationModel
     */
     private function _create($user_id) 
     {
-        $this->_user_id = $user_id;
+        $this->User_id = $user_id;
         session_regenerate_id(true);
         $_SESSION = array();
         $_SESSION['uid'] = $user_id;
         $_SESSION['fingerprint'] = $this->_get_fingerprint($user_id); 
-        $_SESSION['last_active'] = $this->_last_active;
+        $_SESSION['last_active'] = $this->last_active;
         setcookie(self::COOKIE_ID_NAME, $this->_encrypt_id($user_id), time() + self::LOGIN_COOKIE_EXPIRE);
     }
 
@@ -148,7 +153,7 @@ class Session extends ApplicationModel
     */
     public function gc($max_lifetime) 
     {
-        $expired = strtotime($this->_last_active) - $max_lifetime;
+        $expired = strtotime($this->last_active) - $max_lifetime;
         $where = '`last_active`<' . $expired;
         return $this->delete($where);
     }
@@ -179,7 +184,7 @@ class Session extends ApplicationModel
 
     public function get_user_id() 
     {
-        return $this->_user_id;
+        return $this->User_id;
     }
 
     public function is_logged_in()
@@ -188,23 +193,23 @@ class Session extends ApplicationModel
              ($_SESSION['uid'] !== $this->_decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME])) || 
              (!isset($_SESSION['fingerprint'])) || ($_SESSION['fingerprint'] !== $this->_get_fingerprint($_SESSION['uid'])) ) 
              {
-            $this->_user_id = 0;
-            $this->_is_logged_in = false;
+            $this->User_id = 0;
+            $is_logged_in = false;
             $this->kill();
         }
         elseif ( (!isset($_SESSION['last_active'])) || (strtotime($_SESSION['last_active']) + self::SESSION_LIFETIME < time()) ) 
         {
-            $this->_user_id = 0;
-            $this->_is_logged_in = false;
+            $this->User_id = 0;
+            $is_logged_in = false;
             $this->reset();
         }
         else 
         {
-            $this->_user_id = $_SESSION['uid'];
-            $this->_is_logged_in = true;
-            $_SESSION['last_active'] = $this->_last_active;
+            $this->User_id = $_SESSION['uid'];
+            $is_logged_in = true;
+            $_SESSION['last_active'] = $this->last_active;
         }
-        return $this->_is_logged_in;
+        return $is_logged_in;
     }
 
    /**
@@ -289,7 +294,7 @@ class Session extends ApplicationModel
     */
     public function read($session_id) 
     {
-        return $this->_data;
+        return $this->data;
     }
 
    /**
@@ -351,9 +356,14 @@ class Session extends ApplicationModel
     */
     public function write($session_id, $data) 
     {
-        $this->_id = $session_id;
-        $this->_data = $data;
-        return $this->store();       
+        $this->id = $session_id;
+        $this->data = $data;
+
+        if ( $this->User_id > 0 )
+        {
+            return $this->store();       
+        }
+        return true;
     }
 
    /**

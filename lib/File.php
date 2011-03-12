@@ -6,7 +6,7 @@ class File
     public function get_filenames_within($directory)
     {
         $filenames = array();
-        foreach (new DirectoryIterator($directory) as $file) 
+        foreach (new \DirectoryIterator($directory) as $file) 
         {
             if ( $file->isDot() ) 
             {

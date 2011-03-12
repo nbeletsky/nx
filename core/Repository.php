@@ -1,4 +1,4 @@
-<?
+<?php
 namespace core;
 
 class Repository implements PluginInterfaceDB, PluginInterfaceCache
@@ -63,14 +63,19 @@ class Repository implements PluginInterfaceDB, PluginInterfaceCache
         return $this->_db->affected_rows();
     }
 
+    public function connect($host, $database, $username, $password)
+    {
+        return $this->_db->connect($host, $database, $username, $password);
+    }
+
     public function close()
     {
         return $this->_db->close();
     }
 
-    public function delete_object($obj)
+    public function delete($obj)
     {
-        return $this->_db->delete_object($obj);
+        return $this->_db->delete($obj);
     }
 
     public function fetch()

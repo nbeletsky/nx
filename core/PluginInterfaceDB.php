@@ -3,14 +3,6 @@ namespace core;
 
 interface PluginInterfaceDB
 {
-   /**
-    *  Connects and selects database.
-    *
-    *  @access public
-    *  @return void
-    */
-    public function __construct($host, $database, $username, $password);
-
     /**
      *  Returns the number of rows affected by the last DELETE, INSERT, or UPDATE query.
      *
@@ -26,6 +18,14 @@ interface PluginInterfaceDB
      *  @return void
      */
      public function close();
+
+   /**
+    *  Connects and selects database.
+    *
+    *  @access public
+    *  @return void
+    */
+    public function connect($host, $database, $username, $password);
 
     /**
      *  Fetches the next row from a result set.
