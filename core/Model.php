@@ -70,7 +70,6 @@ class Model
     
     public function __set($field_name, $value)
     {
-        $field_name = '_' . $field_name;
         $this->$field_name = $value;
     }
 
@@ -114,7 +113,7 @@ class Model
     {
         $this->_repository->upsert($this);
         $id = PRIMARY_KEY;
-        $this->$id = $this->_repository->insert_id;
+        $this->$id = $this->_repository->insert_id();
     }
 }
 

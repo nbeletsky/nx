@@ -8,15 +8,10 @@ class Controller
     public $handler              = null; // handler for errors, array('controller'=>foo, 'action'=>bar)
 
     protected $_http_get = array();
-    protected $_data = array();
+    protected $_http_post = array();
 
     public function call($action, $id=null)
     {
-        if ( isset($_POST['data']) )
-        {
-            $this->_data = $_POST['data'];
-        }
-
         try
         {
             if ( $this->is_protected($action) )
@@ -129,6 +124,11 @@ class Controller
         else
         {
             $this->_http_get = array();
+        }
+
+        if ( isset($_POST) )
+        {
+            $this->_http_post = $_POST;
         }
 
         $file = new \lib\File();

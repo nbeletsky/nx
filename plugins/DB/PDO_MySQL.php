@@ -326,25 +326,25 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         switch ( $fetch_style ) 
         {
             case 'assoc':
-                $this->_statement->setFetchMode(PDO::FETCH_ASSOC);
+                $this->_statement->setFetchMode(\PDO::FETCH_ASSOC);
                 break;
             case 'both':
-                $this->_statement->setFetchMode(PDO::FETCH_BOTH);
+                $this->_statement->setFetchMode(\PDO::FETCH_BOTH);
                 break;
             case 'into':
-                $this->_statement->setFetchMode(PDO::FETCH_INTO, $obj);
+                $this->_statement->setFetchMode(\PDO::FETCH_INTO, $obj);
                 break;
             case 'lazy':
-                $this->_statement->setFetchMode(PDO::FETCH_LAZY);
+                $this->_statement->setFetchMode(\PDO::FETCH_LAZY);
                 break;
             case 'num':
-                $this->_statement->setFetchMode(PDO::FETCH_NUM);
+                $this->_statement->setFetchMode(\PDO::FETCH_NUM);
                 break;
             case 'obj':
-                $this->_statement->setFetchMode(PDO::FETCH_OBJ);
+                $this->_statement->setFetchMode(\PDO::FETCH_OBJ);
                 break;
             default:
-                $this->_statement->setFetchMode(PDO::FETCH_ASSOC);
+                $this->_statement->setFetchMode(\PDO::FETCH_ASSOC);
                 break;
         }
     }
@@ -417,12 +417,16 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         $property_names = array_keys($properties);
     	$fields = '`' . implode('`, `', $property_names) . '`';
         $values = ':' . implode(', :', $property_names);
+
     
-        $sql .= ' ON DUPLICATE KEY UPDATE `' . PRIMARY_KEY . '`=LAST_INSERT_ID(`' . PRIMARY_KEY . '`), ';
+        $sql .= '(' . $fields . ') VALUES (' . $values . ') ON DUPLICATE KEY UPDATE `' . PRIMARY_KEY . '`=LAST_INSERT_ID(`' . PRIMARY_KEY . '`), ';
 
     	foreach ( $property_names as $name ) 
         {
-            $sql .= '`' . $name . '`=:' . $name . ', ';
+            if ( $name !== PRIMARY_KEY )
+            {
+                $sql .= '`' . $name . '`=:' . $name . ', ';
+            }
     	}
 
         $sql = rtrim($sql, ', ');
@@ -434,7 +438,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     	}
         catch ( \PDOException $e ) 
         {
-            die($e->getMessage());
+            die($e->getMessage() . $sql . var_dump($properties));
             // TODO: How to handle error reporting?
             return false;
         }
