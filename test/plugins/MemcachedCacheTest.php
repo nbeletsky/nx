@@ -1,4 +1,4 @@
-<?
+<?php
 require_once 'config/config.default.php';
 
 class MemcachedTest extends \core\TestCase
@@ -7,12 +7,14 @@ class MemcachedTest extends \core\TestCase
     public function setUp()
     {
         $cache = new \plugins\cache\MemcachedCache();
+        $cache->add_server('127.0.0.1');
         $cache->flush_cache();
     }
 
     public function test_set()
     {
         $cache = new \plugins\cache\MemcachedCache();
+        $cache->add_server('127.0.0.1');
         $key = 'test';
         $value = 'value';
         $cache->set_in_cache($key, $value);
@@ -23,6 +25,7 @@ class MemcachedTest extends \core\TestCase
     public function test_add()
     {
         $cache = new \plugins\cache\MemcachedCache();
+        $cache->add_server('127.0.0.1');
         $key = 'test';
         $value = 'value';
         // First check that adding a non-existent key to cache works
@@ -38,6 +41,7 @@ class MemcachedTest extends \core\TestCase
     public function test_delete()
     {
         $cache = new \plugins\cache\MemcachedCache();
+        $cache->add_server('127.0.0.1');
         $key = 'test';
         $value = 'value';
         $cache->add_to_cache($key, $value);
@@ -49,6 +53,7 @@ class MemcachedTest extends \core\TestCase
     public function test_flush()
     {
         $cache = new \plugins\cache\MemcachedCache();
+        $cache->add_server('127.0.0.1');
         $key = 'test';
         $value = 'value';
         $cache->set_in_cache($key, $value);
@@ -60,6 +65,7 @@ class MemcachedTest extends \core\TestCase
     public function test_replace()
     {
         $cache = new \plugins\cache\MemcachedCache();
+        $cache->add_server('127.0.0.1');
         $key = 'test';
         $value = 'value';
         $replaced_value = 'replaced';
