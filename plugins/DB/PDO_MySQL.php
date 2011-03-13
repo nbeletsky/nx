@@ -76,7 +76,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     
     public function delete($obj, $where=null)
     {
-        $sql = 'DELETE FROM `' . basename(get_class($obj)) . '`';
+        $sql = 'DELETE FROM `' . get_class($obj) . '`';
         if ( is_null($where) )
         {
             $id = PRIMARY_KEY;
@@ -138,7 +138,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
 
     private function _find($obj, $where=null)
     {
-        $sql = 'SELECT * FROM `' . basename(get_class($obj)) . '`';
+        $sql = 'SELECT * FROM `' . get_class($obj) . '`';
         $sql .= $this->_format_where($where);
         return $sql;
     }
@@ -203,7 +203,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     */
     public function insert($obj) 
     {
-        $table = basename(get_class(($obj)));
+        $table = get_class($obj);
         $meta = new \lib\Meta();
         $properties = $meta->get_private_vars($obj);
 
@@ -245,7 +245,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
 
     public function load_object($obj, $id)
     {
-        $this->query('SELECT * FROM `' . basename(get_class($obj)) . '` WHERE `' . PRIMARY_KEY . '`=:' . PRIMARY_KEY); 
+        $sql = 'SELECT * FROM `' . get_class($obj) . '` WHERE `' . PRIMARY_KEY . '`=:' . PRIMARY_KEY;
         $params = array(PRIMARY_KEY => $id);
         $query = $this->query($sql, $params);
         return $this->fetch('into', $obj);
@@ -359,7 +359,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     */
     public function update($obj, $where=null) 
     {
-        $table = basename(get_class($obj));
+        $table = get_class($obj);
         $meta = new lib\Meta();
         $properties = $meta->get_private_vars($obj);
 
@@ -408,7 +408,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     */
     public function upsert($obj) 
     {
-        $table = basename(get_class(($obj)));
+        $table = get_class($obj);
         $meta = new \lib\Meta();
         $properties = $meta->get_private_vars($obj);
 

@@ -94,7 +94,7 @@ class Controller
     
     public function render($query_string)
     {
-        // TODO: URL layout?
+        // URL layout
         // foobar.com/
         // foobar.com/controller
         // foobar.com/controller/id

@@ -19,3 +19,11 @@ CREATE TABLE  `journal`.`Session` (
     `User_id`
     )
 );
+
+CREATE TABLE  `journal`.`Entry` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    `title` VARCHAR( 255 ) NOT NULL ,
+    `content` TEXT NOT NULL ,
+    `created_on` DATETIME NOT NULL ,
+    `User_id` INT UNSIGNED NOT NULL
+)
