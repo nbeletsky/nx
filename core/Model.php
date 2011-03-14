@@ -25,7 +25,7 @@ class Model
             $this->$pk_id = $id;
             $this->_repository->load_object($this, $id);
         }
-        elseif ( $id != '' )
+        elseif ( $id !== '' )
         {
             $this->find_object($id); 
         }

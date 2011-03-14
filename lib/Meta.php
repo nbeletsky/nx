@@ -6,18 +6,14 @@ class Meta
    /** 
     *  Returns the classname without the namespace. 
     *
-    *  @param object|string  $obj    Object or classname from which to retrieve name.
+    *  @param object  $obj    Object from which to retrieve name.
     *  @return string
     */
     public function classname_only($obj)
     {
-        if ( !is_object($obj) && !is_string($obj) ) {
-            return false;
-        }
-
-        if ( is_object($obj) )
+        if ( !is_object($obj) ) 
         {
-            $obj = get_class($obj);
+            return false;
         }
 
         $class = new \ReflectionClass($obj);

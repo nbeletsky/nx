@@ -1,6 +1,7 @@
 <?php
 namespace lib;
 
+// TODO: Clean up this file
 class Form
 {
     public function start($action, $id=null)
@@ -48,7 +49,7 @@ class Form
         $html = "<input type='text' name='". Form::fname($object, $name) . "' id='" . $cname . "_" . $object->id . "_" . $name  . "' value='" . htmlentities($object->$name). "' "; 
         foreach ( $attributes as $name=>$value )
          {
-            if ( $name == 'size')
+            if ( $name === 'size')
             {
                 $value = Form::text_size($value);
             }
@@ -65,7 +66,7 @@ class Form
         $html = "<textarea name='" . Form::fname($object, $name) . "' id='" . $cname . "_" . $object->id . "_" . $name . " ";
         foreach ( $attributes as $name=>$value )
          {
-            if ( $name = 'cols' || $name == 'rows')
+            if ( $name === 'cols' || $name === 'rows')
             {
                 $value = Form::text_size($value);
             }

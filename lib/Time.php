@@ -6,7 +6,7 @@ class Time
 
     public function IntervalTimesForSelect($interval = 15, $military = false)
     {
-        if ( 60 % interval != 0 )
+        if ( 60 % interval !== 0 )
         {
             return false;
         }
