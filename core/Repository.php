@@ -88,6 +88,11 @@ class Repository implements PluginInterfaceDB, PluginInterfaceCache
         return $this->_db->fetch_all();
     }
 
+    public function find($table, $where=null, $additional=null)
+    {
+        return $this->_db->find($table, $where, $additional);
+    }
+
     public function find_all_objects($obj, $where=null)
     {
         return $this->_db->find_all_objects($obj, $where);

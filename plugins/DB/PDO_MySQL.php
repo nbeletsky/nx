@@ -142,11 +142,16 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         return $column; 
     }
 
-    private function _find($obj, $where=null)
+    public function find($table, $where=null, $additional=null)
     {
-        $sql = 'SELECT * FROM `' . get_class($obj) . '`';
+        if ( is_object($table) )
+        {
+            $table = get_class($table);
+        }
+        $sql = 'SELECT * FROM `' . $table . '`';
         $sql .= $this->_format_where($where);
-        return $sql;
+        $sql .= ' ' . $additional;
+        $this->query($sql, $where); 
     }
 
     public function find_all_objects($obj, $where=null)
@@ -154,8 +159,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         $results = array();
         $id = PRIMARY_KEY;
 
-        $sql = $this->_find($obj, $where);
-        $this->query($sql, $where);
+        $this->find($obj, $where);
         $this->_set_fetch_mode('into', $obj);
         while ( $row = $this->_statement->fetch() )
         {
@@ -165,41 +169,9 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         return $results;
     }
 
-    public function find_habtm($from_obj, $to_find_obj)
-    {
-        $from_name = get_class($from_obj);
-        $to_find_name = get_class($to_find_obj);
-        $table_name = ( $from_name < $to_find_name ) ? $from_name . HABTM_SEPARATOR . $to_find_name : $to_find_name . HABTM_SEPARATOR . $from_name;
-
-        $sql = 'SELECT * FROM `' . $table_name . '`';
-
-        $lookup_id = $from_name . PK_SEPARATOR . PRIMARY_KEY;
-        $id = PRIMARY_KEY;
-        $where = array($lookup_id => $from_obj->$id);
-
-        $sql .= $this->_format_where($where);
-        $this->query($sql, $where);
-
-        $rows = $this->fetch_all('assoc');
-        $this->_statement->closeCursor();
-        $results = array();
-        foreach ( $rows as $row )
-        {
-            $new_id = $row[$to_find_name . PK_SEPARATOR . PRIMARY_KEY];
-            $results[] = clone $this->load_object($to_find_obj, $new_id);
-        }
-        return $results;
-    }
-
     public function find_object($obj, $where=null)
     {
-        $sql = $this->_find($obj, $where);
-        $sql .= ' LIMIT 1';
-
-        if ( !$this->query($sql, $where) )
-        {
-            return false;
-        }
+        $this->find($obj, $where, 'LIMIT 1');
         return $this->fetch('into', $obj);
     }
 

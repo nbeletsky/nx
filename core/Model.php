@@ -59,8 +59,23 @@ class Model
         }
         elseif ( $this->habtm($field_name) )
         {
-            $to_obj = new $field_name();
-            return $this->_repository->find_habtm($this, $to_obj);
+            $class_name = get_class($this);
+            $table_name = ( $class_name < $field_name ) ? $class_name . HABTM_SEPARATOR . $field_name : $field_name . HABTM_SEPARATOR . $class_name;
+
+            $lookup_id = $class_name . PK_SEPARATOR . PRIMARY_KEY;
+            $id = PRIMARY_KEY;
+            $where = array($lookup_id => $this->$id);
+
+            $this->_repository->find($table_name, $where);
+
+            $rows = $this->_repository->fetch_all('assoc');
+            $results = array();
+            foreach ( $rows as $row )
+            {
+                $new_id = $row[$field_name . PK_SEPARATOR . PRIMARY_KEY];
+                $results[$new_id] = new $field_name($new_id, $this->_repository); 
+            }
+            return $results;
         }
         else
         {
