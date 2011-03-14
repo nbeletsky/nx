@@ -108,7 +108,9 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     public function fetch($fetch_style=null, $obj=null) 
     {
         $this->_set_fetch_mode($fetch_style, $obj);
-        return $this->_statement->fetch();
+        $row = $this->_statement->fetch();
+        $this->_statement->closeCursor();
+        return $row; 
     }
 
    /**
@@ -121,7 +123,9 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     public function fetch_all($fetch_style=null) 
     {
         $this->_set_fetch_mode($fetch_style);
-        return $this->_statement->fetchAll();
+        $rows = $this->_statement->fetchAll();
+        $this->_statement->closeCursor();
+        return $rows; 
     }
 
    /**
@@ -133,7 +137,9 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     */
     public function fetch_column($column_number=0) 
     {
-        return $this->_statement->fetchColumn($column_number);
+        $column = $this->_statement->fetchColumn($column_number);
+        $this->_statement->closeCursor();
+        return $column; 
     }
 
     private function _find($obj, $where=null)
@@ -150,9 +156,37 @@ class PDO_MySQL implements \core\PluginInterfaceDB
 
         $sql = $this->_find($obj, $where);
         $this->query($sql, $where);
-        while ( $row = $this->fetch('into', $obj) )
+        $this->_set_fetch_mode('into', $obj);
+        while ( $row = $this->_statement->fetch() )
         {
-            $results[$row->$id] = $row;
+            $results[$row->$id] = clone $row;
+        }
+        $this->_statement->closeCursor();
+        return $results;
+    }
+
+    public function find_habtm($from_obj, $to_find_obj)
+    {
+        $from_name = get_class($from_obj);
+        $to_find_name = get_class($to_find_obj);
+        $table_name = ( $from_name < $to_find_name ) ? $from_name . HABTM_SEPARATOR . $to_find_name : $to_find_name . HABTM_SEPARATOR . $from_name;
+
+        $sql = 'SELECT * FROM `' . $table_name . '`';
+
+        $lookup_id = $from_name . PK_SEPARATOR . PRIMARY_KEY;
+        $id = PRIMARY_KEY;
+        $where = array($lookup_id => $from_obj->$id);
+
+        $sql .= $this->_format_where($where);
+        $this->query($sql, $where);
+
+        $rows = $this->fetch_all('assoc');
+        $this->_statement->closeCursor();
+        $results = array();
+        foreach ( $rows as $row )
+        {
+            $new_id = $row[$to_find_name . PK_SEPARATOR . PRIMARY_KEY];
+            $results[] = clone $this->load_object($to_find_obj, $new_id);
         }
         return $results;
     }
@@ -249,7 +283,6 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         $params = array(PRIMARY_KEY => $id);
         $query = $this->query($sql, $params);
         return $this->fetch('into', $obj);
-
     }
 
    /**
@@ -276,6 +309,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     public function query($sql, $parameters=null) 
     {
         $statement = $this->_dbh->prepare($sql);
+
         if ( is_array($parameters) ) 
         {
             foreach ( $parameters as $field => &$value ) 

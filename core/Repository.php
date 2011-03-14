@@ -93,6 +93,11 @@ class Repository implements PluginInterfaceDB, PluginInterfaceCache
         return $this->_db->find_all_objects($obj, $where);
     }
 
+    public function find_habtm($from_obj, $to_find_obj)
+    {
+        return $this->_db->find_habtm($from_obj, $to_find_obj);
+    }
+
     public function find_object($obj, $where=null)
     {
         return $this->_db->find_object($obj, $where);

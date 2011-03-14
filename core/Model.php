@@ -59,8 +59,8 @@ class Model
         }
         elseif ( $this->habtm($field_name) )
         {
-            // TODO: Fix
-            return null;
+            $to_obj = new $field_name();
+            return $this->_repository->find_habtm($this, $to_obj);
         }
         else
         {

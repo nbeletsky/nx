@@ -74,7 +74,7 @@ define("PK_SEPARATOR", "_");
 /**
  * Table separator for HABTM
  */
-define("PLOOF_SEPARATOR", "__");
+define("HABTM_SEPARATOR", "__");
 
 /**
  * Confuse and amaze your friends by changing the view extension to your last name!

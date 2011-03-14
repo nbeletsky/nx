@@ -27,3 +27,17 @@ CREATE TABLE  `journal`.`Entry` (
     `created_on` DATETIME NOT NULL ,
     `User_id` INT UNSIGNED NOT NULL
 )
+
+CREATE TABLE  `journal`.`Tag` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    `tag` VARCHAR( 255 ) NOT NULL ,
+    UNIQUE (
+    `tag`
+    )
+) 
+
+CREATE TABLE  `journal`.`Entry__Tag` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    `Entry_id` INT UNSIGNED NOT NULL ,
+    `Tag_id` INT UNSIGNED NOT NULL
+)

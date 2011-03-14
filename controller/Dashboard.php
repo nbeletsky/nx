@@ -4,15 +4,23 @@ class Dashboard extends ApplicationController
 {
     public function index()
     {
+        /*
         $where = array('username' => 'Derp2');
         $user = new User($where); 
         $entries = $user->Entry;
+        $debug = new \lib\Debug();
         foreach ( $entries as $entry )
         {
-            $debug = new \lib\Debug();
-            $debug->inspect(1, $entry->User);
-            die();
+            $debug->inspect(1, $entry);
         }
+            die();
+            */
+        
+        $entry = new Entry(1); 
+        $tags = $entry->Tag;
+        $debug = new \lib\Debug();
+        $debug->inspect(1, $tags);
+        die();
         return array("contact_email"=>"test@test.com");
     }   
 
