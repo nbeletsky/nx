@@ -157,18 +157,6 @@ class Session extends ApplicationModel
     }
 
    /**
-    *  Retrieves a session variable.
-    *       
-    *  @param string $name       The name of the variable.
-    *  @access public
-    *  @return mixed
-    */
-    public function get($name)
-    {
-        return $_SESSION[$name];
-    }
-
-   /**
     *  Returns the user's session fingerprint.
     *       
     *  @param int $user_id     The user's ID.     
@@ -331,19 +319,6 @@ class Session extends ApplicationModel
         $_SESSION = array();
     }
 
-   /**
-    *  Sets a session variable.
-    *       
-    *  @param string $name       The name of the variable.
-    *  @param mixed $value       The value to be set.
-    *  @access public
-    *  @return void
-    */
-    public function set($name, $value)
-    {
-        $_SESSION[$name]= $value;
-    }
-    
    /**
     *  Saves the session data.
     * 

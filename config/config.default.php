@@ -1,7 +1,6 @@
 <?php
-   /*
-    * Default base install is the directory above where this config file is stored
-    */
+
+    // Default base install is the directory above where this config file is stored
     define("BASE_INSTALL", realpath(__DIR__ . '/..')); 
 
     set_include_path(get_include_path().PATH_SEPARATOR.
@@ -14,9 +13,9 @@
                     BASE_INSTALL."/plugins".PATH_SEPARATOR.
                     BASE_INSTALL."/test/temp");
 
-   /**
-    * Autoload classes
-    */
+    ini_set('display_errors', 1);
+    date_default_timezone_set('America/Los_Angeles');
+
     function autoload($class_name) 
     {
         include_once str_replace("\\", "/", $class_name) . ".php";
@@ -24,60 +23,17 @@
 
     spl_autoload_register('autoload');
 
-   /**
-    * Initial controller to load
-    */
     define("DEFAULT_CONTROLLER", "Dashboard");
-
-   /**
-    * Initial action to call on controllers
-    */
     define("DEFAULT_ACTION", "index");
-
     define("DEFAULT_TEMPLATE", "default");
 
-   /**
-    * Display errors.
-    */
-    ini_set('display_errors', 1);
-
-   /**
-    * How verbose you want to debug (1-5). 5 will show everything.
-    */
-    define("DEBUG_LEVEL", 1);
-
-   /**
-    * PHP 5.3 requires it.
-    */
-    date_default_timezone_set('America/Los_Angeles');
-
-   /**
-    * Turn off / on automatic sanitizers, if available
-    */
-    define("SANITIZE_INPUT", true);
-
-   /**
-    * By default ploof expects your primary keys to be 'id'.
-    * You can change it to something else if you want a different convention.
-    */
     define("PRIMARY_KEY", "id");
-
-   /**
-    * The token that comes before id -- for example, User_id
-    */
     define("PK_SEPARATOR", "_");
-
-   /**
-    * Table separator for HABTM
-    */
     define("HABTM_SEPARATOR", "__");
 
-   /**
-    * Confuse and amaze your friends by changing the view extension to your last name!
-    * Actually this is here so you can change it to what you want so your editor will
-    * mark it up properly. I prefer html. You can use whatever you please.
-    */
     define("VIEW_EXTENSION", ".html");
+
+    define("DEBUG_LEVEL", 1);
 
     require "config.application.php";
 ?>
