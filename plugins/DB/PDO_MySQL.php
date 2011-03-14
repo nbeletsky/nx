@@ -150,7 +150,10 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         }
         $sql = 'SELECT * FROM `' . $table . '`';
         $sql .= $this->_format_where($where);
-        $sql .= ' ' . $additional;
+        if ( !is_null($additional) )
+        {
+            $sql .= ' ' . $additional;
+        }
         $this->query($sql, $where); 
     }
 
