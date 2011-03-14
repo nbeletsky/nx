@@ -49,7 +49,7 @@ class Controller
             }
             
             print_r("<pre>" . $e->getMessage() . $e->getTraceAsString() . '</pre>');
-            exit;
+            exit();
         }  
 
     }
@@ -79,17 +79,38 @@ class Controller
         // override to protect things.
     }
 
-    public function redirect($url)
+   /**
+    *  Provides the redirect location based on the page provided.
+    *       
+    *  @param string $page      The page to be checked.
+    *  @access public
+    *  @return string
+    */
+    public function redirect($page)
     {
+        $query = '?' . parse_url($page, PHP_URL_QUERY);
+        $page = str_replace($query, '', $page);
+        //$redirect_location = $_SERVER['SERVER_NAME'] . '/';
+        switch ( $page ) 
+        {
+            case 'index':
+                $redirect_location = 'index.php';
+                break;    
+            default:
+                //$redirect_location .= 'index.php';
+                $redirect_location = 'index.php';
+                break;    
+        }
+
         if ( headers_sent() )
         {
-            print '<meta content="0; url='.$url.'" http-equiv="refresh"/>';
+            echo '<meta content="0; url=' . $redirect_location . '" http-equiv="refresh"/>';
         }
         else
         {
-            header("Location: $url");
+            header("Location: $redirect_location");
         }
-        exit;
+        exit();
     }
     
     public function render($query_string)

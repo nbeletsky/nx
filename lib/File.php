@@ -54,7 +54,7 @@ class File
     	header('Content-Disposition: attachment; filename="'.$user_file_name.'"');
     	$content = file_get_contents ($os_file_name);
     	print($content);
-    	exit;
+    	exit();
     }
 
 }

@@ -28,31 +28,12 @@ class Form
         return "</form>";
     }
 
-    public function text_size($size_name)
-    {
-        $size = $size_name;
-        switch (strtolower($size_name))
-        {
-            case 'x-small' :  $size =  4; break;
-            case 'small'   :  $size = 10; break;
-            case 'medium'  :  $size = 20; break;
-            case 'large'   :  $size = 30; break;
-            case 'x-large' :  $size = 45; break;
-            case 'xx-large':  $size = 80; break;
-        }
-        return $size;
-    }
-
     public function text($object, $name, $attributes=array())
     {
         $cname = Meta::classname_only($object::classname());
         $html = "<input type='text' name='". Form::fname($object, $name) . "' id='" . $cname . "_" . $object->id . "_" . $name  . "' value='" . htmlentities($object->$name). "' "; 
         foreach ( $attributes as $name=>$value )
          {
-            if ( $name === 'size')
-            {
-                $value = Form::text_size($value);
-            }
             $html .= $name . "='" . $value . "' "; 
         }
         $html .= "/>";
@@ -65,11 +46,7 @@ class Form
         $cname= Meta::classname_only($object::classname());
         $html = "<textarea name='" . Form::fname($object, $name) . "' id='" . $cname . "_" . $object->id . "_" . $name . " ";
         foreach ( $attributes as $name=>$value )
-         {
-            if ( $name === 'cols' || $name === 'rows')
-            {
-                $value = Form::text_size($value);
-            }
+        {
             $html .= $name . "='" . $value . "' "; 
         }
         $html .= '>'. htmlentities($object->$name) . "</textarea>"; 
@@ -206,6 +183,14 @@ class Form
         if (!$object) throw new Exception("No object for fname");
         $cname= Meta::classname_only($object::classname());
         return "data[$cname][$name][]";
+    }
+
+    function view_id($object, $name)
+    {
+        if (!is_object($object))
+            throw new \Exception('no object');
+        
+        return classname_only($object->classname())."_".$object->id."_$name";
     }
 
 }

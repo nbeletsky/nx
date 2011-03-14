@@ -29,6 +29,32 @@ class ApplicationController extends core\Controller
         return new User($user_id);
     }
 
+    /**
+     * data is expected in the format:
+     *      { url: parent_controller_action, obj_id: object_id, 
+     *            classname: obvious, field: field_to_validate, 
+     *            fullname: data[Classname][field][], id: class_foo_id, 
+     *               value: value_to_validate }
+     */
+    // TODO: Fix
+    function validate()
+    {
+        $php_data= json_decode(stripslashes($_REQUEST['data']));
+        if (is_array($php_data))
+        {
+            $obj = $php_data[0];
+            $page= explode("=", parse_url($obj->url, PHP_URL_QUERY));
+            $page= $page[1];
+            $level = explode("/", parse_url($obj->url, PHP_URL_PATH));
+            if ($level[1] == 'Reports')
+            {
+                $rptjob= core\Session::object()->RptJob->find_object(array('id'=>$level[3]));
+                $return= ValidationSuite::for_change($page, $rptjob, $obj->classname, $obj->obj_id, $obj->field, $obj->value);
+            }
+            echo json_encode($return);
+        }
+    }
+
 }
 
 ?>

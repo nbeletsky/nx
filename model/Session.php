@@ -284,27 +284,6 @@ class Session extends ApplicationModel
     }
 
    /**
-    *  Provides the redirect location based on the page provided.
-    *       
-    *  @param string $page      The page to be checked.
-    *  @access public
-    *  @return string
-    */
-    public function redirect($page) 
-    {
-        $query = '?' . parse_url($page, PHP_URL_QUERY);
-        $page = str_replace($query, '', $page);
-        $redirect_location = $_SERVER['SERVER_NAME'] . '/';
-        switch ( $page ) 
-        {
-            default:
-                $redirect_location .= 'index.php';
-                break;    
-        }
-        return $redirect_location;
-    }
-
-   /**
     *  Ends the current session and starts a new one.
     *       
     *  @access public

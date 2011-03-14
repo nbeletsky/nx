@@ -28,7 +28,7 @@ class Dashboard extends ApplicationController
     {
         if ( $this->_user )
         {
-            // TODO: Redirect somewhere
+            $this->redirect('index');
         }
 
         if ( count($this->_http_get) )    
@@ -40,11 +40,11 @@ class Dashboard extends ApplicationController
 
             if ( $this->_session->login($username, $this->_http_get['password'], $_SERVER['REMOTE_ADDR'], $user, $encrypt) )
             {
-                // TODO: Redirect somewhere
+                $this->redirect('index');
             }
             else
             {
-                // TODO: Invalid credentials
+                return array('error_msg' => 'Invalid username/password combination.');
             }
         }
 
