@@ -20,7 +20,7 @@ class Meta
         return $class->getShortName();
     }
 
-    public function get_private_vars($obj)
+    public function get_protected_vars($obj)
     {
         $reflection = new \ReflectionClass($obj);
         $props = $reflection->getProperties(\ReflectionProperty::IS_PROTECTED);

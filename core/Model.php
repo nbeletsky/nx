@@ -20,10 +20,24 @@ class Model
         
         if ( is_numeric($id) )
         {
-            // TODO: Check cache for object first!
             $pk_id = PRIMARY_KEY;
             $this->$pk_id = $id;
-            $this->_repository->load_object($this, $id);
+
+            $key = get_class($this) . '_' . $id;
+            $cached_data = $this->_repository->get_from_cache($key);
+            if ( $cached_data )
+            {
+                // TODO: What to do with the cached data?  Is this correct?
+                $cached_obj = unserialize($cached_data);
+                foreach ( $cached_obj as $key=>$val )
+                {
+                    $this->$key = $val;
+                }
+            }
+            else
+            {
+                $this->_repository->load_object($this, $id);
+            }
         }
         elseif ( $id !== '' )
         {
@@ -33,6 +47,11 @@ class Model
     
     public function __get($field_name)
     {
+        if ( !$this->is_foreign($field_name) )
+        {
+            return $this->$field_name;
+        }
+
         $id = PRIMARY_KEY;
 
         if ( $this->belongs_to($field_name) )
@@ -77,10 +96,6 @@ class Model
             }
             return $results;
         }
-        else
-        {
-            return $this->$field_name;
-        }
     }
     
     public function __set($field_name, $value)
@@ -88,9 +103,24 @@ class Model
         $this->$field_name = $value;
     }
 
+    public function __sleep()
+    {
+        $meta = new \lib\Meta();
+        $properties = $meta->get_protected_vars($obj);
+        return array_keys($properties);
+    }
+
     public function belongs_to($field_name)
     {
         return ( in_array($field_name, $this->_belongs_to) );
+    }
+
+    public function cache()
+    {
+        $data = serialize($this);
+        $id = PRIMARY_KEY;
+        $key = get_class($this) . '_' . $this->$id;
+        $this->_repository->set_in_cache($key, $data);
     }
 
     public function delete($where=null)
@@ -129,6 +159,7 @@ class Model
         $this->_repository->upsert($this);
         $id = PRIMARY_KEY;
         $this->$id = $this->_repository->insert_id();
+        $this->cache();
     }
 }
 

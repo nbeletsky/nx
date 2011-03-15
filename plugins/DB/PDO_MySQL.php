@@ -214,7 +214,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     {
         $table = get_class($obj);
         $meta = new \lib\Meta();
-        $properties = $meta->get_private_vars($obj);
+        $properties = $meta->get_protected_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
         
@@ -370,7 +370,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     {
         $table = get_class($obj);
         $meta = new lib\Meta();
-        $properties = $meta->get_private_vars($obj);
+        $properties = $meta->get_protected_vars($obj);
 
     	$sql = 'UPDATE `' . $table . '` SET ';
     
@@ -419,7 +419,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     {
         $table = get_class($obj);
         $meta = new \lib\Meta();
-        $properties = $meta->get_private_vars($obj);
+        $properties = $meta->get_protected_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
         

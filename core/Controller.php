@@ -3,12 +3,14 @@ namespace core;
 
 class Controller
 {
-    public $protected            = null; // array of blacklist protected actions
-    public $protected_exceptions = null; // array of whitelist unprotected actions
-    public $handler              = null; // handler for errors, array('controller'=>foo, 'action'=>bar)
+    protected $_protected            = null; // array of blacklist protected actions
+    protected $_protected_exceptions = null; // array of whitelist unprotected actions
+    protected $_handler              = null; // handler for errors, array('controller'=>foo, 'action'=>bar)
 
     protected $_http_get = array();
     protected $_http_post = array();
+
+    protected $_template = null; 
 
     public function call($action, $id=null)
     {
@@ -23,18 +25,26 @@ class Controller
             {
                 $this->preload($action);
                 
-                $assignments = $this->$action($id);
+                $to_view = $this->$action($id);
             }   
-            
-            if ( is_array($assignments) )
+
+            // AJAX
+            if ( is_string($to_view) )
             {
-                foreach( $assignments as $name=>$value )
+                echo $to_view;
+                exit;
+            }
+            
+            if ( is_array($to_view) )
+            {
+                foreach( $to_view as $name=>$value )
                 {
                     $$name = $value;
                 }
             }
             
-            $view_action = "../view/" . get_class($this) . "/" . $action . VIEW_EXTENSION;
+            $template = ( !is_null($this->_template) ) ? $this->_template : DEFAULT_TEMPLATE;
+            $view_action = "../view/" . $template . '/' . get_class($this) . "/" . $action . VIEW_EXTENSION;
             if ( file_exists($view_action) )
             {
                 include($view_action);
@@ -43,9 +53,9 @@ class Controller
         // TODO: Fix exceptions
         catch (\Exception $e)
         {
-            if ( $this->handler )
+            if ( $this->_handler )
             {
-                render("/" . $this->handler['controller'] . "/" . $this->handler['action'] . "/" .$this->id);
+                render("/" . $this->_handler['controller'] . "/" . $this->_handler['action'] . "/" .$this->id);
             }
             
             print_r("<pre>" . $e->getMessage() . $e->getTraceAsString() . '</pre>');
@@ -56,14 +66,14 @@ class Controller
     
     public function is_protected($action)
     {
-        if ( is_array($this->protected) )
+        if ( is_array($this->_protected) )
         {
-            return ( in_array($action, $this->protected) );
+            return ( in_array($action, $this->_protected) );
         }
             
-        if ( is_array($this->protected_exceptions) )
+        if ( is_array($this->_protected_exceptions) )
         {
-            return ( in_array($action, $this->protected_exceptions) );
+            return ( in_array($action, $this->_protected_exceptions) );
         }
 
         return false;
@@ -157,10 +167,6 @@ class Controller
         $strip_ext = create_function('$val', 'return basename($val, ".php");');
         $whitelist = array_map($strip_ext, $whitelist);
 
-        // TODO: Load user's template
-        //$template = DEFAULT_TEMPLATE;
-        //$page = 
-        //include "../view/" . $template . '/' . $page . VIEW_EXTENSION;
         if ( in_array($controller, $whitelist) )
         {
             $controller_obj = new $controller();
