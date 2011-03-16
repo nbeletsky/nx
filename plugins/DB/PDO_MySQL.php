@@ -142,13 +142,24 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         return $column; 
     }
 
-    public function find($table, $where=null, $additional=null)
+    public function find($fields, $table, $where=null, $additional=null)
     {
+        $sql = 'SELECT '
+        if ( is_array($fields) )
+        {
+            $sql = '`' . implode('`, `', $fields) . '`';
+        }
+        else
+        {
+            $sql .= $fields;
+        }
+
         if ( is_object($table) )
         {
             $table = get_class($table);
         }
-        $sql = 'SELECT * FROM `' . $table . '`';
+
+        $sql = ' FROM `' . $table . '`';
         $sql .= $this->_format_where($where);
         if ( !is_null($additional) )
         {
@@ -157,6 +168,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         $this->query($sql, $where); 
     }
 
+    /*
     public function find_all_objects($obj, $where=null)
     {
         $results = array();
@@ -171,11 +183,36 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         $this->_statement->closeCursor();
         return $results;
     }
+    */
 
+    public function find_all_objects($obj, $where=null)
+    {
+        $results = array();
+        $id = PRIMARY_KEY;
+
+        $this->find('`' . $id . '`', $obj, $where);
+        $this->_set_fetch_mode('assoc');
+        while ( $row = $this->_statement->fetch() )
+        {
+            $results[] = $row[$id];
+        }
+        $this->_statement->closeCursor();
+        return $results;
+    }
+
+    /*
     public function find_object($obj, $where=null)
     {
         $this->find($obj, $where, 'LIMIT 1');
         return $this->fetch('into', $obj);
+    }
+    */
+
+    public function find_object($obj, $where=null)
+    {
+        $id = PRIMARY_KEY;
+        $this->find('`' . $id . '`', $obj, $where, 'LIMIT 1');
+        return $this->fetch('assoc');
     }
 
     private function _format_where($where=null)
@@ -254,9 +291,8 @@ class PDO_MySQL implements \core\PluginInterfaceDB
 
     public function load_object($obj, $id)
     {
-        $sql = 'SELECT * FROM `' . get_class($obj) . '` WHERE `' . PRIMARY_KEY . '`=:' . PRIMARY_KEY;
-        $params = array(PRIMARY_KEY => $id);
-        $query = $this->query($sql, $params);
+        $where = array(PRIMARY_KEY => $id);
+        $this->find('*', $obj, $where);
         return $this->fetch('into', $obj);
     }
 

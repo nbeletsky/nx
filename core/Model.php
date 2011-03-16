@@ -18,31 +18,21 @@ class Model
     {
         $this->_repository = $repository;
         
+        if ( !is_numeric($id) && $id !== '' )
+        {
+            $result = $this->find_object($id); 
+            $id = $result[PRIMARY_KEY];
+        }
+
         if ( is_numeric($id) )
         {
-            $pk_id = PRIMARY_KEY;
-            $this->$pk_id = $id;
-
-            $key = get_class($this) . '_' . $id;
-            $cached_data = $this->_repository->get_from_cache($key);
-            if ( $cached_data )
-            {
-                // TODO: What to do with the cached data?  Is this correct?
-                $cached_obj = unserialize($cached_data);
-                foreach ( $cached_obj as $key=>$val )
-                {
-                    $this->$key = $val;
-                }
-            }
-            else
+            if ( !$this->pull_from_cache($this, $id) )
             {
                 $this->_repository->load_object($this, $id);
+                $this->cache();
             }
         }
-        elseif ( $id !== '' )
-        {
-            $this->find_object($id); 
-        }
+
     }
     
     public function __get($field_name)
@@ -56,25 +46,53 @@ class Model
 
         if ( $this->belongs_to($field_name) )
         {
-            $lookup_id = $field_name.PK_SEPARATOR.PRIMARY_KEY;
+            $lookup_id = $field_name . PK_SEPARATOR . PRIMARY_KEY;
             $obj_id = $this->$lookup_id;
+
             return new $field_name($obj_id, $this->_repository); 
         }
         elseif ( $this->has_many($field_name) )
         {
-            $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
-
             $obj = new $field_name(); 
+            $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
             $where = array($lookup_id => $this->$id);
-            return $this->_repository->find_all_objects($obj, $where);
+            $all_obj_ids = $this->_repository->find_all_objects($obj, $where);
+
+            $collection = array();
+            foreach ( $all_obj_ids as $obj_id )
+            {
+                $cached_obj = $obj->pull_from_cache($obj, $obj_id); 
+                if ( !$cached_obj )
+                {
+                    $collection[$obj_id] = $obj->_repository->load_object($obj, $obj_id);
+                    $obj->cache();
+                }
+                else
+                {
+                    $collection[$obj_id] = $cached_obj;
+                }
+            }
+            return $collection;
         }
         elseif ( $this->has_one($field_name) )
         {
-            $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
-
             $obj = new $field_name(); 
+            $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
             $where = array($lookup_id => $this->$id);
-            return $this->_repository->find_object($obj, $where);
+            $result = $this->_repository->find_object($obj, $where);
+            $obj_id = $result[PRIMARY_KEY];
+
+            $cached_obj = $obj->pull_from_cache($obj, $obj_id); 
+            if ( !$cached_obj )
+            {
+                $obj->_repository->load_object($obj, $obj_id);
+                $obj->cache();
+                return $obj;
+            }
+            else
+            {
+                return $cached_obj;
+            }
         }
         elseif ( $this->habtm($field_name) )
         {
@@ -85,16 +103,17 @@ class Model
             $id = PRIMARY_KEY;
             $where = array($lookup_id => $this->$id);
 
-            $this->_repository->find($table_name, $where);
+            $target_id = $field_name . PK_SEPARATOR . PRIMARY_KEY;
+            $this->_repository->find('`' . $target_id . '`', $table_name, $where);
 
             $rows = $this->_repository->fetch_all('assoc');
-            $results = array();
+            $collection = array();
             foreach ( $rows as $row )
             {
-                $new_id = $row[$field_name . PK_SEPARATOR . PRIMARY_KEY];
-                $results[$new_id] = new $field_name($new_id, $this->_repository); 
+                $new_id = $row[$target_id];
+                $collection[$new_id] = new $field_name($new_id, $this->_repository); 
             }
-            return $results;
+            return $collection;
         }
     }
     
@@ -154,6 +173,24 @@ class Model
                  $this->habtm($field_name) || $this->belongs_to($field_name) );
     }
 
+    public function pull_from_cache($obj, $id)
+    {
+        $key = get_class($obj) . '_' . $id;
+        $cached_data = $obj->_repository->get_from_cache($key);
+        if ( !$cached_data )
+        {
+            return false;
+        }
+
+        // TODO: What to do with the cached data?  Is this correct?
+        $cached_obj = unserialize($cached_data);
+        foreach ( $cached_obj as $key=>$val )
+        {
+            $obj->$key = $val;
+        }
+        return $obj;
+    }
+
     public function store()
     {
         $this->_repository->upsert($this);
@@ -161,6 +198,7 @@ class Model
         $this->$id = $this->_repository->insert_id();
         $this->cache();
     }
+
 }
 
 ?>
