@@ -19,6 +19,9 @@ class Dashboard extends ApplicationController
         $entry = new Tag(2); 
         $tags = $entry->Entry;
         $debug = new \lib\Debug();
+        $debug->inspect(1, "TAGS");
+        $debug->inspect(1, $entry);
+        $debug->inspect(1, "ENTRY");
         $debug->inspect(1, $tags);
         die();
         return array("contact_email"=>"test@test.com");

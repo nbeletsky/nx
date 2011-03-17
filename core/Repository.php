@@ -50,9 +50,9 @@ class Repository implements PluginInterfaceDB, PluginInterfaceCache
         return $this->_cache->replace_in_cache($key, $value, $expiration, $server_key);
     }
     
-    public function set_in_cache($key, $value, $expiration=0, $server_key='')
+    public function set_in_cache($key, $value, $server_key='', $expiration=0)
     {
-        return $this->_cache->set_in_cache($key, $value, $expiration, $server_key);
+        return $this->_cache->set_in_cache($key, $value, $server_key, $expiration);
     }
     
     //-------------------------------------------------

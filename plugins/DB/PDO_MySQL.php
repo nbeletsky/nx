@@ -144,10 +144,10 @@ class PDO_MySQL implements \core\PluginInterfaceDB
 
     public function find($fields, $table, $where=null, $additional=null)
     {
-        $sql = 'SELECT '
+        $sql = 'SELECT ';
         if ( is_array($fields) )
         {
-            $sql = '`' . implode('`, `', $fields) . '`';
+            $sql .= '`' . implode('`, `', $fields) . '`';
         }
         else
         {
@@ -159,7 +159,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
             $table = get_class($table);
         }
 
-        $sql = ' FROM `' . $table . '`';
+        $sql .= ' FROM `' . $table . '`';
         $sql .= $this->_format_where($where);
         if ( !is_null($additional) )
         {

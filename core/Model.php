@@ -122,13 +122,6 @@ class Model
         $this->$field_name = $value;
     }
 
-    public function __sleep()
-    {
-        $meta = new \lib\Meta();
-        $properties = $meta->get_protected_vars($obj);
-        return array_keys($properties);
-    }
-
     public function belongs_to($field_name)
     {
         return ( in_array($field_name, $this->_belongs_to) );
@@ -136,7 +129,7 @@ class Model
 
     public function cache()
     {
-        $data = serialize($this);
+        $data = $this->encode($this);
         $id = PRIMARY_KEY;
         $key = get_class($this) . '_' . $this->$id;
         $this->_repository->set_in_cache($key, $data);
@@ -145,6 +138,13 @@ class Model
     public function delete($where=null)
     {
         $this->_repository->delete($this, $where);
+    }
+
+    public function encode($obj)
+    {
+        $meta = new \lib\Meta();
+        $properties = $meta->get_protected_vars($obj);
+        return json_encode($properties);
     }
 
     public function find_object($where)
@@ -182,8 +182,7 @@ class Model
             return false;
         }
 
-        // TODO: What to do with the cached data?  Is this correct?
-        $cached_obj = unserialize($cached_data);
+        $cached_obj = json_decode($cached_data, true);
         foreach ( $cached_obj as $key=>$val )
         {
             $obj->$key = $val;

@@ -251,7 +251,7 @@ class MemcachedCache implements \core\PluginInterfaceCache
     */
     public function set_in_cache($key, $value, $server_key='', $expiration=0)
     {
-        return $this->_cache->setByKey($server_key, $key, $value, $expiration);
+        $result = $this->_cache->setByKey($server_key, $key, $value, $expiration);
     }
     
 }
