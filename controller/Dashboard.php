@@ -16,10 +16,10 @@ class Dashboard extends ApplicationController
             die();
             */
         
-        $entry = new Tag(2); 
-        $tags = $entry->Entry;
+        $entry = new Entry(1); 
+        $tags = $entry->User;
         $debug = new \lib\Debug();
-        $debug->inspect(1, "TAGS");
+        $debug->inspect(1, "USER");
         $debug->inspect(1, $entry);
         $debug->inspect(1, "ENTRY");
         $debug->inspect(1, $tags);
