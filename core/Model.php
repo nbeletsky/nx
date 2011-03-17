@@ -20,7 +20,7 @@ class Model
         
         if ( !is_numeric($id) && $id !== '' )
         {
-            $result = $this->find_object($id); 
+            $result = $this->_repository->find_object($this, $id); 
             $id = $result[PRIMARY_KEY];
         }
 
@@ -72,7 +72,10 @@ class Model
 
     public function cache()
     {
-        $data = $this->encode($this);
+        $meta = new \lib\Meta();
+        $properties = $meta->get_protected_vars($this);
+        $data = json_encode($properties);
+
         $id = PRIMARY_KEY;
         $key = get_class($this) . '_' . $this->$id;
         $this->_repository->set_in_cache($key, $data);
@@ -83,16 +86,22 @@ class Model
         $this->_repository->delete($this, $where);
     }
 
-    public function encode($obj)
+    public function find_all($where=null, $obj=null)
     {
-        $meta = new \lib\Meta();
-        $properties = $meta->get_protected_vars($obj);
-        return json_encode($properties);
-    }
+        if ( is_null($obj) )
+        {
+            $obj = $this;
+        }
 
-    public function find_object($where)
-    {
-        return $this->_repository->find_object($this, $where);
+        $all_obj_ids = $obj->_repository->find_all_objects($obj, $where);
+
+        $collection = array();
+        $obj_name = get_class($obj);
+        foreach ( $all_obj_ids as $obj_id )
+        {
+            $collection[$obj_id] = new $obj_name($obj_id, $obj->_repository);
+        }
+        return $collection;
     }
 
     private function _get_belongs_to($field_name)
@@ -101,57 +110,6 @@ class Model
         $obj_id = $this->$lookup_id;
 
         return new $field_name($obj_id, $this->_repository); 
-    }
-
-    private function _get_has_many($field_name)
-    {
-        $obj = new $field_name(); 
-
-        $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
-        $id = PRIMARY_KEY;
-        $where = array($lookup_id => $this->$id);
-
-        $all_obj_ids = $this->_repository->find_all_objects($obj, $where);
-
-        $collection = array();
-        foreach ( $all_obj_ids as $obj_id )
-        {
-            $cached_obj = $obj->pull_from_cache($obj, $obj_id); 
-            if ( !$cached_obj )
-            {
-                $collection[$obj_id] = $obj->_repository->load_object($obj, $obj_id);
-                $obj->cache();
-            }
-            else
-            {
-                $collection[$obj_id] = $cached_obj;
-            }
-        }
-        return $collection;
-    }
-
-    private function _get_has_one($field_name)
-    {
-        $obj = new $field_name(); 
-
-        $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
-        $id = PRIMARY_KEY;
-        $where = array($lookup_id => $this->$id);
-
-        $result = $this->_repository->find_object($obj, $where);
-        $obj_id = $result[PRIMARY_KEY];
-
-        $cached_obj = $obj->pull_from_cache($obj, $obj_id); 
-        if ( !$cached_obj )
-        {
-            $obj->_repository->load_object($obj, $obj_id);
-            $obj->cache();
-            return $obj;
-        }
-        else
-        {
-            return $cached_obj;
-        }
     }
 
     private function _get_habtm($field_name)
@@ -174,6 +132,27 @@ class Model
             $collection[$new_id] = new $field_name($new_id, $this->_repository); 
         }
         return $collection;
+    }
+
+    private function _get_has_many($field_name)
+    {
+        $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
+        $id = PRIMARY_KEY;
+        $where = array($lookup_id => $this->$id);
+
+        return $this->find_all($where, $field_name);
+    }
+
+    private function _get_has_one($field_name)
+    {
+        $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
+        $id = PRIMARY_KEY;
+        $where = array($lookup_id => $this->$id);
+
+        $result = $this->_repository->find_object($field_name, $where);
+        $obj_id = $result[PRIMARY_KEY];
+
+        return new $field_name($obj_id, $this->_repository); 
     }
 
     public function habtm($field_name)
