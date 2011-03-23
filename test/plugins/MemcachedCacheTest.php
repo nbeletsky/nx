@@ -1,7 +1,9 @@
 <?php
 require_once 'config/config.default.php';
+// TODO: Make a master test class?
+require_once 'PHPUnit/Autoload.php';
 
-class MemcachedTest extends \core\TestCase
+class MemcachedCacheTest 
 {    
 
     public function setUp()
