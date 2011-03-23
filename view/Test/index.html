@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='utf-8'>
+    <title>VisualPHPUnit</title>
+    <link rel='stylesheet' href='css/vpu.css' /> 
+</head>
+
+<body>
+    <section>
+        <!-- TODO: Fix this
+        <script type="text/javascript" charset="utf-8">
+            var marginLeft = (window.innerWidth - 960) / 2;
+            document.getElementById('container').style.marginLeft = marginLeft + 'px';
+        </script>
+        -->
+        
+        <!-- main content here -->
+    </section>
+</body>
+
+<script src="ui/js/jquery-1.5.1.min.js"></script>
+<script>
+    $(document).ready(function() {
+
+        $('.expand.button').each(function(index) {
+            $(this).click(function(e) {
+                if ( $(this).text() == '-' ) 
+                {
+                    if ( $(this).parent().hasClass('test') ) 
+                    {
+                        $(this).next('.more').slideUp();
+                    } 
+                    else 
+                    {
+                        $(this).parent().next('.more').slideUp();
+                    }
+                    $(this).text('+');
+                } 
+                else 
+                {
+                    if ( $(this).parent().hasClass('test') ) 
+                    {
+                        $(this).next('.more').slideDown();
+                    } 
+                    else 
+                    {
+                        $(this).parent().next('.more').slideDown();
+                    }
+                    $(this).text('-');
+                }
+            });
+        });
+
+    });
+</script>
+
+</html>

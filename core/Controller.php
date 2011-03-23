@@ -1,4 +1,4 @@
-<?
+<?php
 namespace core;
 
 class Controller
@@ -11,6 +11,7 @@ class Controller
     protected $_http_post = array();
 
     protected $_template = null; 
+    protected $_create_snapshot = false; 
 
     public function call($action, $id=null)
     {
@@ -35,20 +36,11 @@ class Controller
                 exit;
             }
             
-            if ( is_array($to_view) )
-            {
-                foreach( $to_view as $name=>$value )
-                {
-                    $$name = $value;
-                }
-            }
-            
             $template = ( !is_null($this->_template) ) ? $this->_template : DEFAULT_TEMPLATE;
-            $view_action = "../view/" . $template . '/' . get_class($this) . "/" . $action . VIEW_EXTENSION;
-            if ( file_exists($view_action) )
-            {
-                include($view_action);
-            }
+            $view_file = "../view/" . $template . '/' . get_class($this) . "/" . $action . VIEW_EXTENSION;
+
+            $view = new core\View();
+            $view->output($view_file, $to_view, $this->_create_snapshot);
         }
         // TODO: Fix exceptions
         catch (\Exception $e)

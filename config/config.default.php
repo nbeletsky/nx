@@ -4,14 +4,14 @@
     define("BASE_INSTALL", realpath(__DIR__ . '/..')); 
 
     set_include_path(get_include_path().PATH_SEPARATOR.
-                    BASE_INSTALL.PATH_SEPARATOR.
-                    BASE_INSTALL."/model".PATH_SEPARATOR.
-                    BASE_INSTALL."/controller".PATH_SEPARATOR.
-                    BASE_INSTALL."/view".PATH_SEPARATOR.
-                    BASE_INSTALL."/core".PATH_SEPARATOR.
-                    BASE_INSTALL."/lib".PATH_SEPARATOR.
-                    BASE_INSTALL."/plugins".PATH_SEPARATOR.
-                    BASE_INSTALL."/test/temp");
+                     BASE_INSTALL.PATH_SEPARATOR.
+                     BASE_INSTALL."/model".PATH_SEPARATOR.
+                     BASE_INSTALL."/controller".PATH_SEPARATOR.
+                     BASE_INSTALL."/view".PATH_SEPARATOR.
+                     BASE_INSTALL."/core".PATH_SEPARATOR.
+                     BASE_INSTALL."/lib".PATH_SEPARATOR.
+                     BASE_INSTALL."/plugins".PATH_SEPARATOR.
+                     BASE_INSTALL."/test/temp");
 
     ini_set('display_errors', 1);
     date_default_timezone_set('America/Los_Angeles');
