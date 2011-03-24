@@ -63,9 +63,9 @@ class Repository implements PluginInterfaceDB, PluginInterfaceCache
         return $this->_db->affected_rows();
     }
 
-    public function connect($host, $database, $username, $password)
+    public function connect($database, $host, $username, $password)
     {
-        return $this->_db->connect($host, $database, $username, $password);
+        return $this->_db->connect($database, $host, $username, $password);
     }
 
     public function close()
