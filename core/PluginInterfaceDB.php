@@ -25,7 +25,7 @@ interface PluginInterfaceDB
     *  @access public
     *  @return void
     */
-    public function connect($host, $database, $username, $password);
+    public function connect($database, $host, $username, $password);
 
     /**
      *  Fetches the next row from a result set.
