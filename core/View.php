@@ -21,8 +21,7 @@ class View
             {
                 $snapshot = ob_get_contents(); 
                 $file = new lib\File(); 
-                // TODO: Modify create_snapshot so that the filenames are better handled
-                $file->create_snapshot($snapshot, 'html');
+                $file->create_snapshot($snapshot, basename(realpath($filename)));
             }
         }
 

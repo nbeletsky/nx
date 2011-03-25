@@ -7,7 +7,6 @@ class Test extends core\Controller
 
     public function index()
     {   
-        // TODO: Fix all VPU-related constants!
         $path = realpath(VPU_TEST_DIRECTORY); 	
         if ( !is_dir($path) ) 
         {
@@ -28,14 +27,7 @@ class Test extends core\Controller
         // TODO: Fix this!
         echo $vpu->to_HTML($results);
 
-        if ( VPU_CREATE_SNAPSHOTS )
-        {
-            $snapshot = ob_get_contents(); 
-            $file = new lib\File(); 
-            // TODO: Modify create_snapshot so that the filenames are better handled
-            // TODO: Use VPU_SNAPSHOT_DIRECTORY here 
-            $file->create_snapshot($snapshot, 'html');
-        }
+        $this->_create_snapshot = VPU_CREATE_SNAPSHOTS;
     }
         
 }

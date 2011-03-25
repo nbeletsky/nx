@@ -7,6 +7,8 @@ define("DATABASE_NAME", "buildingadvice");
 
 define("MEMCACHED_HOST", "127.0.0.1");
 
+// The directory where historical snapshots will be stored
+define('SNAPSHOT_DIRECTORY', 'history');
 
 // The directory where PHPUnit is installed
 define('PHPUNIT_INSTALL', '/usr/share/pear/PHPUnit');
@@ -27,9 +29,6 @@ define('VPU_TEST_FILENAME', 'Test');
 
 // Whether or not to create snapshots of the test results
 define('VPU_CREATE_SNAPSHOTS', false);
-
-// The directory where the test results will be stored
-define('VPU_SNAPSHOT_DIRECTORY', 'history');
 
 // Whether or not to sandbox PHP errors
 define('VPU_SANDBOX_ERRORS', false);

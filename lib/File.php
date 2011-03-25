@@ -8,19 +8,20 @@ class File
     *  Creates a snapshot of the test results.
     *
     *  @param string $data            The data to be written.
-    *  @param string $ext             The filename extension to be used.
+    *  @param string $filename        The filename to be used. 
     *  @access public
     *  @return void
     */
-    public function create_snapshot($data, $ext)
+    public function create_snapshot($data, $filename)
     {
         $top = BASE_INSTALL . '/' . SNAPSHOT_DIRECTORY;
         if ( $top{strlen($top) - 1} !== '/' )
         {
             $top .= '/';
         }
-        $filename = $top .  $ext . '/' . date('d-m-Y G:i') . '.' . $ext;
-        $this->write_file($filename, $data);
+        $ext = pathinfo($filename, PATHINFO_EXTENSION);
+        $final_name = $top .  $ext . '/' . basename($filename, '.' . $ext) . '_' . date('d-m-Y G:i') . '.' . $ext;
+        $this->write_file($final_name, $data);
         chmod($filename, 0777);
     }
 

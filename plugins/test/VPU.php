@@ -401,9 +401,7 @@ class VPU
         if ( VPU_CREATE_SNAPSHOTS )
         {
             $file = new lib\File(); 
-            // TODO: Modify create_snapshot so that the filenames are better handled
-            // TODO: Use VPU_SNAPSHOT_DIRECTORY here 
-            $file->create_snapshot($this->_format_json($results), 'json');
+            $file->create_snapshot($this->_format_json($results), 'vpu_log.json');
         }
 
         $results = json_decode($results, true);
