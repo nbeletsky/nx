@@ -236,7 +236,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
                         $sql .= '`' . $name . '`=:' . $name . ' and ';
                     }
                 }
-                $sql = rtrim($sql, 'and ');
+                $sql = substr($sql, 0, strlen($sql) - strlen(' and '));
             }
             // $where is a string
             else

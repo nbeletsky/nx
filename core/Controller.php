@@ -39,7 +39,7 @@ class Controller
             $template = ( !is_null($this->_template) ) ? $this->_template : DEFAULT_TEMPLATE;
             $view_file = "../view/" . $template . '/' . get_class($this) . "/" . $action . VIEW_EXTENSION;
 
-            $view = new core\View();
+            $view = new View();
             $view->output($view_file, $to_view, $this->_create_snapshot);
         }
         // TODO: Fix exceptions
