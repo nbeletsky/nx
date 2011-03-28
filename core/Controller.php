@@ -39,8 +39,26 @@ class Controller
             $template = ( !is_null($this->_template) ) ? $this->_template : DEFAULT_TEMPLATE;
             $view_file = "../view/" . $template . '/' . get_class($this) . "/" . $action . VIEW_EXTENSION;
 
-            $view = new View();
-            $view->output($view_file, $to_view, $this->_create_snapshot);
+            if ( is_array($to_view) )
+            {
+                foreach( $to_view as $name=>$value )
+                {
+                    $$name = $value;
+                }
+            }
+            
+            if ( file_exists($view_file) )
+            {
+                include($view_file);
+
+                if ( $this->_create_snapshot )
+                {
+                    $snapshot = ob_get_contents(); 
+                    $file = new lib\File(); 
+                    $file->create_snapshot($snapshot, basename(realpath($view_file)));
+                }
+            }
+
         }
         // TODO: Fix exceptions
         catch (\Exception $e)
@@ -152,7 +170,6 @@ class Controller
 
         if ( isset($_POST) )
         {
-
             $this->_http_post = $_POST;
         }
 
