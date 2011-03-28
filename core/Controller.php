@@ -124,12 +124,13 @@ class Controller
         // foobar.com/controller/action/id
         // foobar.com/controller/action/id/args
         /* 
+        server.document-root = "/srv/http/YOURSITE/public"
         url.rewrite-once = (
-            "^/$"=>"/public/index.php",
-            "^/([A-Za-z0-9\.\-]+)$"=>"/public/index.php?controller=$1",
-            "^/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)$"=>"/public/index.php?controller=$1&$id=$2",
-            "^/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)$"=>"/public/index.php?controller=$1&action=$2&id=$3",
-            "^/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-]+)/([A-Za-z0-9\.\-\&\=\_]+)$"=>"/public/index.php?controller=$1&action=$2&id=$3&args=$4"
+            "^/$"=>"/index.php",
+            "^/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1",
+            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1&$id=$2",
+            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1&action=$2&id=$3",
+            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&action=$2&id=$3&args=$4"
         )
         */
 
@@ -151,6 +152,7 @@ class Controller
 
         if ( isset($_POST) )
         {
+
             $this->_http_post = $_POST;
         }
 
