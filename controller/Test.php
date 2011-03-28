@@ -20,18 +20,18 @@ class Test extends core\Controller
             set_error_handler(array($vpu, 'handle_errors'));
         }
 
-        $results = $vpu->run();
-
+        $suites = $vpu->run();
+        $sandbox = $vpu->get_sandbox();
         $this->_create_snapshot = VPU_CREATE_SNAPSHOTS;
-        $meta = new \lib\Meta();
-        return array('suites'       => $results,
-                     'query_string' => 'controller=' . $meta->classname_only($this) . '&action=suite');
+
+        return array('suites'       => $suites,
+                     'sandbox'      => $sandbox,
+                     'query_string' => 'controller=' . $this->_classname . '&action=suite');
     }
 
     public function suite()
     {
-        $meta = new \lib\Meta();
-        return array('query_string' => 'controller=' . $meta->classname_only($this) . '&action=test');
+        return array('query_string' => 'controller=' . $this->_classname . '&action=test');
     }
 
     public function test()

@@ -57,6 +57,17 @@ class VPU
     *  @access private
     */
     private $_exceptions = '';
+
+   /**
+    *  The list of files to be ignored when creating a stack trace. 
+    *
+    *  @var array
+    *  @access private
+    */
+    private $_ignore_trace = array('plugins/test/vpu.php',
+                                   'public/index.php',
+                                   'core/controller.php',
+                                   'controller/test.php');
     
    /**
     *  Loads tests from the supplied directory.
@@ -163,11 +174,6 @@ class VPU
 
             $final[] = $suite; 
         }
-
-        if ( VPU_SANDBOX_ERRORS )
-        {
-            $final['errors'] = $this->_exceptions . $this->_get_errors();
-        }
         
         return $final;
     }
@@ -263,6 +269,18 @@ class VPU
         return $message;
     }
 
+    public function get_sandbox()
+    {
+        if ( VPU_SANDBOX_ERRORS )
+        {
+            return $this->_exceptions . $this->_get_errors();
+        }
+        else
+        {
+            return '';
+        }
+    }
+
    /**
     *  Retrieves the status from a PHPUnit test result. 
     *
@@ -320,10 +338,17 @@ class VPU
         $new_trace = array();
         foreach ( $trace as $arr ) 
         {
-            // TODO: Fix this logic
-            if ( (stripos($arr['file'], 'vpu.php') === false) &&
-                 (stripos($arr['file'], 'index.php') === false) &&
-                 ((!isset($arr['class'])) || (stripos($arr['class'], 'phpunit') === false) )) 
+            $found = false;
+            foreach ( $this->_ignore_trace as $ignore )
+            {
+                if ( stripos($arr['file'], $ignore) !== false )
+                {
+                    $found = true;
+                    break;
+                }
+            }
+
+            if ( !$found )
             {
                 $new_trace[] = $arr;
             }
@@ -379,8 +404,9 @@ class VPU
         $error['line'] = $err_line;
         $error['file'] = $err_file;
         ob_start(); 
-        include 'ui/error.html';
-        $this->_write_file(VPU_SANDBOX_FILENAME, ob_get_contents()); 
+        include 'default/Test/error.html';
+        $file = new \lib\File(); 
+        $file->write_file(VPU_SANDBOX_FILENAME, ob_get_contents()); 
         ob_end_clean();
         return true;
     }
@@ -399,7 +425,7 @@ class VPU
                        'line'    => $exception->getLine(),
                        'file'    => $exception->getFile());
         ob_start(); 
-        include 'ui/error.html';
+        include 'default/Test/error.html';
         $this->_exceptions .= ob_get_contents(); 
         ob_end_clean();
     }

@@ -12,11 +12,14 @@ class Controller
 
     protected $_template = null; 
     protected $_create_snapshot = false; 
+    protected $_classname = null;
 
     public function call($action, $id=null, $additional=null)
     {
         try
         {
+            $this->_classname = get_called_class(); 
+
             if ( $this->is_protected($action) )
             {
                 $this->protect($action); // should throw an exception
