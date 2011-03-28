@@ -39,13 +39,20 @@ class Controller
             $template = ( !is_null($this->_template) ) ? $this->_template : DEFAULT_TEMPLATE;
             $view_file = "../view/" . $template . '/' . get_class($this) . "/" . $action . VIEW_EXTENSION;
 
-            if ( is_array($to_view) )
+            if ( is_array($additional) )
             {
-                if ( is_array($additional) )
+                if ( !is_array($to_view) )
+                {
+                    $to_view = $additional;
+                }
+                else
                 {
                     $to_view = array_merge($to_view, $additional);
                 }
+            }
 
+            if ( is_array($to_view) )
+            {
                 foreach( $to_view as $NAME_FOR_VIEWS=>$value )
                 {
                     $$NAME_FOR_VIEWS = $value;
