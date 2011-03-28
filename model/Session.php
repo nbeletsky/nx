@@ -14,7 +14,6 @@ class Session extends ApplicationModel
     */
     protected $last_active;
 
-
    /**
     *  The user's id.
     *
@@ -175,15 +174,19 @@ class Session extends ApplicationModel
 
     public function is_logged_in()
     {
-        if ( (!isset($_SESSION['uid'])) || (!isset($_COOKIE[self::COOKIE_ID_NAME])) ||
-             ($_SESSION['uid'] !== $this->_decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME])) || 
-             (!isset($_SESSION['fingerprint'])) || ($_SESSION['fingerprint'] !== $this->_get_fingerprint($_SESSION['uid'])) ) 
-             {
+        if ( (!isset($_SESSION['uid'])) || (!isset($_SESSION['fingerprint'])) || (!isset($_SESSION['last_active'])) )
+        {
+            $this->User_id = 0;
+            $is_logged_in = false;
+        }
+        elseif ( (!isset($_COOKIE[self::COOKIE_ID_NAME])) || ($_SESSION['uid'] !== $this->_decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME])) || 
+                 ($_SESSION['fingerprint'] !== $this->_get_fingerprint($_SESSION['uid'])) ) 
+        {
             $this->User_id = 0;
             $is_logged_in = false;
             $this->kill();
         }
-        elseif ( (!isset($_SESSION['last_active'])) || (strtotime($_SESSION['last_active']) + self::SESSION_LIFETIME < time()) ) 
+        elseif ( (strtotime($_SESSION['last_active']) + self::SESSION_LIFETIME < time()) ) 
         {
             $this->User_id = 0;
             $is_logged_in = false;
@@ -208,7 +211,6 @@ class Session extends ApplicationModel
     {
         $_SESSION = array();
         setcookie(self::COOKIE_ID_NAME, '', time() - 3600);
-        session_unset();
         session_destroy();
     }
    
@@ -291,7 +293,6 @@ class Session extends ApplicationModel
     */
     public function reset() 
     {
-        session_unset();
         session_destroy();
         session_start();
         session_regenerate_id();
