@@ -35,7 +35,7 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     */
     public function __construct($database, $host, $username, $password) 
     {
-        $this->connect($host, $database, $username, $password);
+        $this->connect($database, $host, $username, $password);
     }
 
     public function connect($database, $host, $username, $password) 
