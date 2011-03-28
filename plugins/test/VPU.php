@@ -36,8 +36,8 @@
  */
 namespace plugins\test;
 
-require 'Autoload.php';
-require 'Util/Log/JSON.php';
+require_once 'Autoload.php';
+require_once 'Util/Log/JSON.php';
 
 class VPU 
 {
@@ -70,50 +70,106 @@ class VPU
         if ( !is_null($test_dir) )
         {
             $this->_set_dir($test_dir);
-            $this->_empty_file(VPU_SANDBOX_FILENAME);
+            $file = new \lib\File();
+            $file->empty_file(VPU_SANDBOX_FILENAME);
         }
     }
 
    /**
-    *  Builds a suite of tests.
+    *  Converts the JSON from PHPUnit into an array of suites. 
     *
-    *  @param array $suite        The suite-related variables to be displayed.
-    *  @access private
-    *  @return string
+    *  @param string $pu_output        The JSON output from PHPUnit. 
+    *  @access public
+    *  @return array
     */
-    private function _build_suite($suite)
+    private function _build_suites($pu_output) 
     {
-        $suite['expand'] = ( $suite['status'] == 'failure' ) ? '-' : '+';
-        $suite['display'] = ( $suite['status'] == 'failure' ) ? 'show' : 'hide';
-        $suite['time'] = 'Executed in ' . $suite['time'] . ' seconds.'; 
-
-        ob_start(); 
-        include 'ui/suite.html';
-        $suite_content = ob_get_contents(); 
-        ob_end_clean();
-        return $suite_content;
-    }
-
-   /**
-    *  Builds a test.
-    *
-    *  @param array $test             The test-related variables to be displayed.
-    *  @access private
-    *  @return string
-    */
-    private function _build_test($test)
-    {
-        if ( $test['variables_message'] && $test['status'] === 'failure' ) 
+        $results = $this->_parse_output($pu_output);    
+        if ( !is_array($results) )
         {
-            $test['expand'] = '-';
-            $test['display'] = 'show';
+            return '';
         }
+
+        $final = $suite = $test = array();
+        
+        foreach ( $results as $key=>$event ) 
+        {
+            if ( $event['event'] === 'suiteStart' ) 
+            {
+                if ( isset($suite['tests']) )
+                {
+
+                    $suite['expand'] = ( $suite['status'] == 'failure' ) ? '-' : '+';
+                    $suite['display'] = ( $suite['status'] == 'failure' ) ? 'show' : 'hide';
+                    $suite['time'] = 'Executed in ' . $suite['time'] . ' seconds.'; 
+
+                    $final[] = $suite; 
+                    $suite = $test = array();
+                }
+
+                $suite['status'] = 'success';
+                $suite['name'] = $event['suite'];
+                $suite['tests'] = array();
+                $suite['time'] = 0;
+            } 
+            elseif ( $event['event'] == 'test' ) 
+            {
+                $test['status'] = $this->_get_status($event['status'], $event['message']);
+                $test['expand'] = ( $test['status'] == 'fail' ) ? '-' : '+';
+                $test['display'] = ( $test['status'] == 'fail' ) ? 'show' : 'hide';
+
+                if ( $test['status'] === 'incomplete' && $suite['status'] !== 'failure' && $suite['status'] !== 'skipped' ) 
+                {
+                    $suite['status'] = 'incomplete';
+                } 
+                elseif ( $test['status'] === 'skipped' && $suite['status'] !== 'failure' ) 
+                {
+                    $suite['status'] = 'skipped';
+                } 
+                elseif ( $test['status'] === 'failure' ) 
+                {
+                    $suite['status'] = 'failure';
+                }
                 
-        ob_start(); 
-        include 'ui/test.html';
-        $test_content = ob_get_contents(); 
-        ob_end_clean();
-        return $test_content;
+                $test['name'] = substr($event['test'], strpos($event['test'], '::') + 2);
+                $test['message'] = $this->_get_message($event['message']); 
+                $test['message'] .= '<br /><br />Executed in ' . $event['time'] . ' seconds.';
+                $suite['time'] += $event['time'];
+
+                $test['variables_message'] = ( isset($event['collected']) ) ? trim($event['collected']) : '';
+                $test['variables_display'] = ( $test['variables_message'] ) ? 'show' : 'hide';
+
+                $test['trace_message'] = $this->_get_trace($event['trace']);
+                $test['trace_display'] = ( $test['trace_message'] ) ? 'show' : 'hide';
+                
+                $test['separator_display'] = ( isset($results[$key + 1]) && $results[$key +1 ]['event'] !== 'suiteStart' ); 
+
+                if ( $test['variables_message'] && $test['status'] === 'failure' ) 
+                {
+                    $test['expand'] = '-';
+                    $test['display'] = 'show';
+                }
+
+                $suite['tests'][] = $test; 
+            }	
+                        
+        }
+
+        if ( isset($suite['tests']) )
+        {
+            $suite['expand'] = ( $suite['status'] == 'failure' ) ? '-' : '+';
+            $suite['display'] = ( $suite['status'] == 'failure' ) ? 'show' : 'hide';
+            $suite['time'] = 'Executed in ' . $suite['time'] . ' seconds.'; 
+
+            $final[] = $suite; 
+        }
+
+        if ( VPU_SANDBOX_ERRORS )
+        {
+            $final['errors'] = $this->_exceptions . $this->_get_errors();
+        }
+        
+        return $final;
     }
 
    /**
@@ -173,7 +229,8 @@ class VPU
     private function _get_errors()
     {
         $errors = file_get_contents(VPU_SANDBOX_FILENAME);
-        $this->_empty_file(VPU_SANDBOX_FILENAME);
+        $file = new \lib\File();
+        $file->empty_file(VPU_SANDBOX_FILENAME);
         return $errors;
     }
 
@@ -400,7 +457,7 @@ class VPU
 
         if ( VPU_CREATE_SNAPSHOTS )
         {
-            $file = new lib\File(); 
+            $file = new \lib\File(); 
             $file->create_snapshot($this->_format_json($results), 'vpu_log.json');
         }
 
@@ -465,7 +522,7 @@ class VPU
             
             if ( $nest !== 0 ) 
             {
-                throw new Exception('Unable to parse JSON response from PHPUnit.');
+                throw new \Exception('Unable to parse JSON response from PHPUnit.');
             }
 
             return $tags;
@@ -495,7 +552,7 @@ class VPU
             
             if ( $pos === false )
             {
-                throw new Exception('Cannot find tag to replace (old: ' . $old . ', new: ' . htmlspecialchars($new) . ').');
+                throw new \Exception('Cannot find tag to replace (old: ' . $old . ', new: ' . htmlspecialchars($new) . ').');
             }
 
             return substr_replace($subject, $new, $pos, strlen($old));
@@ -512,11 +569,11 @@ class VPU
     *
     *  @param array|string $tests        The tests to be run through PHPUnit.
     *  @access public
-    *  @return string
+    *  @return array
     */
     public function run($tests=null) 
     {
-        $suite = new PHPUnit_Framework_TestSuite();
+        $suite = new \PHPUnit_Framework_TestSuite();
 
         $loaded_tests = $this->_load_tests($tests);
         foreach ( $loaded_tests as $test ) 
@@ -527,16 +584,16 @@ class VPU
             }
         }
 
-        $result = new PHPUnit_Framework_TestResult;
+        $result = new \PHPUnit_Framework_TestResult;
 
-        $result->addListener(new PHPUnit_Util_Log_JSON);
+        $result->addListener(new \PHPUnit_Util_Log_JSON);
         
         ob_start();
         $suite->run($result);
         $results = ob_get_contents();
         ob_end_clean();
         
-        return $results;
+        return $this->_build_suites($results);
     }
 
    /**
@@ -553,10 +610,10 @@ class VPU
             $test_dir = realpath($test_dir);
             if ( !is_dir($test_dir) ) 
             {
-                throw new Exception($test_dir . 'is not a valid directory.');
+                throw new \Exception($test_dir . 'is not a valid directory.');
             }
 
-            $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($test_dir), RecursiveIteratorIterator::SELF_FIRST);
+            $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($test_dir), \RecursiveIteratorIterator::SELF_FIRST);
                             
             $pattern = '/' . VPU_TEST_FILENAME . '/i';
             while ( $it->valid() ) 
@@ -575,89 +632,6 @@ class VPU
             $this->_handle_exception($e);
             return false;
         }
-    }
-
-   /**
-    *  Renders the JSON from PHPUnit into HTML. 
-    *
-    *  @param string $pu_output        The JSON output from PHPUnit. 
-    *  @access public
-    *  @return string
-    */
-    public function to_HTML($pu_output) 
-    {
-        $results = $this->_parse_output($pu_output);    
-        if ( !is_array($results) )
-        {
-            return '';
-        }
-
-        $final = '';
-        $suite = $test = array();
-        
-        foreach ( $results as $key=>$event ) 
-        {
-            if ( $event['event'] === 'suiteStart' ) 
-            {
-                if ( isset($suite['tests']) )
-                {
-                    $final .= $this->_build_suite($suite);
-                    $suite = $test = array();
-                }
-
-                $suite['status'] = 'success';
-                $suite['name'] = $event['suite'];
-                $suite['tests'] = '';
-                $suite['time'] = 0;
-            } 
-            elseif ( $event['event'] == 'test' ) 
-            {
-                $test['status'] = $this->_get_status($event['status'], $event['message']);
-                $test['expand'] = ( $test['status'] == 'fail' ) ? '-' : '+';
-                $test['display'] = ( $test['status'] == 'fail' ) ? 'show' : 'hide';
-
-                if ( $test['status'] === 'incomplete' && $suite['status'] !== 'failure' && $suite['status'] !== 'skipped' ) 
-                {
-                    $suite['status'] = 'incomplete';
-                } 
-                elseif ( $test['status'] === 'skipped' && $suite['status'] !== 'failure' ) 
-                {
-                    $suite['status'] = 'skipped';
-                } 
-                elseif ( $test['status'] === 'failure' ) 
-                {
-                    $suite['status'] = 'failure';
-                }
-                
-                $test['name'] = substr($event['test'], strpos($event['test'], '::') + 2);
-                $test['message'] = $this->_get_message($event['message']); 
-                $test['message'] .= '<br /><br />Executed in ' . $event['time'] . ' seconds.';
-                $suite['time'] += $event['time'];
-
-                $test['variables_message'] = ( isset($event['collected']) ) ? trim($event['collected']) : '';
-                $test['variables_display'] = ( $test['variables_message'] ) ? 'show' : 'hide';
-
-                $test['trace_message'] = $this->_get_trace($event['trace']);
-                $test['trace_display'] = ( $test['trace_message'] ) ? 'show' : 'hide';
-                
-                $test['separator_display'] = ( isset($results[$key + 1]) && $results[$key +1 ]['event'] !== 'suiteStart' ); 
-
-                $suite['tests'] .= $this->_build_test($test); 
-            }	
-                        
-        }
-
-        if ( isset($suite['tests']) )
-        {
-            $final .= $this->_build_suite($suite);
-        }
-
-        if ( VPU_SANDBOX_ERRORS )
-        {
-            $final .= $this->_exceptions . $this->_get_errors();
-        }
-        
-        return $final;
     }
 
 }

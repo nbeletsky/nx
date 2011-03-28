@@ -1,7 +1,5 @@
 <?php
 
-require 'VPU.php';
-
 class Test extends core\Controller
 {
 
@@ -15,7 +13,7 @@ class Test extends core\Controller
 
         chdir($path);
 
-        $vpu = new VPU($path);
+        $vpu = new \plugins\test\VPU($path);
 
         if ( VPU_SANDBOX_ERRORS )
         {
@@ -24,10 +22,21 @@ class Test extends core\Controller
 
         $results = $vpu->run();
 
-        // TODO: Fix this!
-        echo $vpu->to_HTML($results);
-
         $this->_create_snapshot = VPU_CREATE_SNAPSHOTS;
+        $meta = new \lib\Meta();
+        return array('suites'       => $results,
+                     'query_string' => 'controller=' . $meta->classname_only($this) . '&action=suite');
+    }
+
+    public function suite()
+    {
+        $meta = new \lib\Meta();
+        return array('query_string' => 'controller=' . $meta->classname_only($this) . '&action=test');
+    }
+
+    public function test()
+    {
+        return array();
     }
         
 }

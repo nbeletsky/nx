@@ -1,0 +1,15 @@
+                    <div class="box rounded"> 
+                        <div class="testsuite <?=$status?>"> 
+                            <div class="light rounded"></div> 
+                            <div class="name"><?=$name?></div> 
+                            <div class="stats"><?=$time?></div> 
+                            <div class="expand button"><?=$expand?></div> 
+                        </div> 
+                        <div class="more <?=$display?>"> 
+                            <hr class = "big" /> 
+                            <?  $controller = new core\Controller();
+                                foreach ( $tests as $test ) { 
+                                    $controller->render($query_string, $test);
+                                } ?>
+                        </div>
+                    </div> 

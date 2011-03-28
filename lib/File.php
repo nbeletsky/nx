@@ -63,7 +63,7 @@ class File
 	$supported_types = array('doc', 'pdf', 'ppt', 'png', 'jpg', 'xls');
 	if (!in_array($ext, $supported_types))
 	{
-	    throw new Exception('Unsupported extension: ' . $ext . ' from file name ' . $file_name);
+	    throw new \Exception('Unsupported extension: ' . $ext . ' from file name ' . $file_name);
 	}
 	return 'application/'.strtolower($ext);
     }
@@ -106,7 +106,7 @@ class File
         if ( !$handle )
         {
             // TODO: Set exception handler!
-            throw new Exception('Could not open ' . $filename . ' for writing.  Check the location and permissions of the file and try again.');
+            throw new \Exception('Could not open ' . $filename . ' for writing.  Check the location and permissions of the file and try again.');
         }
 
         fwrite($handle, $data);

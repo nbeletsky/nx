@@ -16,9 +16,39 @@
     ini_set('display_errors', 1);
     date_default_timezone_set('America/Los_Angeles');
 
-    function autoload($class_name) 
+    function file_exists_in_include_path($file)
     {
-        include_once str_replace("\\", "/", $class_name) . ".php";
+        if ( file_exists($file) ) 
+        {
+            return realpath($file);
+        }
+
+        $paths = explode(PATH_SEPARATOR, get_include_path());
+
+        foreach ($paths as $path) 
+        {
+            $fullpath = $path . DIRECTORY_SEPARATOR . $file;
+
+            if ( file_exists($fullpath) ) 
+            {
+                return realpath($fullpath);
+            }
+        }
+
+        return false;
+    }
+
+    function autoload($class) 
+    {
+        $file = str_replace("\\", "/", $class) . ".php";
+        if ( file_exists_in_include_path($file) )
+        {
+            require_once $file;
+        }
+        else
+        {
+            // TODO: Throw exception!
+        }
     }
 
     spl_autoload_register('autoload');

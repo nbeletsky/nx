@@ -2,7 +2,7 @@
 <html lang='en'>
 
 <head>
-    <meta charset='utf-8'>
+    <meta charset='utf-8' />
     <title>VisualPHPUnit</title>
     <link rel='stylesheet' href='css/vpu.css' /> 
 </head>
@@ -16,11 +16,14 @@
         </script>
         -->
         
-        <!-- main content here -->
+        <?  $controller = new core\Controller();
+            foreach ( $suites as $suite ) { 
+                $controller->render($query_string, $suite);
+            } ?>
     </section>
 </body>
 
-<script src="ui/js/jquery-1.5.1.min.js"></script>
+<script src="/js/jquery-1.5.1.min.js"></script>
 <script>
     $(document).ready(function() {
 

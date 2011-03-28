@@ -1,23 +1,23 @@
 <?php
 
-define("DATABASE_USER", "root");
-define("DATABASE_PASS", "Admin");
-define("DATABASE_HOST", "db.dev");
-define("DATABASE_NAME", "buildingadvice");
+define('DATABASE_USER', 'root');
+define('DATABASE_PASS', 'admin');
+define('DATABASE_HOST', 'localhost');
+define('DATABASE_NAME', 'test');
 
-define("MEMCACHED_HOST", "127.0.0.1");
-
-// The directory where historical snapshots will be stored
-define('SNAPSHOT_DIRECTORY', 'history');
+define('MEMCACHED_HOST', '127.0.0.1');
 
 // The directory where PHPUnit is installed
 define('PHPUNIT_INSTALL', '/usr/share/pear/PHPUnit');
 
 set_include_path(get_include_path().PATH_SEPARATOR.
-                 PHPUNIT_INSTALL.PATH_SEPARATOR);
+                 PHPUNIT_INSTALL);
+
+// The directory where historical snapshots will be stored
+define('SNAPSHOT_DIRECTORY', 'history');
 
 // The directory where the tests reside
-define('VPU_TEST_DIRECTORY', 'tests');
+define('VPU_TEST_DIRECTORY', 'test');
 
 // VPU scans the test directory supplied above and will only include files 
 // containing VPU_TEST_FILENAME (case-insensitive) within their filenames
@@ -34,6 +34,6 @@ define('VPU_CREATE_SNAPSHOTS', false);
 define('VPU_SANDBOX_ERRORS', false);
 
 // The file to use as a temporary storage for PHP errors during PHPUnit runs
-define('VPU_SANDBOX_FILENAME', BASE_INSTALL . '/errors/errors.tmp');
+define('VPU_SANDBOX_FILENAME', BASE_INSTALL . '/test/errors/errors.tmp');
 
 ?>

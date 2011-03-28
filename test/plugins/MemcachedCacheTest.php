@@ -1,8 +1,6 @@
 <?php
 
-require_once 'core/Test.php';
-
-class MemcachedCacheTest extends core\Test 
+class MemcachedCacheTest extends \PHPUnit_Framework_TestCase
 {    
 
     public function setUp()

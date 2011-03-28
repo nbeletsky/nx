@@ -13,7 +13,7 @@ class Controller
     protected $_template = null; 
     protected $_create_snapshot = false; 
 
-    public function call($action, $id=null)
+    public function call($action, $id=null, $additional=null)
     {
         try
         {
@@ -41,9 +41,14 @@ class Controller
 
             if ( is_array($to_view) )
             {
-                foreach( $to_view as $name=>$value )
+                if ( is_array($additional) )
                 {
-                    $$name = $value;
+                    $to_view = array_merge($to_view, $additional);
+                }
+
+                foreach( $to_view as $NAME_FOR_VIEWS=>$value )
+                {
+                    $$NAME_FOR_VIEWS = $value;
                 }
             }
             
@@ -133,7 +138,7 @@ class Controller
         exit();
     }
     
-    public function render($query_string)
+    public function render($query_string, $additional=null)
     {
         // URL layout
         // foobar.com/
@@ -181,7 +186,7 @@ class Controller
         if ( in_array($controller, $whitelist) )
         {
             $controller_obj = new $controller();
-            $controller_obj->call($action, $id);
+            $controller_obj->call($action, $id, $additional);
         }
         else
         {
