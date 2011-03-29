@@ -10,7 +10,7 @@ class Controller
     protected $_http_get = array();
     protected $_http_post = array();
 
-    protected $_template = null; 
+    protected $_template = DEFAULT_TEMPLATE; 
     protected $_create_snapshot = false; 
     protected $_classname = null;
 
@@ -39,8 +39,7 @@ class Controller
                 exit;
             }
             
-            $template = ( !is_null($this->_template) ) ? $this->_template : DEFAULT_TEMPLATE;
-            $view_file = "../view/" . $template . '/' . get_class($this) . "/" . $action . VIEW_EXTENSION;
+            $view_file = "../view/" . $this->_template . '/' . get_class($this) . "/" . $action . VIEW_EXTENSION;
 
             if ( is_array($additional) )
             {

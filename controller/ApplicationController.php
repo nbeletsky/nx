@@ -17,7 +17,7 @@ class ApplicationController extends core\Controller
         else
         {
             $this->_user = null;
-            $this->_template = null;
+            $this->_template = DEFAULT_TEMPLATE;
         }
     }
 

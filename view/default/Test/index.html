@@ -9,13 +9,6 @@
 
 <body>
     <section>
-        <!-- TODO: Fix this
-        <script type="text/javascript" charset="utf-8">
-            var marginLeft = (window.innerWidth - 960) / 2;
-            document.getElementById('container').style.marginLeft = marginLeft + 'px';
-        </script>
-        -->
-        
         <?  $controller = new core\Controller();
             foreach ( $suites as $suite ) { 
                 $controller->render($query_string, $suite);
