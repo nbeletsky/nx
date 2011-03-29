@@ -169,7 +169,7 @@ class Controller
 
         parse_str($query_string, $query);
 
-        $controller = ( isset($query['controller']) ) ? $query['controller'] : DEFAULT_CONTROLLER;
+        $controller = ( isset($query['controller']) ) ? ucfirst($query['controller']) : DEFAULT_CONTROLLER;
         $action =     ( isset($query['action']) )     ? $query['action']     : DEFAULT_ACTION;
         $id =         ( isset($query['id']) )         ? $query['id']         : null;
 

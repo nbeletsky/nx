@@ -17,7 +17,7 @@ set_include_path(get_include_path().PATH_SEPARATOR.
 define('SNAPSHOT_DIRECTORY', 'history');
 
 // The directory where the tests reside
-define('VPU_TEST_DIRECTORY', 'test');
+define('VPU_TEST_DIRECTORY', '../test');
 
 // VPU scans the test directory supplied above and will only include files 
 // containing VPU_TEST_FILENAME (case-insensitive) within their filenames
@@ -31,7 +31,7 @@ define('VPU_TEST_FILENAME', 'Test');
 define('VPU_CREATE_SNAPSHOTS', false);
 
 // Whether or not to sandbox PHP errors
-define('VPU_SANDBOX_ERRORS', false);
+define('VPU_SANDBOX_ERRORS', true);
 
 // The file to use as a temporary storage for PHP errors during PHPUnit runs
 define('VPU_SANDBOX_FILENAME', BASE_INSTALL . '/test/errors/errors.tmp');
