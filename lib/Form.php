@@ -1,41 +1,103 @@
 <?php
 namespace lib;
 
-// TODO: Clean up this file
 class Form
 {
-    public function start($action, $id=null)
-    {
-        if ($_REQUEST['ajax'])
-            $html= "<form method=POST class='ajax_form' action='$action'";
-        else
-            $html= "<form method=POST action='$action'";
-            
-        $html.= ($id) ? " id='$id'>" : ">"; 
-            
-        $html.= "<input type='hidden' name='form_content' value='1'/>";
 
-        if ($_REQUEST["parent"])
+    public function checkbox($object, $name, $value, $attributes=array())
+    {
+        $html = "<input type='checkbox' name='" . $this->_format_name($object, $name) . "' value='" . $value . "' ";
+        $html .= $this->_parse_attributes($attributes);
+
+        if ( $object->$name == $value )
         {
-            $html.= "<input type='hidden' name='".$_REQUEST['parent']::object()."_id' value='".$_REQUEST['parentid']."'/>";
+            $html .= "checked='checked' ";
         }
+        $html .= "/>";
         
         return $html;
     }
 
     public function end()
     {
-        return "</form>";
+        return '</form>';
+    }
+
+    private function _format_name($object, $name)
+    {
+        $meta = new lib\Meta();
+        $classname = $meta->classname_only($object);
+        $id = PRIMARY_KEY;
+        return 'data[' . $classname . '][' . $object->$id . '][' . $name . ']';
+    }
+
+    public function hidden($object, $name, $attributes=array())
+    {
+        $html = "<input type='hidden' name='" . $this->_format_name($object, $name) . "' value='" . $object->$name . "' ";
+        $html .= $this->_parse_attributes($attributes);
+        $html .= "/>";
+    }
+
+    private function _parse_attributes($attributes)
+    {
+        $html = '';
+        foreach ( $attributes as $name=>$value )
+        {
+            $html .= $name . "='" . $value . "' "; 
+        }
+        return $html;
+    }
+
+    public function radios($object, $name, $values, $attributes=array())
+    {
+        $html = '';
+        foreach ( $values as $value=>$display )
+        {
+            $html .= "<input type='radio' name='" . $this->_format_name($object, $name) . "' ";
+            $html .= $this->_parse_attributes($attributes);
+            if ( $object->$name == $value )
+            {
+                $html .= "checked='checked' ";
+            }
+            $html.= "/>";
+        }
+
+        return $html;
+    }
+
+    public function select($object, $name, $options, $attributes=array())
+    {
+        $html = "<select name='" . $this->_format_name($object, $name) . "' ";
+        $html .= $this->_parse_attributes($attributes);
+        $html .= ">";
+        foreach( $options as $value=>$display )
+        {
+            $html.= "<option value='" . $value . "' ";
+                
+            if ( $object->$name == $value )
+            {
+                $html.= "selected='selected' ";
+            }
+            $html.= ">" . $display . "</option>";
+        }
+        $html.= "</select>";
+
+        return $html;
+    }
+
+    public function start($action, $attributes=array())
+    {
+        $html = "<form method='post' action='" . $action . "'";
+        $html .= $this->_parse_attributes($attributes);
+        $html .= ">";
+        
+        return $html;
     }
 
     public function text($object, $name, $attributes=array())
     {
-        $cname = Meta::classname_only($object::classname());
-        $html = "<input type='text' name='". Form::fname($object, $name) . "' id='" . $cname . "_" . $object->id . "_" . $name  . "' value='" . htmlentities($object->$name). "' "; 
-        foreach ( $attributes as $name=>$value )
-         {
-            $html .= $name . "='" . $value . "' "; 
-        }
+        $html = "<input type='text' name='" . $this->_format_name($object, $name) . " value='" . htmlentities($object->$name, ENT_QUOTES). "' "; 
+        $html .= $this->_parse_attributes($attributes);
         $html .= "/>";
         
         return $html; 
@@ -43,154 +105,10 @@ class Form
 
     public function textarea($object, $name, $attributes=array())
     {
-        $cname= Meta::classname_only($object::classname());
-        $html = "<textarea name='" . Form::fname($object, $name) . "' id='" . $cname . "_" . $object->id . "_" . $name . " ";
-        foreach ( $attributes as $name=>$value )
-        {
-            $html .= $name . "='" . $value . "' "; 
-        }
+        $html = "<textarea name='" . $this->_format_name($object, $name) . "' ";
+        $html .= $this->_parse_attributes($attributes);
         $html .= '>'. htmlentities($object->$name) . "</textarea>"; 
         return $html;
-    }
-
-    public function hidden($object, $name)
-    {
-        return "<input type='hidden' class='input' name='" . Form::fname($object, $name) . "' value='" . $object->$name . "'/>";
-    }
-
-    public function select($object, $name, $options, $display=null, $class='input')
-    {
-        $cname= Meta::classname_only($object::classname());
-        $html= "<select id='".$cname."_".$object->id."_$name' class='$class' name='".Form::fname($object, $name)."'>";
-        foreach($options as $k=>$o)
-        {
-            if (is_object($o))
-            {
-                $html.= "<option value=\"$o->id\" ";
-                if (strcmp($object->$name, $o->id) == 0)
-                    $html.= "selected='selected' ";
-                $html.=">".$o->$display."</option>";
-            }
-            else
-            {
-                $html.= "<option value=\"$k\" ";
-                    
-                if (strcmp($object->$name, $k) == 0)
-                    $html.= "selected='selected' ";
-                $html.=">".$o."</option>";
-            }
-        }
-        $html.="</select>";
-        return $html;
-    }
-
-    public function form_select_simple($name, $options, $select=null, $class='input', $id=null)
-    {
-        $html="<select id='$id' class='$class' name='$name'>";
-    
-        foreach($options as $k=>$o)
-        {
-            $html.= "<option value=\"$k\"";
-            if (strcmp($select, $k) == 0)
-                $html.= "selected='selected' ";
-            $html.=">".$o."</option>";
-        }
-        $html.="</select>";
-        return $html;
-    }
-
-
-    public function form_checkbox($object, $name, $value=null, $label=null, $class='input')
-    {
-        $checked= false;
-
-        if ($object->$name === $value)
-            $checked= "checked='checked'";
-        
-        $cname= Meta::classname_only($object::classname());
-        $id= $cname."_".$object->id."_$name";
-
-        $html= "<input onchange='toggle_checkbox(\"$id\", \"$value\")' class='$class' id='$id' type='checkbox' name='$id' value='".$value."' $checked />";
-
-        if ($checked)
-            $html.= "<input type='hidden' id='hidden_checkbox_$id' name='".Form::fname($object, $name)."' value='".$object->$name."'/>";
-        else
-            $html.= "<input type='hidden' id='hidden_checkbox_$id' name='".Form::fname($object, $name)."' value=''/>";
-
-        return $html;
-    }
-
-    public function form_checkbox_simple($name, $value, $checked=false, $label=null, $class='input', $id=null)
-    {
-        if ($checked)
-            $checked= "checked='checked'";
-        
-        $id= md5($name."_".$value);
-        
-        $html= "<label style='cursor: default;' onClick='toggle_checkbox(\"$id\")'><input class='$class' id='$id' type='checkbox' name='$id' value='$value' $checked/>";
-        
-        if ($checked)
-            $html.="<input type='hidden' id='hidden_checkbox_$id' name='$name' value='".$value."'/>";
-        else
-            $html.="<input type='hidden' id='hidden_checkbox_$id' name='$name' value=''/>";
-        
-        if (!$label)
-            $html.= " $value";
-        else
-            $html.= " $label";
-        
-        $html.="</label>";
-        
-        return $html;
-    }
-
-    public function form_radio($object, $name, $values, $class='input', $list_vertically=false)
-    {
-        $id= md5($name."_".$object->id);
-        $id_ploof= Meta::classname_only($object->classname())."_".$object->id."_$name";
-        $hidden_val = ($object->$name == null) ? 0 : $object->$name;
-        $html= "<input type='hidden' id='hidden_radio_$id' name='".Form::fname($object, $name)."' value='". $hidden_val  ."'/>";
-        
-        foreach($values as $k=>$v)
-        {
-            $checked= ($object->$name == $k) ? "checked='checked'" : "";
-            $option = "<input class='$class' type='radio' name='$k_$id' id='".$id_ploof."_$k' $checked value='$k' onMousedown='$(\"#hidden_radio_$id\").val(\"$k\")'> $v";
-            if ($list_vertically)
-                $option = "<span style='display:block;'>".$option."</span>";
-            $html.= $option;
-        }
-        return $html;
-    }
-
-    public function form_radio_simple($name, $value, $checked, $class='input', $id=null)
-    {
-        if ($checked)
-            $checked= "checked='checked'";
-
-        if (!$id)
-            $id= $name."_".$value;
-            
-        $html= "<input class='$class' id='$id' type='radio' name='$name' $checked value='$value'/>";
-        
-        return $html;
-    }
-
-    /**
-    * Get the form name for an object / value.
-    */
-    public function fname($object, $name)
-    {
-        if (!$object) throw new Exception("No object for fname");
-        $cname= Meta::classname_only($object::classname());
-        return "data[$cname][$name][]";
-    }
-
-    function view_id($object, $name)
-    {
-        if (!is_object($object))
-            throw new \Exception('no object');
-        
-        return classname_only($object->classname())."_".$object->id."_$name";
     }
 
 }
