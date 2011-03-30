@@ -7,6 +7,16 @@ define('DATABASE_NAME', 'test');
 
 define('MEMCACHED_HOST', '127.0.0.1');
 
+define('CSRF_TOKEN_SALT', 'JU7]h{I^Wic)');
+
+
+
+
+
+
+
+
+
 // The directory where PHPUnit is installed
 define('PHPUNIT_INSTALL', '/usr/share/pear/PHPUnit');
 

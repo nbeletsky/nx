@@ -16,7 +16,8 @@ class Page
         url.rewrite-once = (
             "^/$"=>"/index.php",
             "^/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1",
-            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1&$id=$2",
+            "^/([A-Za-z0-9\-]+)\?([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&args=$2",
+            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1&id=$2",
             "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1&action=$2&id=$3",
             "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&action=$2&id=$3&args=$4"
         )
@@ -31,7 +32,7 @@ class Page
         $get = array();
         if ( isset($query['args']) )
         {
-            $args = substr($query_string, strpos($query['args']));
+            $args = substr($query_string, strpos($query_string, $query['args']));
             parse_str($args, $get);
         }
 

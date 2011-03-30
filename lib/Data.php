@@ -4,19 +4,27 @@ namespace lib;
 class Data
 {
 
-    public function extract_post($data)
+    public function extract_post($post_data)
     {
+        $data = $post_data['data'];
         $collection = array();
         foreach ( $data as $classname=>$child_array )
         {
             foreach ( $child_array as $id=>$grandchild_array )
             {
-                $obj = new $classname($id);
-                foreach ( $grandchild_array as $name=>$val )
+                if ( is_numeric($id) )
                 {
-                    $obj->$name = $val;
+                    $obj = new $classname($id);
+                    foreach ( $grandchild_array as $name=>$val )
+                    {
+                        $obj->$name = $val;
+                    }
+                    $collection['objects'][$classname . '_' . $id] = $obj;
                 }
-                $collection[] = $obj;
+                else
+                {
+                    $collection[$classname][$id] = $grandchild_array;
+                }
             }
         }
 
