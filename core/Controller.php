@@ -17,7 +17,7 @@ class Controller
     public function __construct($get=null, $post=null)
     {
         $this->_http_get = ( !is_null($get) ) ? $get : array();
-        $this->_http_post = ( !is_null($post) ) ? $post : array();
+        $this->_http_post = ( isset($post['data']) ) ? $post['data'] : array();
     }
 
     public function call($action, $id=null, $additional=null)

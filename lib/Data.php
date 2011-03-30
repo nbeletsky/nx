@@ -4,9 +4,8 @@ namespace lib;
 class Data
 {
 
-    public function extract_post($post_data)
+    public function extract_post($data)
     {
-        $data = $post_data['data'];
         $collection = array();
         foreach ( $data as $classname=>$child_array )
         {
