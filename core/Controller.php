@@ -60,7 +60,7 @@ class Controller
                 }
             }
 
-            $libs = $this->_load_libraries();
+            $libs = ( method_exists($this, '_load_libraries') ) ? $this->_load_libraries() : null;
 
             if ( is_array($libs) )
             {
