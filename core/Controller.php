@@ -47,6 +47,7 @@ class Controller
             
             $view_file = "../view/" . $this->_template . '/' . get_class($this) . "/" . $action . VIEW_EXTENSION;
 
+            // TODO: Fix this logic
             if ( is_array($additional) )
             {
                 if ( !is_array($to_view) )
@@ -56,6 +57,20 @@ class Controller
                 else
                 {
                     $to_view = array_merge($to_view, $additional);
+                }
+            }
+
+            $libs = $this->_load_libraries();
+
+            if ( is_array($libs) )
+            {
+                if ( !is_array($to_view) )
+                {
+                    $to_view = $libs;
+                }
+                else
+                {
+                    $to_view = array_merge($to_view, $libs);
                 }
             }
 
