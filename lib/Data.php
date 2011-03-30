@@ -30,6 +30,33 @@ class Data
         return $collection; 
     }
 
+    // TODO: Fix this!  Implement sanitizers for POST!
+   /**
+    *  Sanitizes input according to type.
+    * 
+    *  @param mixed $data      The data to be sanitized.
+    *  @param string $type     The type of validation.
+    *  @access public
+    *  @return string
+    */
+    public function sanitize($data, $type) 
+    {
+        switch ( $type ) 
+        {
+            case 'float' :
+                $data = filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+                break;
+            case 'int' :
+                $data = filter_var($data, FILTER_SANITIZE_NUMBER_INT);
+                break;
+            case 'string' :
+                $data = filter_var($data, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+                break;
+        }
+        return $data;
+    }
+
+
 }
 
 ?>
