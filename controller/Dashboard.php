@@ -55,3 +55,5 @@ class Dashboard extends ApplicationController
     }
     
 }
+
+?>

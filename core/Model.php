@@ -32,6 +32,11 @@ class Model
                 $this->cache();
             }
         }
+        else
+        {
+            $id = PRIMARY_KEY;
+            $this->$id = 0;
+        }
 
     }
 

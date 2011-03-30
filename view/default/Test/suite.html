@@ -7,9 +7,9 @@
                         </div> 
                         <div class="more <?=$display?>"> 
                             <hr class = "big" /> 
-                            <?  $controller = new core\Controller();
+                            <?  $page = new lib\Page();
                                 foreach ( $tests as $test ) { 
-                                    $controller->render($query_string, $test);
+                                    $page->render($query_string, $test);
                                 } ?>
                         </div>
                     </div> 

@@ -25,7 +25,7 @@ class Form
 
     private function _format_name($object, $name)
     {
-        $meta = new lib\Meta();
+        $meta = new \lib\Meta();
         $classname = $meta->classname_only($object);
         $id = PRIMARY_KEY;
         return 'data[' . $classname . '][' . $object->$id . '][' . $name . ']';
@@ -43,7 +43,14 @@ class Form
         $html = '';
         foreach ( $attributes as $name=>$value )
         {
-            $html .= $name . "='" . $value . "' "; 
+            if ( !is_numeric($name) )
+            {
+                $html .= $name . "='" . $value . "' "; 
+            }
+            else
+            {
+                $html .= $value . " "; 
+            }
         }
         return $html;
     }
@@ -96,7 +103,7 @@ class Form
 
     public function text($object, $name, $attributes=array())
     {
-        $html = "<input type='text' name='" . $this->_format_name($object, $name) . " value='" . htmlentities($object->$name, ENT_QUOTES). "' "; 
+        $html = "<input type='text' name='" . $this->_format_name($object, $name) . "' value='" . htmlentities($object->$name, ENT_QUOTES) . "' "; 
         $html .= $this->_parse_attributes($attributes);
         $html .= "/>";
         

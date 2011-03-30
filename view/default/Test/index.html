@@ -9,9 +9,9 @@
 
 <body>
     <section>
-        <?  $controller = new core\Controller();
+        <?  $page = new lib\Page();
             foreach ( $suites as $suite ) { 
-                $controller->render($query_string, $suite);
+                $page->render($query_string, $suite);
             } 
             echo $sandbox; ?>
     </section>

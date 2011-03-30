@@ -40,3 +40,5 @@ class Test extends core\Controller
     }
         
 }
+
+?>

@@ -5,8 +5,10 @@ class ApplicationController extends core\Controller
     protected $_session;
     protected $_user;
 
-    public function __construct() 
+    public function __construct($get=null, $post=null) 
     {
+        parent::__construct($get, $post);
+
         $this->_session = $this->_get_default_session();
 
         if ( $this->_session->is_logged_in() )
