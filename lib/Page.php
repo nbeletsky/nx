@@ -17,17 +17,20 @@ class Page
             "^/$"=>"/index.php",
             "^/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1",
             "^/([A-Za-z0-9\-]+)\?([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&args=$2",
-            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1&id=$2",
+            "^/([A-Za-z0-9\-]+)/([\d]+)$"=>"/index.php?controller=$1&id=$2",
+            "^/([A-Za-z0-9\-]+)/([\d]+)\?([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&id=$2&args=$3",
+            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1&action=$2",
+            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)\?([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&action=$2&args=$3",
             "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1&action=$2&id=$3",
-            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&action=$2&id=$3&args=$4"
+            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)\?([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&action=$2&id=$3&args=$4"
         )
         */
 
         parse_str($query_string, $query);
 
         $controller = ( isset($query['controller']) ) ? ucfirst($query['controller']) : DEFAULT_CONTROLLER;
-        $action =     ( isset($query['action']) )     ? $query['action']     : DEFAULT_ACTION;
-        $id =         ( isset($query['id']) )         ? $query['id']         : null;
+        $action =     ( isset($query['action']) )     ? $query['action']              : DEFAULT_ACTION;
+        $id =         ( isset($query['id']) )         ? $query['id']                  : null;
 
         $get = array();
         if ( isset($query['args']) )
