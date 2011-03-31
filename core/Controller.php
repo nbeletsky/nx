@@ -16,16 +16,17 @@ class Controller
 
     public function __construct($get=null, $post=null)
     {
+        $data = new \lib\Data();
         $this->_http_get = ( !is_null($get) ) ? $get : array();
-        $this->_http_post = ( isset($post['data']) ) ? $post['data'] : array();
+        $this->_http_post = ( isset($post) ) ? $data->extract_post($post) : array();
+
+        $this->_classname = get_called_class(); 
     }
 
     public function call($action, $id=null, $additional=null)
     {
         try
         {
-            $this->_classname = get_called_class(); 
-
             if ( $this->is_protected($action) )
             {
                 $this->protect($action); // should throw an exception

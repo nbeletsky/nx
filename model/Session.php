@@ -217,15 +217,13 @@ class Session extends ApplicationModel
    /**
     *  Logs a user in.
     *
-    *  @param string $username    The supplied username.
-    *  @param string $password    The supplied password.
-    *  @param string $ip          The user's IP address.
-    *  @param obj $user           The user object to check against.
-    *  @param obj $encrypt        The encryption object to use.
+    *  @param obj $user               The user object to check against.
+    *  @param obj $hashed_password    The encrypted password to check against.
+    *  @param string $ip              The user's IP address.
     *  @access public
     *  @return bool
     */
-    public function login($username, $password, $ip, $user, $encrypt) 
+    public function login($user, $hashed_password, $ip) 
     {
         if ( !$user ) 
         {
@@ -233,9 +231,7 @@ class Session extends ApplicationModel
         }
 
         // Check that password matches
-        $id = PRIMARY_KEY;
-        $hashed_pass = $encrypt->password($password, $user->$id, $username, $user->join_date);
-        if ( $user->password !== $hashed_pass ) 
+        if ( $user->password !== $hashed_password ) 
         {
             return false;
         }

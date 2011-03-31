@@ -6,6 +6,11 @@ class Data
 
     public function extract_post($data)
     {
+        if ( isset($data['data']) )
+        {
+            // Trim the first layer
+            $data = $data['data'];
+        }
         $collection = array();
         foreach ( $data as $classname=>$child_array )
         {
@@ -16,13 +21,17 @@ class Data
                     $obj = new $classname($id);
                     foreach ( $grandchild_array as $name=>$val )
                     {
-                        $obj->$name = $val;
+                        $type = substr($name, strrpos($name, '|') + 1);
+                        $obj->$name = $this->sanitize($val, $type);
                     }
-                    $collection['objects'][$classname . '_' . $id] = $obj;
+                    $collection[$classname][$id] = $obj; 
                 }
                 else
                 {
-                    $collection[$classname][$id] = $grandchild_array;
+                    $type_loc = strrpos($id, '|');
+                    $type = substr($id, $type_loc + 1);
+                    $id = substr($id, 0, $type_loc);
+                    $collection[$classname][$id] = $this->sanitize($grandchild_array, $type);
                 }
             }
         }
@@ -43,19 +52,21 @@ class Data
     {
         switch ( $type ) 
         {
-            case 'float' :
-                $data = filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+            case 'b':
+                $data = (bool) filter_var($data, FILTER_SANITIZE_NUMBER_INT);
                 break;
-            case 'int' :
-                $data = filter_var($data, FILTER_SANITIZE_NUMBER_INT);
+            case 'f':
+                $data = floatval(filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION));
                 break;
-            case 'string' :
-                $data = filter_var($data, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+            case 'i':
+                $data = intval(filter_var($data, FILTER_SANITIZE_NUMBER_INT));
+                break;
+            case 's':
+                $data = strval(filter_var($data, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
                 break;
         }
         return $data;
     }
-
 
 }
 

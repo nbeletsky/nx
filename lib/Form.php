@@ -4,9 +4,9 @@ namespace lib;
 class Form
 {
 
-    public function checkbox($object, $name, $value, $attributes=array())
+    public function checkbox($object, $name, $type, $value, $attributes=array())
     {
-        $html = "<input type='checkbox' name='" . $this->_format_name($object, $name) . "' value='" . $value . "' ";
+        $html = "<input type='checkbox' name='" . $this->_format_name($object, $name, $type) . "' value='" . $value . "' ";
         $html .= $this->_parse_attributes($attributes);
 
         if ( $object->$name == $value )
@@ -23,17 +23,18 @@ class Form
         return '</form>';
     }
 
-    private function _format_name($object, $name)
+    private function _format_name($object, $name, $type)
     {
         $meta = new \lib\Meta();
         $classname = $meta->classname_only($object);
         $id = PRIMARY_KEY;
-        return 'data[' . $classname . '][' . $object->$id . '][' . $name . ']';
+        // TODO: Ensure that $type is 's', 'f', or 'i'
+        return 'data[' . $classname . '][' . $object->$id . '][' . $name . '|' . $type ']';
     }
 
-    public function hidden($object, $name, $attributes=array())
+    public function hidden($object, $name, $type, $attributes=array())
     {
-        $html = "<input type='hidden' name='" . $this->_format_name($object, $name) . "' value='" . $object->$name . "' ";
+        $html = "<input type='hidden' name='" . $this->_format_name($object, $name, $type) . "' value='" . $object->$name . "' ";
         $html .= $this->_parse_attributes($attributes);
         $html .= "/>";
     }
@@ -55,12 +56,12 @@ class Form
         return $html;
     }
 
-    public function radios($object, $name, $values, $attributes=array())
+    public function radios($object, $name, $type, $values, $attributes=array())
     {
         $html = '';
         foreach ( $values as $value=>$display )
         {
-            $html .= "<input type='radio' name='" . $this->_format_name($object, $name) . "' ";
+            $html .= "<input type='radio' name='" . $this->_format_name($object, $name, $type) . "' ";
             $html .= $this->_parse_attributes($attributes);
             if ( $object->$name == $value )
             {
@@ -72,9 +73,9 @@ class Form
         return $html;
     }
 
-    public function select($object, $name, $options, $attributes=array())
+    public function select($object, $name, $type, $options, $attributes=array())
     {
-        $html = "<select name='" . $this->_format_name($object, $name) . "' ";
+        $html = "<select name='" . $this->_format_name($object, $name, $type) . "' ";
         $html .= $this->_parse_attributes($attributes);
         $html .= ">";
         foreach( $options as $value=>$display )
@@ -101,18 +102,18 @@ class Form
         return $html;
     }
 
-    public function text($object, $name, $attributes=array())
+    public function text($object, $name, $type, $attributes=array())
     {
-        $html = "<input type='text' name='" . $this->_format_name($object, $name) . "' value='" . htmlentities($object->$name, ENT_QUOTES) . "' "; 
+        $html = "<input type='text' name='" . $this->_format_name($object, $name, $type) . "' value='" . htmlentities($object->$name, ENT_QUOTES) . "' "; 
         $html .= $this->_parse_attributes($attributes);
         $html .= "/>";
         
         return $html; 
     }
 
-    public function textarea($object, $name, $attributes=array())
+    public function textarea($object, $name, $type, $attributes=array())
     {
-        $html = "<textarea name='" . $this->_format_name($object, $name) . "' ";
+        $html = "<textarea name='" . $this->_format_name($object, $name, $type) . "' ";
         $html .= $this->_parse_attributes($attributes);
         $html .= '>'. htmlentities($object->$name) . "</textarea>"; 
         return $html;
