@@ -32,10 +32,6 @@ class Model
                 $this->cache();
             }
         }
-        elseif ( !is_null($id) )
-        {
-            $this->_repository->load_object($this, $id);
-        }
         else
         {
             $id = PRIMARY_KEY;
