@@ -4,13 +4,10 @@ class ApplicationController extends core\Controller
 {
     protected $_session;
     protected $_user;
-    protected $_self;
 
     public function __construct($get=null, $post=null) 
     {
         parent::__construct($get, $post);
-
-        $this->_self = strtolower($this->_classname);
 
         $this->_session = $this->_get_default_session();
 

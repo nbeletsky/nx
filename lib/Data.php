@@ -6,19 +6,14 @@ class Data
 
     public function extract_post($data)
     {
-        if ( isset($data['data']) )
-        {
-            // Trim the first layer
-            $data = $data['data'];
-        }
         $collection = array();
-        foreach ( $data as $classname=>$child_array )
+        foreach ( $data as $child_key=>$child )
         {
-            foreach ( $child_array as $id=>$grandchild_array )
+            if ( is_array($child) )
             {
-                if ( is_numeric($id) )
+                foreach ( $child as $id=>$grandchild_array )
                 {
-                    $obj = new $classname($id);
+                    $obj = new $child_key($id);
                     foreach ( $grandchild_array as $name=>$val )
                     {
                         $type = substr($name, strrpos($name, '|') + 1);
@@ -26,20 +21,19 @@ class Data
                     }
                     $collection[$classname][$id] = $obj; 
                 }
-                else
-                {
-                    $type_loc = strrpos($id, '|');
-                    $type = substr($id, $type_loc + 1);
-                    $id = substr($id, 0, $type_loc);
-                    $collection[$classname][$id] = $this->sanitize($grandchild_array, $type);
-                }
+            }
+            else
+            {
+                $type_loc = strrpos($child_key, '|');
+                $type = substr($child_key, $type_loc + 1);
+                $id = substr($child_key, 0, $type_loc);
+                $collection[$id] = $this->sanitize($child, $type);
             }
         }
 
         return $collection; 
     }
 
-    // TODO: Fix this!  Implement sanitizers for POST!
    /**
     *  Sanitizes input according to type.
     * 

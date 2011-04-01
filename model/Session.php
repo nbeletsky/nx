@@ -4,7 +4,7 @@ class Session extends ApplicationModel
 {
     protected $id;
 
-    protected $data = "";
+    protected $data;
 
    /**
     *  The timestamp of the user's last activity.
@@ -25,7 +25,7 @@ class Session extends ApplicationModel
     const SESSION_LIFETIME    = 3600;            // 60 minutes
     const LOGIN_COOKIE_EXPIRE = 2592000;         // Cookie expiration date (30 days)
     const SESSION_SALT        = 'M^mc?(9%ZKx[';  // Session salt
-    const COOKIE_ID_NAME      = 'ploof_id';      // Name of the cookie for the user date
+    const COOKIE_ID_NAME      = 'nx_id';         // Name of the cookie for the user date
 
    /**
     *  Constructor.
@@ -35,8 +35,6 @@ class Session extends ApplicationModel
     */
     public function __construct() 
     {
-        parent::__construct();
-
         $this->last_active = date('Y-m-d H:i:s', time());
 
         session_set_save_handler(array($this,'open'),
@@ -47,6 +45,8 @@ class Session extends ApplicationModel
                                  array($this,'gc'));
 
         session_start();
+
+        parent::__construct(array(PRIMARY_KEY => session_id()));
     }
 
    /**
@@ -241,6 +241,7 @@ class Session extends ApplicationModel
         $user->last_login = date('Y-m-d H:i:s');
         $user->store();
        
+        $id = PRIMARY_KEY;
         $this->_create($user->$id); 
 
         return true;
@@ -278,6 +279,7 @@ class Session extends ApplicationModel
     */
     public function read($session_id) 
     {
+        var_dump($this->data);
         return $this->data;
     }
 
@@ -308,11 +310,7 @@ class Session extends ApplicationModel
         $this->id = $session_id;
         $this->data = $data;
 
-        if ( $this->User_id > 0 )
-        {
-            return $this->store();       
-        }
-        return true;
+        return $this->store();       
     }
 
    /**

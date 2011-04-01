@@ -3,7 +3,6 @@ namespace lib;
 
 class Form
 {
-
     public function checkbox($object, $name, $type, $value, $attributes=array())
     {
         $html = "<input type='checkbox' name='" . $this->_format_name($object, $name, $type) . "' value='" . $value . "' ";
@@ -29,7 +28,7 @@ class Form
         $classname = $meta->classname_only($object);
         $id = PRIMARY_KEY;
         // TODO: Ensure that $type is 's', 'f', or 'i'
-        return 'data[' . $classname . '][' . $object->$id . '][' . $name . '|' . $type ']';
+        return '[' . $classname . '][' . $object->$id . '][' . $name . '|' . $type ']';
     }
 
     public function hidden($object, $name, $type, $attributes=array())

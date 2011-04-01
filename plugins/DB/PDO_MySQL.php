@@ -472,14 +472,11 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         $values = ':' . implode(', :', $property_names);
 
     
-        $sql .= '(' . $fields . ') VALUES (' . $values . ') ON DUPLICATE KEY UPDATE `' . PRIMARY_KEY . '`=LAST_INSERT_ID(`' . PRIMARY_KEY . '`), ';
+        $sql .= '(' . $fields . ') VALUES (' . $values . ') ON DUPLICATE KEY UPDATE ';
 
     	foreach ( $property_names as $name ) 
         {
-            if ( $name !== PRIMARY_KEY )
-            {
-                $sql .= '`' . $name . '`=:' . $name . ', ';
-            }
+            $sql .= '`' . $name . '`=:' . $name . ', ';
     	}
 
         $sql = rtrim($sql, ', ');

@@ -10,9 +10,13 @@ class Controller
     protected $_http_get = array();
     protected $_http_post = array();
 
+    protected $_validation_errors = array();
+
     protected $_template = DEFAULT_TEMPLATE; 
     protected $_create_snapshot = false; 
     protected $_classname = null;
+
+    protected $_token = null;
 
     public function __construct($get=null, $post=null)
     {
@@ -32,12 +36,15 @@ class Controller
                 $this->protect($action); // should throw an exception
             }
             
-            if ( method_exists($this, $action) )
+            if ( !method_exists($this, $action) )
             {
-                $this->preload($action);
-                
-                $to_view = $this->$action($id);
+                // TODO: throw 404!
+                die();
             }   
+
+            $this->preload($action);
+            
+            $to_view = $this->$action($id);
 
             // AJAX
             if ( is_string($to_view) )
@@ -127,7 +134,25 @@ class Controller
 
     public function preload($action)
     {
-        // called before call(). override to do stuff before loading $action.
+        if ( !empty($this->_http_post) )
+        {
+            if ( $this->_http_post['token'] !== $_SESSION[$this->_classname . '_token'] )
+            {
+                // CSRF attack
+                die('CSRF detected' .$this->_http_post['token'] . ":" . $_SESSION[$this->_classname . '_token']);
+            }
+
+            $validator = '\\lib\validators\\' . $this->_classname; 
+            if ( class_exists($validator) )
+            {
+                $validator = new $validator($this->_http_post);
+                $this->_validation_errors = $validator->$action();
+            }
+        }
+
+        $this->_token = sha1(microtime() . CSRF_TOKEN_SALT);
+        $_SESSION[$this->_classname . '_token'] = $this->_token;
+
     }
     
     public function protect($action)

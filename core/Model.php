@@ -24,13 +24,14 @@ class Model
             $id = $result[PRIMARY_KEY];
         }
 
-        if ( is_numeric($id) )
+        if ( !is_null($id) )
         {
-            if ( !$this->pull_from_cache($this, $id) )
-            {
+            //if ( !$this->pull_from_cache($this, $id) )
+            //{
                 $this->_repository->load_object($this, $id);
-                $this->cache();
-            }
+             //   $this->cache();
+            //}
+            var_dump($this);
         }
         else
         {
