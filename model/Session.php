@@ -4,7 +4,7 @@ class Session extends ApplicationModel
 {
     protected $id;
 
-    protected $data;
+    protected $data = '';
 
    /**
     *  The timestamp of the user's last activity.
@@ -35,6 +35,8 @@ class Session extends ApplicationModel
     */
     public function __construct() 
     {
+        parent::__construct();
+
         $this->last_active = date('Y-m-d H:i:s', time());
 
         session_set_save_handler(array($this,'open'),
@@ -45,8 +47,6 @@ class Session extends ApplicationModel
                                  array($this,'gc'));
 
         session_start();
-
-        parent::__construct(array(PRIMARY_KEY => session_id()));
     }
 
    /**
@@ -279,8 +279,11 @@ class Session extends ApplicationModel
     */
     public function read($session_id) 
     {
-        var_dump($this->data);
-        return $this->data;
+        $where = array(PRIMARY_KEY => $session_id);
+        $this->_repository->find('`data`', get_class($this), $where);
+
+        $data = $this->_repository->fetch_column();
+        return $data;
     }
 
    /**

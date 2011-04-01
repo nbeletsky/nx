@@ -42,6 +42,8 @@ class Controller
                 die();
             }   
 
+            $this->_validate($action);
+
             $this->preload($action);
             
             $to_view = $this->$action($id);
@@ -134,27 +136,9 @@ class Controller
 
     public function preload($action)
     {
-        if ( !empty($this->_http_post) )
-        {
-            if ( $this->_http_post['token'] !== $_SESSION[$this->_classname . '_token'] )
-            {
-                // CSRF attack
-                die('CSRF detected' .$this->_http_post['token'] . ":" . $_SESSION[$this->_classname . '_token']);
-            }
-
-            $validator = '\\lib\validators\\' . $this->_classname; 
-            if ( class_exists($validator) )
-            {
-                $validator = new $validator($this->_http_post);
-                $this->_validation_errors = $validator->$action();
-            }
-        }
-
-        $this->_token = sha1(microtime() . CSRF_TOKEN_SALT);
-        $_SESSION[$this->_classname . '_token'] = $this->_token;
-
+        // preload some stuff
     }
-    
+
     public function protect($action)
     {
         // override to protect things.
@@ -192,6 +176,29 @@ class Controller
             header("Location: $redirect_location");
         }
         exit();
+    }
+
+    private function _validate($action)
+    {
+        if ( !empty($this->_http_post) )
+        {
+            if ( $this->_http_post['token'] !== $_SESSION[$this->_classname . '_token'] )
+            {
+                // CSRF attack
+                die('CSRF detected!');
+            }
+
+            $validator = '\\lib\validators\\' . $this->_classname; 
+            if ( class_exists($validator) )
+            {
+                $validator = new $validator($this->_http_post);
+                $this->_validation_errors = $validator->$action();
+            }
+        }
+
+        $this->_token = sha1(microtime() . CSRF_TOKEN_SALT);
+        $_SESSION[$this->_classname . '_token'] = $this->_token;
+
     }
     
 }

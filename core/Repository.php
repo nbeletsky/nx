@@ -88,6 +88,11 @@ class Repository implements PluginInterfaceDB, PluginInterfaceCache
         return $this->_db->fetch_all();
     }
 
+    public function fetch_column($column_number=0) 
+    {
+        return $this->_db->fetch_column($column_number);
+    }
+
     public function find($fields, $table, $where=null, $additional=null)
     {
         return $this->_db->find($fields, $table, $where, $additional);
