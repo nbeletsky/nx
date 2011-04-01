@@ -18,7 +18,7 @@ class Model
     {
         $this->_repository = $repository;
         
-        if ( !is_numeric($id) && $id !== '' )
+        if ( !is_numeric($id) && !is_null($id) )
         {
             $result = $this->_repository->find_object($this, $id); 
             $id = $result[PRIMARY_KEY];
@@ -32,12 +32,6 @@ class Model
                 $this->cache();
             }
         }
-        else
-        {
-            $id = PRIMARY_KEY;
-            $this->$id = 0;
-        }
-
     }
 
     public function __get($field_name)

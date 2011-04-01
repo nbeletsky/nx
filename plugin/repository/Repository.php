@@ -1,12 +1,12 @@
 <?php
 namespace core;
 
-class Repository implements PluginInterfaceDB, PluginInterfaceCache
+class Repository implements interface\DBPlugin, interface\CachePlugin
 {
     private $_db;
     private $_cache;
     
-    public function __construct(PluginInterfaceDB $db, PluginInterfaceCache $cache)
+    public function __construct(interface\DBPlugin $db, interface\CachePlugin $cache)
     {
         $this->_db = $db;
         $this->_cache = $cache;
@@ -23,7 +23,7 @@ class Repository implements PluginInterfaceDB, PluginInterfaceCache
     }
     
     //-------------------------------------------------
-    // by contract to PluginInterfaceCache
+    // by contract to CachePlugin
     //-------------------------------------------------
     public function add_to_cache($key, $value, $expiration=0, $server_key='')
     {
@@ -56,7 +56,7 @@ class Repository implements PluginInterfaceDB, PluginInterfaceCache
     }
     
     //-------------------------------------------------
-    // by contract to PluginInterfaceDB:
+    // by contract to DBPlugin
     //-------------------------------------------------
     public function affected_rows()
     {

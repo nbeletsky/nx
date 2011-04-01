@@ -13,7 +13,7 @@ class Test extends core\Controller
 
         chdir($path);
 
-        $vpu = new \plugins\test\VPU($path);
+        $vpu = new \plugin\test\VPU($path);
 
         if ( VPU_SANDBOX_ERRORS )
         {

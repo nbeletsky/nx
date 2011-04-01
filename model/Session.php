@@ -280,7 +280,7 @@ class Session extends ApplicationModel
     public function read($session_id) 
     {
         $where = array(PRIMARY_KEY => $session_id);
-        $this->_repository->find('`data`', get_class($this), $where);
+        $this->_repository->find('`data`', $this, $where);
 
         $data = $this->_repository->fetch_column();
         return $data;

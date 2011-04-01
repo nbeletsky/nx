@@ -1,7 +1,8 @@
 <?php
-namespace plugins\DB;
+namespace plugin\db;
 
-class PDO_MySQL implements \core\PluginInterfaceDB 
+// TODO: Fix this class!
+class MongoDB implements \core\interface\DBPlugin 
 {
    /**
     *  The db handle. 
@@ -35,7 +36,8 @@ class PDO_MySQL implements \core\PluginInterfaceDB
     */
     public function __construct($database, $host, $username, $password) 
     {
-        $this->connect($database, $host, $username, $password);
+        $this->_dbh = new Mongo();
+        $this->connect
     }
 
     public function connect($database, $host, $username, $password) 
@@ -168,6 +170,23 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         $this->query($sql, $where); 
     }
 
+    /*
+    public function find_all_objects($obj, $where=null)
+    {
+        $results = array();
+        $id = PRIMARY_KEY;
+
+        $this->find($obj, $where);
+        $this->_set_fetch_mode('into', $obj);
+        while ( $row = $this->_statement->fetch() )
+        {
+            $results[$row->$id] = clone $row;
+        }
+        $this->_statement->closeCursor();
+        return $results;
+    }
+    */
+
     public function find_all_objects($obj, $where=null)
     {
         $results = array();
@@ -182,6 +201,14 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         $this->_statement->closeCursor();
         return $results;
     }
+
+    /*
+    public function find_object($obj, $where=null)
+    {
+        $this->find($obj, $where, 'LIMIT 1');
+        return $this->fetch('into', $obj);
+    }
+    */
 
     public function find_object($obj, $where=null)
     {
@@ -198,45 +225,12 @@ class PDO_MySQL implements \core\PluginInterfaceDB
             $sql = ' WHERE ';
             if ( is_array($where) )
             {
-                foreach ( $where as $name=>$val ) 
+                $field_names = array_keys($where);
+                foreach ( $field_names as $name ) 
                 {
-                    // $EXAMPLE = array( "i" => array( "\$gt" => 20, "\$lte" => 30 ) );
-                    if ( is_array($val) )
-                    {
-                        foreach ( $val as $sign=>$constraint )
-                        {
-                            $new_name = $name .  '__' . $constraint;
-                            $sql .=  '`' . $new_name . '` ';
-                            switch ( $sign )
-                            {
-                                case 'gt':
-                                    $sql .= '>';
-                                    break;
-                                case 'gte':
-                                    $sql .= '>=';
-                                    break;
-                                case 'lt':
-                                    $sql .= '<';
-                                    break;
-                                case 'lte':
-                                    $sql .= '<=';
-                                    break;
-                                case 'e':
-                                default:
-                                    $sql .= '=';
-                                    break;
-                            }
-                            $sql .= ':' . $new_name . ' and ';
-                            $where[$new_name] = $constraint;
-                            unset($where[$name]);
-                        }
-                    }
-                    else
-                    {
-                        $sql .= '`' . $name . '`=:' . $name . ' and ';
-                    }
+                    $sql .= '`' . $name . '`=:' . $name . ', ';
                 }
-                $sql = substr($sql, 0, strlen($sql) - strlen(' and '));
+                $sql = rtrim($sql, ', ');
             }
             // $where is a string
             else
@@ -472,11 +466,14 @@ class PDO_MySQL implements \core\PluginInterfaceDB
         $values = ':' . implode(', :', $property_names);
 
     
-        $sql .= '(' . $fields . ') VALUES (' . $values . ') ON DUPLICATE KEY UPDATE ';
+        $sql .= '(' . $fields . ') VALUES (' . $values . ') ON DUPLICATE KEY UPDATE `' . PRIMARY_KEY . '`=LAST_INSERT_ID(`' . PRIMARY_KEY . '`), ';
 
     	foreach ( $property_names as $name ) 
         {
-            $sql .= '`' . $name . '`=:' . $name . ', ';
+            if ( $name !== PRIMARY_KEY )
+            {
+                $sql .= '`' . $name . '`=:' . $name . ', ';
+            }
     	}
 
         $sql = rtrim($sql, ', ');

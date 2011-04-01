@@ -34,7 +34,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-namespace plugins\test;
+namespace plugin\test;
 
 require_once 'Autoload.php';
 require_once 'Util/Log/JSON.php';
@@ -64,7 +64,7 @@ class VPU
     *  @var array
     *  @access private
     */
-    private $_ignore_trace = array('plugins/test/vpu.php',
+    private $_ignore_trace = array('plugin/test/vpu.php',
                                    'public/index.php',
                                    'core/controller.php',
                                    'controller/test.php');

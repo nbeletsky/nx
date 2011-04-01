@@ -10,7 +10,7 @@
                      BASE_INSTALL."/view".PATH_SEPARATOR.
                      BASE_INSTALL."/core".PATH_SEPARATOR.
                      BASE_INSTALL."/lib".PATH_SEPARATOR.
-                     BASE_INSTALL."/plugins".PATH_SEPARATOR.
+                     BASE_INSTALL."/plugin".PATH_SEPARATOR.
                      BASE_INSTALL."/test/temp");
 
     ini_set('display_errors', 1);

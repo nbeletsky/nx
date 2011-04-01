@@ -1,7 +1,8 @@
-<?
-namespace plugins\cache;
+<?php
 
-class MemcachedCache implements \core\PluginInterfaceCache
+namespace plugin\cache;
+
+class MemcachedCache implements \core\interface\CachePlugin
 {
 
    /**

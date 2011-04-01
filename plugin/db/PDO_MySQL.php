@@ -1,8 +1,7 @@
 <?php
-namespace plugins\DB;
+namespace plugin\db;
 
-// TODO: Fix this class!
-class MongoDB implements \core\PluginInterfaceDB 
+class PDO_MySQL implements \core\interface\DBPlugin 
 {
    /**
     *  The db handle. 
@@ -36,8 +35,7 @@ class MongoDB implements \core\PluginInterfaceDB
     */
     public function __construct($database, $host, $username, $password) 
     {
-        $this->_dbh = new Mongo();
-        $this->connect
+        $this->connect($database, $host, $username, $password);
     }
 
     public function connect($database, $host, $username, $password) 
@@ -170,23 +168,6 @@ class MongoDB implements \core\PluginInterfaceDB
         $this->query($sql, $where); 
     }
 
-    /*
-    public function find_all_objects($obj, $where=null)
-    {
-        $results = array();
-        $id = PRIMARY_KEY;
-
-        $this->find($obj, $where);
-        $this->_set_fetch_mode('into', $obj);
-        while ( $row = $this->_statement->fetch() )
-        {
-            $results[$row->$id] = clone $row;
-        }
-        $this->_statement->closeCursor();
-        return $results;
-    }
-    */
-
     public function find_all_objects($obj, $where=null)
     {
         $results = array();
@@ -201,14 +182,6 @@ class MongoDB implements \core\PluginInterfaceDB
         $this->_statement->closeCursor();
         return $results;
     }
-
-    /*
-    public function find_object($obj, $where=null)
-    {
-        $this->find($obj, $where, 'LIMIT 1');
-        return $this->fetch('into', $obj);
-    }
-    */
 
     public function find_object($obj, $where=null)
     {
@@ -225,12 +198,45 @@ class MongoDB implements \core\PluginInterfaceDB
             $sql = ' WHERE ';
             if ( is_array($where) )
             {
-                $field_names = array_keys($where);
-                foreach ( $field_names as $name ) 
+                foreach ( $where as $name=>$val ) 
                 {
-                    $sql .= '`' . $name . '`=:' . $name . ', ';
+                    // $EXAMPLE = array( "i" => array( "\$gt" => 20, "\$lte" => 30 ) );
+                    if ( is_array($val) )
+                    {
+                        foreach ( $val as $sign=>$constraint )
+                        {
+                            $new_name = $name .  '__' . $constraint;
+                            $sql .=  '`' . $new_name . '` ';
+                            switch ( $sign )
+                            {
+                                case 'gt':
+                                    $sql .= '>';
+                                    break;
+                                case 'gte':
+                                    $sql .= '>=';
+                                    break;
+                                case 'lt':
+                                    $sql .= '<';
+                                    break;
+                                case 'lte':
+                                    $sql .= '<=';
+                                    break;
+                                case 'e':
+                                default:
+                                    $sql .= '=';
+                                    break;
+                            }
+                            $sql .= ':' . $new_name . ' and ';
+                            $where[$new_name] = $constraint;
+                            unset($where[$name]);
+                        }
+                    }
+                    else
+                    {
+                        $sql .= '`' . $name . '`=:' . $name . ' and ';
+                    }
                 }
-                $sql = rtrim($sql, ', ');
+                $sql = substr($sql, 0, strlen($sql) - strlen(' and '));
             }
             // $where is a string
             else
@@ -466,14 +472,11 @@ class MongoDB implements \core\PluginInterfaceDB
         $values = ':' . implode(', :', $property_names);
 
     
-        $sql .= '(' . $fields . ') VALUES (' . $values . ') ON DUPLICATE KEY UPDATE `' . PRIMARY_KEY . '`=LAST_INSERT_ID(`' . PRIMARY_KEY . '`), ';
+        $sql .= '(' . $fields . ') VALUES (' . $values . ') ON DUPLICATE KEY UPDATE ';
 
     	foreach ( $property_names as $name ) 
         {
-            if ( $name !== PRIMARY_KEY )
-            {
-                $sql .= '`' . $name . '`=:' . $name . ', ';
-            }
+            $sql .= '`' . $name . '`=:' . $name . ', ';
     	}
 
         $sql = rtrim($sql, ', ');

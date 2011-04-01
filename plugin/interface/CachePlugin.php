@@ -1,7 +1,7 @@
-<?
-namespace core;
+<?php
+namespace core\interface;
 
-interface PluginInterfaceCache
+interface CachePlugin
 {
 
    /**
