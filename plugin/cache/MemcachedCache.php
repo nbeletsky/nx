@@ -2,7 +2,7 @@
 
 namespace plugin\cache;
 
-class MemcachedCache implements \core\interface\CachePlugin
+class MemcachedCache implements \plugin\Cache
 {
 
    /**

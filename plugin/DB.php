@@ -1,7 +1,7 @@
 <?php
-namespace core\interface;
+namespace plugin;
 
-interface DBPlugin
+interface DB
 {
     /**
      *  Returns the number of rows affected by the last DELETE, INSERT, or UPDATE query.

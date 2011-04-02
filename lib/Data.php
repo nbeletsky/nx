@@ -56,7 +56,7 @@ class Data
                 $data = intval(filter_var($data, FILTER_SANITIZE_NUMBER_INT));
                 break;
             case 's':
-                $data = strval(filter_var($data, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES));
+                $data = trim(strval(filter_var($data, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES)));
                 break;
         }
         return $data;

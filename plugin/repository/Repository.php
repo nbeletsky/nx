@@ -1,12 +1,12 @@
 <?php
-namespace core;
+namespace plugin\repository;
 
-class Repository implements interface\DBPlugin, interface\CachePlugin
+class Repository implements \plugin\DB, \plugin\Cache
 {
     private $_db;
     private $_cache;
     
-    public function __construct(interface\DBPlugin $db, interface\CachePlugin $cache)
+    public function __construct(\plugin\DB $db, \plugin\Cache $cache)
     {
         $this->_db = $db;
         $this->_cache = $cache;

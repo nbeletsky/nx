@@ -1,7 +1,7 @@
 <?php
 namespace plugin\db;
 
-class PDO_MySQL implements \core\interface\DBPlugin 
+class PDO_MySQL implements \plugin\DB
 {
    /**
     *  The db handle. 
