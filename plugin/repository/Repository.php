@@ -1,4 +1,6 @@
 <?php
+
+// TODO: The whole repository thing sucks huge ass.
 namespace plugin\repository;
 
 class Repository implements \plugin\DB, \plugin\Cache

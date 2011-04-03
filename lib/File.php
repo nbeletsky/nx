@@ -1,8 +1,9 @@
 <?php
+
 namespace lib;
 
-class File
-{
+// TODO: Clean this file!
+class File {
 
    /**
     *  Creates a snapshot of the test results.
@@ -12,11 +13,9 @@ class File
     *  @access public
     *  @return void
     */
-    public function create_snapshot($data, $filename)
-    {
+    public function create_snapshot($data, $filename) {
         $top = BASE_INSTALL . '/' . SNAPSHOT_DIRECTORY;
-        if ( $top{strlen($top) - 1} !== '/' )
-        {
+        if ( $top{strlen($top) - 1} !== '/' ) {
             $top .= '/';
         }
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -32,18 +31,14 @@ class File
     *  @access public
     *  @return void
     */
-    public function empty_file($filename)
-    {
+    public function empty_file($filename) {
         $this->write_file($filename, '', 'w');
     }
 
-    public function get_filenames_within($directory)
-    {
+    public function get_filenames_within($directory) {
         $filenames = array();
-        foreach (new \DirectoryIterator($directory) as $file) 
-        {
-            if ( $file->isDot() ) 
-            {
+        foreach (new \DirectoryIterator($directory) as $file) {
+            if ( $file->isDot() ) {
                 continue;
             }
             $filenames[] = $file->getFilename();
@@ -56,13 +51,11 @@ class File
     * 
     * @param string $file_name
     */
-    public function parse_content_type($file_name)
-    {
+    public function parse_content_type($file_name) {
 	$ext = array_pop(explode(".", $file_name));
 
 	$supported_types = array('doc', 'pdf', 'ppt', 'png', 'jpg', 'xls');
-	if (!in_array($ext, $supported_types))
-	{
+	if (!in_array($ext, $supported_types)) {
 	    throw new \Exception('Unsupported extension: ' . $ext . ' from file name ' . $file_name);
 	}
 	return 'application/'.strtolower($ext);
@@ -74,10 +67,8 @@ class File
     * @param string $os_file_name Full path file name for file
     * @param string $user_file_name File name displayed to the user
     */
-    public function render($os_file_name, $user_file_name)
-    {
-    	if(!file_exists($os_file_name))
-        {
+    public function render($os_file_name, $user_file_name) {
+    	if(!file_exists($os_file_name)) {
     	    throw new exception\PloofException("File $os_file_name Not found");
         }
 
@@ -100,11 +91,9 @@ class File
     *  @access public
     *  @return string
     */
-    public function write_file($filename, $data, $mode='a')
-    {
+    public function write_file($filename, $data, $mode='a') {
         $handle = @fopen($filename, $mode);
-        if ( !$handle )
-        {
+        if ( !$handle ) {
             // TODO: Set exception handler!
             throw new \Exception('Could not open ' . $filename . ' for writing.  Check the location and permissions of the file and try again.');
         }

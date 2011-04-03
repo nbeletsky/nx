@@ -2,8 +2,7 @@
 
 namespace plugin\cache;
 
-class MemcachedCache implements \plugin\Cache
-{
+class MemcachedCache {
 
    /**
     *  The Memcached object. 
@@ -21,13 +20,12 @@ class MemcachedCache implements \plugin\Cache
     *  @access public
     *  @return void
     */
-    public function __construct($persistent_id='')
-    {
+    public function __construct($persistent_id='') {
         $this->_cache = new \Memcached($persistent_id);
     }
 
    /**
-    *  Adds an item under a new key.  Functionally equivalent to set_in_cache(), though this operation will fail
+    *  Adds an item under a new key.  Functionally equivalent to store(), though this operation will fail
     *  if $key already exists on the server.
     *
     *  @param string $key                       The key under which to store the value.
@@ -39,8 +37,7 @@ class MemcachedCache implements \plugin\Cache
     *  @access public
     *  @return bool 
     */
-    public function add_to_cache($key, $value, $server_key='', $expiration=0)
-    {
+    public function add($key, $value, $server_key='', $expiration=0) {
         return $this->_cache->addByKey($server_key, $key, $value, $expiration);
     }
 
@@ -55,8 +52,7 @@ class MemcachedCache implements \plugin\Cache
     *  @access public
     *  @return bool 
     */
-    public function add_server($host, $weight=0, $port=11211)
-    {
+    public function add_server($host, $weight=0, $port=11211) {
         return $this->_cache->addServer($host, $port, $weight);
     }
 
@@ -67,14 +63,14 @@ class MemcachedCache implements \plugin\Cache
     *  @access public
     *  @return bool 
     */
-    public function add_servers($servers)
-    {
+    public function add_servers($servers) {
         $reassembled = array();
-        foreach ( array_values($servers) as $server )
-        {
-            $reassembled[] = array($server[0], 
-                                   (isset($server[2])) ? $server[2] : 11211, 
-                                   (isset($server[1])) ? $server[1] : 0);
+        foreach ( array_values($servers) as $server ) {
+            $reassembled[] = array(
+                $server[0], 
+                (isset($server[2])) ? $server[2] : 11211, 
+                (isset($server[1])) ? $server[1] : 0
+            );
         }
 
         return $this->_cache->addServers($reassembled);
@@ -89,8 +85,7 @@ class MemcachedCache implements \plugin\Cache
     *  @access public
     *  @return bool 
     */
-    public function append($key, $value, $server_key='')
-    {
+    public function append($key, $value, $server_key='') {
         return $this->_cache->appendByKey($server_key, $key, $value);
     }
 
@@ -107,10 +102,9 @@ class MemcachedCache implements \plugin\Cache
     *  @access public
     *  @return bool 
     *
-    *  @see get_from_cache() for how to obtain the CAS token.
+    *  @see retrieve() for how to obtain the CAS token.
     */
-    public function cas($token, $key, $value, $server_key='', $expiration=0)
-    {
+    public function cas($token, $key, $value, $server_key='', $expiration=0) {
         return $this->_cache->casByKey($token, $server_key, $key, $value, $expiration);
     }
 
@@ -123,8 +117,7 @@ class MemcachedCache implements \plugin\Cache
     *  @return int                              If the item's value is not numeric, it is treated as if the value were 0.
     *                                           If the operation would decrease the value below 0, the new value will be 0.
     */
-    public function decrement($key, $offset=1)
-    {
+    public function decrement($key, $offset=1) {
         return $this->_cache->decrement($key, $offset);
     }
 
@@ -137,8 +130,7 @@ class MemcachedCache implements \plugin\Cache
     *  @access public
     *  @return bool 
     */
-    public function delete_from_cache($key, $server_key='', $time=0)
-    {
+    public function delete($key, $server_key='', $time=0) {
         return $this->_cache->deleteByKey($server_key, $key, $time);
     }
 
@@ -149,9 +141,50 @@ class MemcachedCache implements \plugin\Cache
     *  @access public
     *  @return bool 
     */
-    public function flush_cache($delay=0)
-    {
+    public function flush($delay=0) {
         return $this->_cache->flush($delay);
+    }
+
+   /**
+    *  Increments a numeric item's value.
+    *
+    *  @param string $key                       The key of the item to increment.
+    *  @param int $offset                       The amount by which to increment the item's value. 
+    *  @access public
+    *  @return int                              If the item's value is not numeric, it is treated as if the value were 0.
+    */
+    public function increment($key, $offset=1) {
+        return $this->_cache->increment($key, $offset);
+    }
+
+   /**
+    *  Prepends data to an existing item.
+    *
+    *  @param string $key                       The key of the item to prepend the data to.
+    *  @param string $value                     The string to prepend.
+    *  @param mixed $server_key                 The key identifying the server to store the value on.
+    *  @access public
+    *  @return bool 
+    */
+    public function prepend($key, $value, $server_key='') {
+        return $this->_cache->prependByKey($server_key, $key, $value);
+    }
+
+   /**
+    *  Replaces the item under an existing key.  Functionally equivalent to store(), though this operation will fail
+    *  if $key does not exist.
+    *
+    *  @param string $key                       The key under which to store the value.
+    *  @param mixed $value                      The value to be stored. 
+    *  @param string $server_key                The key identifying the server to store the value on.
+    *  @param int $expiration                   The expiration time.  Can be number of seconds from now.  
+    *                                           If this value exceeds 60*60*24*30 (number of seconds in 30 days), the value will be interpreted
+    *                                           as a UNIX timestamp.
+    *  @access public
+    *  @return bool 
+    */
+    public function replace($key, $value, $server_key='', $expiration=0) {
+        return $this->_cache->replaceByKey($server_key, $key, $value, $expiration);
     }
 
    /**
@@ -166,8 +199,7 @@ class MemcachedCache implements \plugin\Cache
     *
     *  @see cas() for how to use CAS tokens.
     */
-    public function get_from_cache($key, $server_key='', $cache_callback=null, &$cas_token=null)
-    {
+    public function retrieve($key, $server_key='', $cache_callback=null, &$cas_token=null) {
         return $this->_cache->getByKey($server_key, $key, $cache_callback, $cas_token);
     }
 
@@ -177,8 +209,7 @@ class MemcachedCache implements \plugin\Cache
     *  @access public
     *  @return array
     */
-    public function get_server_list()
-    {
+    public function server_list() {
         return $this->_cache->getServerList();
     }
 
@@ -188,54 +219,8 @@ class MemcachedCache implements \plugin\Cache
     *  @access public
     *  @return array
     */
-    public function get_stats()
-    {
+    public function stats() {
         return $this->_cache->getStats();
-    }
-
-   /**
-    *  Increments a numeric item's value.
-    *
-    *  @param string $key                       The key of the item to increment.
-    *  @param int $offset                       The amount by which to increment the item's value. 
-    *  @access public
-    *  @return int                              If the item's value is not numeric, it is treated as if the value were 0.
-    */
-    public function increment($key, $offset=1)
-    {
-        return $this->_cache->increment($key, $offset);
-    }
-
-   /**
-    *  Prepends data to an existing item.
-    *
-    *  @param string $key                       The key of the item to prepend the data to.
-    *  @param string $value                     The string to prepend.
-    *  @param mixed $server_key                 The key identifying the server to store the value on.
-    *  @access public
-    *  @return bool 
-    */
-    public function prepend($key, $value, $server_key='')
-    {
-        return $this->_cache->prependByKey($server_key, $key, $value);
-    }
-
-   /**
-    *  Replaces the item under an existing key.  Functionally equivalent to set_in_cache(), though this operation will fail
-    *  if $key does not exist.
-    *
-    *  @param string $key                       The key under which to store the value.
-    *  @param mixed $value                      The value to be stored. 
-    *  @param string $server_key                The key identifying the server to store the value on.
-    *  @param int $expiration                   The expiration time.  Can be number of seconds from now.  
-    *                                           If this value exceeds 60*60*24*30 (number of seconds in 30 days), the value will be interpreted
-    *                                           as a UNIX timestamp.
-    *  @access public
-    *  @return bool 
-    */
-    public function replace_in_cache($key, $value, $server_key='', $expiration=0)
-    {
-        return $this->_cache->replaceByKey($server_key, $key, $value, $expiration);
     }
 
    /**
@@ -250,10 +235,9 @@ class MemcachedCache implements \plugin\Cache
     *  @access public
     *  @return bool 
     */
-    public function set_in_cache($key, $value, $server_key='', $expiration=0)
-    {
+    public function store($key, $value, $server_key='', $expiration=0) {
         $result = $this->_cache->setByKey($server_key, $key, $value, $expiration);
     }
-    
+
 }
 ?>

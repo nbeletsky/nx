@@ -1,7 +1,8 @@
 <?php
 
-class Session extends ApplicationModel
-{
+namespace model;
+
+class Session extends ApplicationModel {
     protected $id;
 
     protected $data = '';
@@ -33,18 +34,19 @@ class Session extends ApplicationModel
     *  @access public
     *  @return void
     */
-    public function __construct() 
-    {
+    public function __construct() {
         parent::__construct();
 
         $this->last_active = date('Y-m-d H:i:s', time());
 
-        session_set_save_handler(array($this,'open'),
-                                 array($this,'close'),
-                                 array($this,'read'),
-                                 array($this,'write'),
-                                 array($this,'destroy'),
-                                 array($this,'gc'));
+        session_set_save_handler(
+            array($this,'open'),
+            array($this,'close'),
+            array($this,'read'),
+            array($this,'write'),
+            array($this,'destroy'),
+            array($this,'gc')
+        );
 
         session_start();
     }
@@ -55,8 +57,7 @@ class Session extends ApplicationModel
     *  @access public
     *  @return bool
     */
-    public function close() 
-    {
+    public function close() {
         return true;
     }
 
@@ -67,8 +68,7 @@ class Session extends ApplicationModel
     *  @access private
     *  @return void
     */
-    private function _create($user_id) 
-    {
+    private function _create($user_id) {
         $this->User_id = $user_id;
         session_regenerate_id(true);
         $_SESSION = array();
@@ -85,18 +85,15 @@ class Session extends ApplicationModel
     *  @access private
     *  @return int
     */
-    private function _decrypt_cookie($hex_hash) 
-    {
+    private function _decrypt_cookie($hex_hash) {
         $hex_hash = filter_var($hex_hash, FILTER_SANITIZE_STRING);
-        if ( strlen($hex_hash) !== 40 ) 
-        {
+        if ( strlen($hex_hash) !== 40 ) {
             return false;
         }
         // Extrapolate hex from hash
         $cur_pos = 0;
         $hex_id = '';
-        for ( $i = 0; $i <= 7; $i++ ) 
-        {
+        for ( $i = 0; $i <= 7; $i++ ) {
             $cur_pos += $i + 1; 
             $hex_id .= substr($hex_hash, $cur_pos, 1);
         }
@@ -111,8 +108,7 @@ class Session extends ApplicationModel
     *  @access public
     *  @return bool
     */
-    public function destroy($session_id) 
-    {
+    public function destroy($session_id) {
         $this->delete();
         return true;
     } 
@@ -124,8 +120,8 @@ class Session extends ApplicationModel
     *  @access private
     *  @return string
     */
-    private function _encrypt_id($user_id) 
-    {
+    // TODO: Move to lib\Encrypt?
+    private function _encrypt_id($user_id) {
         // Create the hash
         $hex_salt = 'R1c?+r.VEfIN';
         $hex_hash = sha1($hex_salt . $user_id);
@@ -133,8 +129,7 @@ class Session extends ApplicationModel
         $user_hex = $this->_zeropad(dechex($user_id), 8);
         // Interpolate hex into hash
         $cur_pos = 0;
-        for ( $i = 0; $i <= 7; $i++ ) 
-        {
+        for ( $i = 0; $i <= 7; $i++ ) {
             $cur_pos += $i + 1; 
             $hex_hash = substr_replace($hex_hash, substr($user_hex, $i, 1), $cur_pos, 1);
         }
@@ -148,8 +143,7 @@ class Session extends ApplicationModel
     *  @access public
     *  @return bool
     */
-    public function gc($max_lifetime) 
-    {
+    public function gc($max_lifetime) {
         $expired = strtotime($this->last_active) - $max_lifetime;
         $where = '`last_active`<' . $expired;
         return $this->delete($where);
@@ -162,38 +156,28 @@ class Session extends ApplicationModel
     *  @access private
     *  @return string
     */
-    private function _get_fingerprint($user_id) 
-    {
+    private function _get_fingerprint($user_id) {
         return sha1(self::SESSION_SALT . $user_id . $_SERVER['HTTP_USER_AGENT']);
     }
 
-    public function get_user_id() 
-    {
+    public function get_user_id() {
         return $this->User_id;
     }
 
-    public function is_logged_in()
-    {
-        if ( (!isset($_SESSION['uid'])) || (!isset($_SESSION['fingerprint'])) || (!isset($_SESSION['last_active'])) )
-        {
+    public function is_logged_in() {
+        if ( (!isset($_SESSION['uid'])) || (!isset($_SESSION['fingerprint'])) || (!isset($_SESSION['last_active'])) ) {
             $this->User_id = 0;
             $is_logged_in = false;
-        }
-        elseif ( (!isset($_COOKIE[self::COOKIE_ID_NAME])) || ($_SESSION['uid'] !== $this->_decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME])) || 
-                 ($_SESSION['fingerprint'] !== $this->_get_fingerprint($_SESSION['uid'])) ) 
-        {
+        } elseif ( (!isset($_COOKIE[self::COOKIE_ID_NAME])) || ($_SESSION['uid'] !== $this->_decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME])) || 
+                 ($_SESSION['fingerprint'] !== $this->_get_fingerprint($_SESSION['uid'])) ) {
             $this->User_id = 0;
             $is_logged_in = false;
             $this->kill();
-        }
-        elseif ( (strtotime($_SESSION['last_active']) + self::SESSION_LIFETIME < time()) ) 
-        {
+        } elseif ( (strtotime($_SESSION['last_active']) + self::SESSION_LIFETIME < time()) ) {
             $this->User_id = 0;
             $is_logged_in = false;
             $this->reset();
-        }
-        else 
-        {
+        } else {
             $this->User_id = $_SESSION['uid'];
             $is_logged_in = true;
             $_SESSION['last_active'] = $this->last_active;
@@ -207,8 +191,7 @@ class Session extends ApplicationModel
     *  @access public
     *  @return void
     */
-    public function kill() 
-    {
+    public function kill() {
         $_SESSION = array();
         setcookie(self::COOKIE_ID_NAME, '', time() - 3600);
         session_destroy();
@@ -223,16 +206,13 @@ class Session extends ApplicationModel
     *  @access public
     *  @return bool
     */
-    public function login($user, $hashed_password, $ip) 
-    {
-        if ( !$user ) 
-        {
+    public function login($user, $hashed_password, $ip) {
+        if ( !$user ) {
             return false; 
         }
 
         // Check that password matches
-        if ( $user->password !== $hashed_password ) 
-        {
+        if ( $user->password !== $hashed_password ) {
             return false;
         }
 
@@ -253,8 +233,7 @@ class Session extends ApplicationModel
     *  @access public
     *  @return void
     */ 
-    public function logout()
-    {
+    public function logout() {
         $this->kill();
     }
 
@@ -264,8 +243,7 @@ class Session extends ApplicationModel
     *  @access public
     *  @return bool
     */
-    public function open() 
-    {
+    public function open() {
         return true;
     }
 
@@ -277,8 +255,7 @@ class Session extends ApplicationModel
     *  @access public
     *  @return string
     */
-    public function read($session_id) 
-    {
+    public function read($session_id) {
         $where = array(PRIMARY_KEY => $session_id);
         $this->_repository->find('`data`', $this, $where);
 
@@ -292,8 +269,7 @@ class Session extends ApplicationModel
     *  @access public
     *  @return void
     */
-    public function reset() 
-    {
+    public function reset() {
         session_destroy();
         session_start();
         session_regenerate_id();
@@ -308,8 +284,7 @@ class Session extends ApplicationModel
     *  @access public
     *  @return int                      The lastInsertID.
     */
-    public function write($session_id, $data) 
-    {
+    public function write($session_id, $data) {
         $this->id = $session_id;
         $this->data = $data;
 
@@ -324,8 +299,7 @@ class Session extends ApplicationModel
     *  @access private
     *  @return string
     */
-    private function _zeropad($num, $limit) 
-    {
+    private function _zeropad($num, $limit) {
         return str_repeat('0', max(0, $limit - strlen($num))) . $num;
     }
     

@@ -9,8 +9,6 @@ class User extends ApplicationModel
     protected $ip;
     protected $join_date;
     protected $last_login;
-
-    protected $_has_many = array('Entry');
 }
 
 ?>

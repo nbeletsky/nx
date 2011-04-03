@@ -1,10 +1,11 @@
 <?php
+
 namespace lib;
 
-class Page
-{
-    public function render($query_string, $additional=null)
-    {
+use lib\File;
+
+class Page {
+    public function render($query_string, $additional=null) {
         // URL layout
         // foobar.com/
         // foobar.com/controller
@@ -33,24 +34,20 @@ class Page
         $id =         ( isset($query['id']) )         ? $query['id']                  : null;
 
         $get = array();
-        if ( isset($query['args']) )
-        {
+        if ( isset($query['args']) ) {
             $args = substr($query_string, strpos($query_string, $query['args']));
             parse_str($args, $get);
         }
 
-        $file = new \lib\File();
+        $file = new File();
         $whitelist = $file->get_filenames_within(BASE_INSTALL . '/controller');
         $strip_ext = create_function('$val', 'return basename($val, ".php");');
         $whitelist = array_map($strip_ext, $whitelist);
 
-        if ( in_array($controller, $whitelist) )
-        {
+        if ( in_array($controller, $whitelist) ) {
             $controller_obj = new $controller($get, $_POST);
             $controller_obj->call($action, $id, $additional);
-        }
-        else
-        {
+        } else {
             // TODO: Throw exception!
         }
     }

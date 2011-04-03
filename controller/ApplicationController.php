@@ -1,36 +1,31 @@
 <?php
 
-class ApplicationController extends core\Controller
-{
+namespace controller;
+
+class ApplicationController extends core\Controller {
+
     protected $_session;
     protected $_user;
 
-    public function __construct($get=null, $post=null) 
-    {
+    protected $_classes = array(
+        'session' => 'model\Session', 
+        'user'    => 'model\User'
+    );
+
+    public function __construct($get=null, $post=null) {
         parent::__construct($get, $post);
 
-        $this->_session = $this->_get_default_session();
+        $session = $this->_classes['session'];
+        $this->_session = new $session(); 
 
-        if ( $this->_session->is_logged_in() )
-        {
-            $this->_user = $this->_get_default_user($this->_session->get_user_id());
+        if ( $this->_session->is_logged_in() ) {
+            $user = $this->_classes['user'];
+            $this->_user = new $user($this->_session->get_user_id());
             $this->_template = $this->_user->get_template();
-        }
-        else
-        {
+        } else {
             $this->_user = null;
             $this->_template = DEFAULT_TEMPLATE;
         }
-    }
-
-    private function _get_default_session()
-    {
-        return new Session(); 
-    }
-
-    private function _get_default_user($user_id)
-    {
-        return new User($user_id);
     }
 }
 

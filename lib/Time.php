@@ -1,13 +1,11 @@
 <?php
+
 namespace lib;
 
-class Time
-{
+class Time {
 
-    public function IntervalTimesForSelect($interval = 15, $military = false)
-    {
-        if ( 60 % interval !== 0 )
-        {
+    public function IntervalTimesForSelect($interval = 15, $military = false) {
+        if ( 60 % interval !== 0 ) {
             return false;
         }
 

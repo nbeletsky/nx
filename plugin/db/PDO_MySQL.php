@@ -1,31 +1,33 @@
 <?php
+
 namespace plugin\db;
 
-class PDO_MySQL implements \plugin\DB
-{
+use lib\Meta;
+
+class PDO_MySQL {
    /**
     *  The db handle. 
     *
     *  @var object
-    *  @access private
+    *  @access protected
     */
-    private $_dbh;
+    protected $_dbh;
 
    /**
     *  Number of rows affected by MySQL query.
     *
     *  @var int
-    *  @access private
+    *  @access protected
     */
-    private $_affected_rows = 0;
+    protected $_affected_rows = 0;
 
    /**
     *  The result set associated with a prepared statement.
     *
     *  @var PDOStatement
-    *  @access private
+    *  @access protected
     */
-    private $_statement;
+    protected $_statement;
 
    /**
     *  Connects and selects database.
@@ -33,21 +35,16 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return void
     */
-    public function __construct($database, $host, $username, $password) 
-    {
+    public function __construct($database, $host, $username, $password) {
         $this->connect($database, $host, $username, $password);
     }
 
-    public function connect($database, $host, $username, $password) 
-    {
+    public function connect($database, $host, $username, $password) {
         $dsn = 'mysql:host=' . $host . ';dbname=' . $database; 
-        try 
-        {
+        try {
             $this->_dbh = new \PDO($dsn, $username, $password);
             $this->_dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        }
-        catch ( PDOException $e ) 
-        {
+        } catch ( PDOException $e ) {
             // TODO: How to handle error reporting?
         }
     }
@@ -58,8 +55,7 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return int
     */
-    public function affected_rows() 
-    {
+    public function affected_rows() {
     	return $this->_affected_rows;
     }
 
@@ -69,30 +65,23 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return void
     */
-    public function close()
-    {
+    public function close() {
         $this->_dbh = null;
     }
     
-    public function delete($obj, $where=null)
-    {
+    public function delete($obj, $where=null) {
         $sql = 'DELETE FROM `' . get_class($obj) . '`';
-        if ( is_null($where) )
-        {
+        if ( is_null($where) ) {
             $id = PRIMARY_KEY;
             $where = array(PRIMARY_KEY => $obj->$id);
         }
 
         $sql .= $this->_format_where($where);
 
-        if ( is_array($where) )
-        {
-            return $this->query($sql, $where);
-        }
-        // $where is a string
-        else
-        {
+        if ( is_string($where) ) {
             return $this->query($sql);
+        } elseif ( is_array($where) ) {
+            return $this->query($sql, $where);
         }
     }
     
@@ -105,8 +94,7 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return mixed
     */
-    public function fetch($fetch_style=null, $obj=null) 
-    {
+    public function fetch($fetch_style=null, $obj=null) {
         $this->_set_fetch_mode($fetch_style, $obj);
         $row = $this->_statement->fetch();
         $this->_statement->closeCursor();
@@ -120,8 +108,7 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return mixed
     */
-    public function fetch_all($fetch_style=null) 
-    {
+    public function fetch_all($fetch_style=null) {
         $this->_set_fetch_mode($fetch_style);
         $rows = $this->_statement->fetchAll();
         $this->_statement->closeCursor();
@@ -135,114 +122,96 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return mixed
     */
-    public function fetch_column($column_number=0) 
-    {
+    public function fetch_column($column_number=0) {
         $column = $this->_statement->fetchColumn($column_number);
         $this->_statement->closeCursor();
         return $column; 
     }
 
-    public function find($fields, $table, $where=null, $additional=null)
-    {
+    public function find($fields, $table, $where=null, $additional=null) {
         $sql = 'SELECT ';
-        if ( is_array($fields) )
-        {
+        if ( is_array($fields) ) {
             $sql .= '`' . implode('`, `', $fields) . '`';
-        }
-        else
-        {
+        } else {
             $sql .= $fields;
         }
 
-        if ( is_object($table) )
-        {
+        if ( is_object($table) ) {
             $table = get_class($table);
         }
 
         $sql .= ' FROM `' . $table . '`';
         $sql .= $this->_format_where($where);
-        if ( !is_null($additional) )
-        {
+        if ( !is_null($additional) ) {
             $sql .= ' ' . $additional;
         }
         $this->query($sql, $where); 
     }
 
-    public function find_all_objects($obj, $where=null)
-    {
+    public function find_all_objects($obj, $where=null) {
         $results = array();
         $id = PRIMARY_KEY;
 
         $this->find('`' . $id . '`', $obj, $where);
         $this->_set_fetch_mode('assoc');
-        while ( $row = $this->_statement->fetch() )
-        {
+        while ( $row = $this->_statement->fetch() ) {
             $results[] = $row[$id];
         }
         $this->_statement->closeCursor();
         return $results;
     }
 
-    public function find_object($obj, $where=null)
-    {
+    public function find_object($obj, $where=null) {
         $id = PRIMARY_KEY;
         $this->find('`' . $id . '`', $obj, $where, 'LIMIT 1');
         return $this->fetch('assoc');
     }
 
-    private function _format_where($where=null)
-    {
+    protected function _format_where($where=null) {
         $sql = '';
-        if ( !is_null($where) )
-        {
-            $sql = ' WHERE ';
-            if ( is_array($where) )
-            {
-                foreach ( $where as $name=>$val ) 
-                {
-                    // $EXAMPLE = array( "i" => array( "\$gt" => 20, "\$lte" => 30 ) );
-                    if ( is_array($val) )
-                    {
-                        foreach ( $val as $sign=>$constraint )
-                        {
-                            $new_name = $name .  '__' . $constraint;
-                            $sql .=  '`' . $new_name . '` ';
-                            switch ( $sign )
-                            {
-                                case 'gt':
-                                    $sql .= '>';
-                                    break;
-                                case 'gte':
-                                    $sql .= '>=';
-                                    break;
-                                case 'lt':
-                                    $sql .= '<';
-                                    break;
-                                case 'lte':
-                                    $sql .= '<=';
-                                    break;
-                                case 'e':
-                                default:
-                                    $sql .= '=';
-                                    break;
-                            }
-                            $sql .= ':' . $new_name . ' and ';
-                            $where[$new_name] = $constraint;
-                            unset($where[$name]);
+
+        if ( is_null($where) ) {
+            return $sql;
+        }
+
+        $sql = ' WHERE ';
+        if ( is_string($where) ) {
+            $sql .= $where;
+        } elseif ( is_array($where) ) {
+            foreach ( $where as $name=>$val ) {
+                // $EXAMPLE = array( "i" => array( "\$gt" => 20, "\$lte" => 30 ) );
+                // TODO: Re-order this logic
+                if ( is_array($val) ) {
+                    foreach ( $val as $sign=>$constraint ) {
+                        $new_name = $name .  '__' . $constraint;
+                        $sql .=  '`' . $new_name . '` ';
+                        switch ( $sign ) {
+                            case 'gt':
+                                $sql .= '>';
+                                break;
+                            case 'gte':
+                                $sql .= '>=';
+                                break;
+                            case 'lt':
+                                $sql .= '<';
+                                break;
+                            case 'lte':
+                                $sql .= '<=';
+                                break;
+                            case 'e':
+                            default:
+                                $sql .= '=';
+                                break;
                         }
+                        $sql .= ':' . $new_name . ' and ';
+                        $where[$new_name] = $constraint;
+                        unset($where[$name]);
                     }
-                    else
-                    {
-                        $sql .= '`' . $name . '`=:' . $name . ' and ';
-                    }
+                } else {
+                    $sql .= '`' . $name . '`=:' . $name . ' and ';
                 }
-                $sql = substr($sql, 0, strlen($sql) - strlen(' and '));
             }
-            // $where is a string
-            else
-            {
-                $sql .= $where;
-            }
+            $sql = substr($sql, 0, strlen($sql) - strlen(' and '));
         }
 
         return $sql;
@@ -255,10 +224,9 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return bool
     */
-    public function insert($obj) 
-    {
+    public function insert($obj) {
         $table = get_class($obj);
-        $meta = new \lib\Meta();
+        $meta = new Meta();
         $properties = $meta->get_protected_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
@@ -271,12 +239,9 @@ class PDO_MySQL implements \plugin\DB
 
     	$statement = $this->_dbh->prepare($sql);
 
-        try 
-        {
+        try {
             $statement->execute($properties);
-    	}
-        catch ( \PDOException $e ) 
-        {
+    	} catch ( \PDOException $e ) {
             die($e->getMessage());
             // TODO: How to handle error reporting?
             return false;
@@ -292,13 +257,11 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return int
     */
-    public function insert_id()
-    {
+    public function insert_id() {
         return $this->_dbh->lastInsertId();
     }
 
-    public function load_object($obj, $id)
-    {
+    public function load_object($obj, $id) {
         $where = array(PRIMARY_KEY => $id);
         $this->find('*', $obj, $where);
         return $this->fetch('into', $obj);
@@ -310,8 +273,7 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return int       
     */
-    public function num_rows()
-    {
+    public function num_rows() {
         $this->query('SELECT FOUND_ROWS()');
         $rows = $this->fetch_column();
         return $rows;
@@ -325,23 +287,17 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return bool 
     */
-    public function query($sql, $parameters=null) 
-    {
+    public function query($sql, $parameters=null) {
         $statement = $this->_dbh->prepare($sql);
 
-        if ( is_array($parameters) ) 
-        {
-            foreach ( $parameters as $field => &$value ) 
-            {
+        if ( is_array($parameters) ) {
+            foreach ( $parameters as $field => &$value ) {
                 $statement->bindParam(':' . $field, $value);
             }
         }
-        try 
-        {
+        try {
             $statement->execute();
-    	}
-        catch ( \PDOException $e ) 
-        {
+    	} catch ( \PDOException $e ) {
             die($e->getMessage());
             // TODO: How to handle error reporting?
             $this->_affected_rows = 0;
@@ -361,8 +317,7 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return mixed       
     */
-    public function query_first($sql, $parameters=null) 
-    {
+    public function query_first($sql, $parameters=null) {
         $this->query($sql . ' LIMIT 1', $parameters);
     }
 
@@ -371,13 +326,11 @@ class PDO_MySQL implements \plugin\DB
     *
     *  @param string $fetch_style        Controls how the rows will be returned.
     *  @param obj $obj                   The object to be fetched into for use with FETCH_INTO.
-    *  @access private
+    *  @access protected
     *  @return int 
     */
-    private function _set_fetch_mode($fetch_style, $obj=null) 
-    {
-        switch ( $fetch_style ) 
-        {
+    protected function _set_fetch_mode($fetch_style, $obj=null) {
+        switch ( $fetch_style ) {
             case 'assoc':
                 $this->_statement->setFetchMode(\PDO::FETCH_ASSOC);
                 break;
@@ -410,39 +363,32 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return bool 
     */
-    public function update($obj, $where=null) 
-    {
+    public function update($obj, $where=null) {
         $table = get_class($obj);
-        $meta = new lib\Meta();
+        $meta = new Meta();
         $properties = $meta->get_protected_vars($obj);
 
     	$sql = 'UPDATE `' . $table . '` SET ';
     
         $property_names = array_keys($properties);
-    	foreach ( $property_names as $name ) 
-        {
+    	foreach ( $property_names as $name ) {
             $sql .= '`' . $name . '`=:' . $name . ', ';
     	}
 
         $sql = rtrim($sql, ', ');
 
-        if ( !is_null($where) )
-        {
+        if ( !is_null($where) ) {
     	    $sql .= ' WHERE ';
-            foreach ( $where as $name => $val ) 
-            {
+            foreach ( $where as $name => $val ) {
                 $sql .= '`' . $name . '`=:' . $name . '_where, ';
                 $properties[$name . '_where'] = $val;
             }
         }
     	$statement = $this->_dbh->prepare($sql);
 
-        try 
-        {
+        try {
             $statement->execute($properties);
-    	}
-        catch ( \PDOException $e ) 
-        {
+    	} catch ( \PDOException $e ) {
             die($e->getMessage());
             // TODO: How to handle error reporting?
             return false;
@@ -459,10 +405,9 @@ class PDO_MySQL implements \plugin\DB
     *  @access public
     *  @return bool 
     */
-    public function upsert($obj) 
-    {
+    public function upsert($obj) {
         $table = get_class($obj);
-        $meta = new \lib\Meta();
+        $meta = new Meta();
         $properties = $meta->get_protected_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
@@ -474,20 +419,16 @@ class PDO_MySQL implements \plugin\DB
     
         $sql .= '(' . $fields . ') VALUES (' . $values . ') ON DUPLICATE KEY UPDATE ';
 
-    	foreach ( $property_names as $name ) 
-        {
+    	foreach ( $property_names as $name ) {
             $sql .= '`' . $name . '`=:' . $name . ', ';
     	}
 
         $sql = rtrim($sql, ', ');
     	$statement = $this->_dbh->prepare($sql);
 
-        try 
-        {
+        try {
             $statement->execute($properties);
-    	}
-        catch ( \PDOException $e ) 
-        {
+    	} catch ( \PDOException $e ) {
             die($e->getMessage() . $sql . var_dump($properties));
             // TODO: How to handle error reporting?
             return false;

@@ -1,18 +1,22 @@
 <?php
 
+namespace test\plugin;
+
+use plugin\cache\MemcachedCache;
+
 class MemcachedCacheTest extends \PHPUnit_Framework_TestCase
 {    
 
     public function setUp()
     {
-        $cache = new \plugin\cache\MemcachedCache();
+        $cache = new MemcachedCache();
         $cache->add_server(MEMCACHED_HOST);
         $cache->flush_cache();
     }
 
     public function test_set()
     {
-        $cache = new \plugin\cache\MemcachedCache();
+        $cache = new MemcachedCache();
         $cache->add_server(MEMCACHED_HOST);
         $key = 'test';
         $value = 'value';
@@ -23,7 +27,7 @@ class MemcachedCacheTest extends \PHPUnit_Framework_TestCase
 
     public function test_add()
     {
-        $cache = new \plugin\cache\MemcachedCache();
+        $cache = new MemcachedCache();
         $cache->add_server(MEMCACHED_HOST);
         $key = 'test';
         $value = 'value';
@@ -39,7 +43,7 @@ class MemcachedCacheTest extends \PHPUnit_Framework_TestCase
 
     public function test_delete()
     {
-        $cache = new \plugin\cache\MemcachedCache();
+        $cache = new MemcachedCache();
         $cache->add_server(MEMCACHED_HOST);
         $key = 'test';
         $value = 'value';
@@ -51,7 +55,7 @@ class MemcachedCacheTest extends \PHPUnit_Framework_TestCase
 
     public function test_flush()
     {
-        $cache = new \plugin\cache\MemcachedCache();
+        $cache = new MemcachedCache();
         $cache->add_server(MEMCACHED_HOST);
         $key = 'test';
         $value = 'value';
@@ -63,7 +67,7 @@ class MemcachedCacheTest extends \PHPUnit_Framework_TestCase
 
     public function test_replace()
     {
-        $cache = new \plugin\cache\MemcachedCache();
+        $cache = new MemcachedCache();
         $cache->add_server(MEMCACHED_HOST);
         $key = 'test';
         $value = 'value';

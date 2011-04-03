@@ -1,29 +1,22 @@
 <?php
+
 namespace lib;
 
-class Data
-{
+class Data {
 
-    public function extract_post($data)
-    {
+    public function extract_post($data) {
         $collection = array();
-        foreach ( $data as $child_key=>$child )
-        {
-            if ( is_array($child) )
-            {
-                foreach ( $child as $id=>$grandchild_array )
-                {
+        foreach ( $data as $child_key=>$child ) {
+            if ( is_array($child) ) {
+                foreach ( $child as $id=>$grandchild_array ) {
                     $obj = new $child_key($id);
-                    foreach ( $grandchild_array as $name=>$val )
-                    {
+                    foreach ( $grandchild_array as $name=>$val ) {
                         $type = substr($name, strrpos($name, '|') + 1);
                         $obj->$name = $this->sanitize($val, $type);
                     }
                     $collection[$classname][$id] = $obj; 
                 }
-            }
-            else
-            {
+            } else {
                 $type_loc = strrpos($child_key, '|');
                 $type = substr($child_key, $type_loc + 1);
                 $id = substr($child_key, 0, $type_loc);
@@ -42,12 +35,10 @@ class Data
     *  @access public
     *  @return string
     */
-    public function sanitize($data, $type) 
-    {
-        switch ( $type ) 
-        {
+    public function sanitize($data, $type) {
+        switch ( $type ) {
             case 'b':
-                $data = (bool) filter_var($data, FILTER_SANITIZE_NUMBER_INT);
+                $data = (boolean) filter_var($data, FILTER_SANITIZE_NUMBER_INT);
                 break;
             case 'f':
                 $data = floatval(filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION));
