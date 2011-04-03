@@ -15,14 +15,14 @@ class Page
         server.document-root = "/srv/http/YOURSITE/public"
         url.rewrite-once = (
             "^/$"=>"/index.php",
-            "^/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1",
-            "^/([A-Za-z0-9\-]+)\?([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&args=$2",
-            "^/([A-Za-z0-9\-]+)/([\d]+)$"=>"/index.php?controller=$1&id=$2",
-            "^/([A-Za-z0-9\-]+)/([\d]+)\?([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&id=$2&args=$3",
-            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1&action=$2",
-            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)\?([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&action=$2&args=$3",
-            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)$"=>"/index.php?controller=$1&action=$2&id=$3",
-            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)/([A-Za-z0-9\-]+)\?([A-Za-z0-9\-\&\=\_]+)$"=>"/index.php?controller=$1&action=$2&id=$3&args=$4"
+            "^/([A-Za-z0-9\-]+)/?$"=>"/index.php?controller=$1",
+            "^/([A-Za-z0-9\-]+)/([\d]+)/?$"=>"/index.php?controller=$1&id=$2",
+            "^/([A-Za-z0-9\-]+)\?(.+)$"=>"/index.php?controller=$1&args=$2",
+            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/?$"=>"/index.php?controller=$1&action=$2",
+            "^/([A-Za-z0-9\-]+)/([\d]+)\?(.+)$"=>"/index.php?controller=$1&id=$2&args=$3",
+            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/([\d]+)/?$"=>"/index.php?controller=$1&action=$2&id=$3",
+            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)\?(.+)$"=>"/index.php?controller=$1&action=$2&args=$3",
+            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/([\d]+)\?(.+)$"=>"/index.php?controller=$1&action=$2&id=$3&args=$4"
         )
         */
 
