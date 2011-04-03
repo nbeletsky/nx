@@ -5,8 +5,15 @@ namespace core;
 use lib\Meta;
 
 class Model {
-    protected $_repository;
-    
+
+    protected $_classes = array(
+        'db'    => 'plugin\db\PDO_MySQL',
+        'cache' => 'plugin\cache\MemcachedCache'
+    );
+
+    protected $_db;
+    protected $_cache;
+
     protected $_has_one = array();
     protected $_has_many = array();
     protected $_belongs_to = array();
@@ -16,17 +23,20 @@ class Model {
         
     // id can either be an unique identifier 
     // or a WHERE relationship
-    public function __construct($id, $repository) {
-        $this->_repository = $repository;
+    public function __construct($id = null) {
+        $db = $this->_classes['db'];
+        $this->_db = new $db(); 
+        $cache = $this->_classes['cache'];
+        $this->_cache = new $cache(); 
         
         if ( !is_numeric($id) && !is_null($id) ) {
-            $result = $this->_repository->find_object($this, $id); 
+            $result = $this->_db->find_object($this, $id); 
             $id = $result[PRIMARY_KEY];
         }
 
         if ( is_numeric($id) ) {
             if ( !$this->pull_from_cache($this, $id) ) {
-                $this->_repository->load_object($this, $id);
+                $this->_db->load_object($this, $id);
                 $this->cache();
             }
         }
@@ -63,24 +73,25 @@ class Model {
 
         $id = PRIMARY_KEY;
         $key = get_class($this) . '_' . $this->$id;
-        $this->_repository->set_in_cache($key, $data);
+        $this->_cache->store($key, $data);
     }
 
-    public function delete($where=null) {
-        $this->_repository->delete($this, $where);
+    public function delete($where = null) {
+        $this->_db->delete($this, $where);
+        // TODO: Delete from cache!
     }
 
-    public function find_all($where=null, $obj=null) {
+    public function find_all($where = null, $obj = null) {
         if ( is_null($obj) ) {
             $obj = $this;
         }
 
-        $all_obj_ids = $obj->_repository->find_all_objects($obj, $where);
+        $all_obj_ids = $obj->_db->find_all_objects($obj, $where);
 
         $collection = array();
         $obj_name = get_class($obj);
         foreach ( $all_obj_ids as $obj_id ) {
-            $collection[$obj_id] = new $obj_name($obj_id, $obj->_repository);
+            $collection[$obj_id] = new $obj_name($obj_id);
         }
         return $collection;
     }
@@ -89,7 +100,7 @@ class Model {
         $lookup_id = $field_name . PK_SEPARATOR . PRIMARY_KEY;
         $obj_id = $this->$lookup_id;
 
-        return new $field_name($obj_id, $this->_repository); 
+        return new $field_name($obj_id); 
     }
 
     protected function _get_habtm($field_name) {
@@ -101,13 +112,13 @@ class Model {
         $where = array($lookup_id => $this->$id);
 
         $target_id = $field_name . PK_SEPARATOR . PRIMARY_KEY;
-        $this->_repository->find('`' . $target_id . '`', $table_name, $where);
+        $this->_db->find('`' . $target_id . '`', $table_name, $where);
 
-        $rows = $this->_repository->fetch_all('assoc');
+        $rows = $this->_db->fetch_all('assoc');
         $collection = array();
         foreach ( $rows as $row ) {
             $new_id = $row[$target_id];
-            $collection[$new_id] = new $field_name($new_id, $this->_repository); 
+            $collection[$new_id] = new $field_name($new_id); 
         }
         return $collection;
     }
@@ -125,10 +136,10 @@ class Model {
         $id = PRIMARY_KEY;
         $where = array($lookup_id => $this->$id);
 
-        $result = $this->_repository->find_object($field_name, $where);
+        $result = $this->_db->find_object($field_name, $where);
         $obj_id = $result[PRIMARY_KEY];
 
-        return new $field_name($obj_id, $this->_repository); 
+        return new $field_name($obj_id); 
     }
 
     public function habtm($field_name) {
@@ -150,22 +161,22 @@ class Model {
 
     public function pull_from_cache($obj, $id) {
         $key = get_class($obj) . '_' . $id;
-        $cached_data = $obj->_repository->get_from_cache($key);
+        $cached_data = $obj->_cache->retrieve($key);
         if ( !$cached_data ) {
             return false;
         }
 
         $cached_obj = json_decode($cached_data, true);
-        foreach ( $cached_obj as $key=>$val ) {
+        foreach ( $cached_obj as $key => $val ) {
             $obj->$key = $val;
         }
         return $obj;
     }
 
     public function store() {
-        $this->_repository->upsert($this);
+        $this->_db->upsert($this);
         $id = PRIMARY_KEY;
-        $this->$id = $this->_repository->insert_id();
+        $this->$id = $this->_db->insert_id();
         $this->cache();
     }
 

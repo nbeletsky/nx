@@ -6,11 +6,11 @@ class Data {
 
     public function extract_post($data) {
         $collection = array();
-        foreach ( $data as $child_key=>$child ) {
+        foreach ( $data as $child_key => $child ) {
             if ( is_array($child) ) {
-                foreach ( $child as $id=>$grandchild_array ) {
+                foreach ( $child as $id => $grandchild_array ) {
                     $obj = new $child_key($id);
-                    foreach ( $grandchild_array as $name=>$val ) {
+                    foreach ( $grandchild_array as $name => $val ) {
                         $type = substr($name, strrpos($name, '|') + 1);
                         $obj->$name = $this->sanitize($val, $type);
                     }

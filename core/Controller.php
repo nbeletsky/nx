@@ -21,7 +21,7 @@ class Controller {
 
     protected $_token = null;
 
-    public function __construct($get=null, $post=null) {
+    public function __construct($get = null, $post = null) {
         $data = new Data();
         $this->_http_get = ( !is_null($get) ) ? $get : array();
         $this->_http_post = ( isset($post) ) ? $data->extract_post($post) : array();
@@ -29,7 +29,7 @@ class Controller {
         $this->_classname = get_called_class(); 
     }
 
-    public function call($action, $id=null, $additional=null) {
+    public function call($action, $id = null, $additional = null) {
         try {
             if ( $this->is_protected($action) ) {
                 $this->protect($action); // should throw an exception
@@ -67,7 +67,7 @@ class Controller {
             }
 
             if ( is_array($to_view) ) {
-                foreach( $to_view as $NAME_FOR_VIEWS=>$value ) {
+                foreach( $to_view as $NAME_FOR_VIEWS => $value ) {
                     $$NAME_FOR_VIEWS = $value;
                 }
             }

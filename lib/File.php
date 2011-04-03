@@ -91,7 +91,7 @@ class File {
     *  @access public
     *  @return string
     */
-    public function write_file($filename, $data, $mode='a') {
+    public function write_file($filename, $data, $mode = 'a') {
         $handle = @fopen($filename, $mode);
         if ( !$handle ) {
             // TODO: Set exception handler!

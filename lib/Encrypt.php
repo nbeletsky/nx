@@ -18,7 +18,7 @@ class Encrypt {
     *  @access public
     *  @return string
     */ 
-    public function password($content, $user_id, $username, $date_registered, $enc_technique='sha256') {
+    public function password($content, $user_id, $username, $date_registered, $enc_technique = 'sha256') {
         if ( !is_numeric($user_id) || $user_id < 1 ) {
             return false; 
         }

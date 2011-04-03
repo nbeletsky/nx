@@ -69,7 +69,7 @@ class PDO_MySQL {
         $this->_dbh = null;
     }
     
-    public function delete($obj, $where=null) {
+    public function delete($obj, $where = null) {
         $sql = 'DELETE FROM `' . get_class($obj) . '`';
         if ( is_null($where) ) {
             $id = PRIMARY_KEY;
@@ -94,7 +94,7 @@ class PDO_MySQL {
     *  @access public
     *  @return mixed
     */
-    public function fetch($fetch_style=null, $obj=null) {
+    public function fetch($fetch_style = null, $obj = null) {
         $this->_set_fetch_mode($fetch_style, $obj);
         $row = $this->_statement->fetch();
         $this->_statement->closeCursor();
@@ -108,7 +108,7 @@ class PDO_MySQL {
     *  @access public
     *  @return mixed
     */
-    public function fetch_all($fetch_style=null) {
+    public function fetch_all($fetch_style = null) {
         $this->_set_fetch_mode($fetch_style);
         $rows = $this->_statement->fetchAll();
         $this->_statement->closeCursor();
@@ -122,13 +122,13 @@ class PDO_MySQL {
     *  @access public
     *  @return mixed
     */
-    public function fetch_column($column_number=0) {
+    public function fetch_column($column_number = 0) {
         $column = $this->_statement->fetchColumn($column_number);
         $this->_statement->closeCursor();
         return $column; 
     }
 
-    public function find($fields, $table, $where=null, $additional=null) {
+    public function find($fields, $table, $where = null, $additional = null) {
         $sql = 'SELECT ';
         if ( is_array($fields) ) {
             $sql .= '`' . implode('`, `', $fields) . '`';
@@ -148,7 +148,7 @@ class PDO_MySQL {
         $this->query($sql, $where); 
     }
 
-    public function find_all_objects($obj, $where=null) {
+    public function find_all_objects($obj, $where = null) {
         $results = array();
         $id = PRIMARY_KEY;
 
@@ -161,13 +161,13 @@ class PDO_MySQL {
         return $results;
     }
 
-    public function find_object($obj, $where=null) {
+    public function find_object($obj, $where = null) {
         $id = PRIMARY_KEY;
         $this->find('`' . $id . '`', $obj, $where, 'LIMIT 1');
         return $this->fetch('assoc');
     }
 
-    protected function _format_where($where=null) {
+    protected function _format_where($where = null) {
         $sql = '';
 
         if ( is_null($where) ) {
@@ -178,11 +178,11 @@ class PDO_MySQL {
         if ( is_string($where) ) {
             $sql .= $where;
         } elseif ( is_array($where) ) {
-            foreach ( $where as $name=>$val ) {
+            foreach ( $where as $name => $val ) {
                 // $EXAMPLE = array( "i" => array( "\$gt" => 20, "\$lte" => 30 ) );
                 // TODO: Re-order this logic
                 if ( is_array($val) ) {
-                    foreach ( $val as $sign=>$constraint ) {
+                    foreach ( $val as $sign => $constraint ) {
                         $new_name = $name .  '__' . $constraint;
                         $sql .=  '`' . $new_name . '` ';
                         switch ( $sign ) {
@@ -287,7 +287,7 @@ class PDO_MySQL {
     *  @access public
     *  @return bool 
     */
-    public function query($sql, $parameters=null) {
+    public function query($sql, $parameters = null) {
         $statement = $this->_dbh->prepare($sql);
 
         if ( is_array($parameters) ) {
@@ -317,7 +317,7 @@ class PDO_MySQL {
     *  @access public
     *  @return mixed       
     */
-    public function query_first($sql, $parameters=null) {
+    public function query_first($sql, $parameters = null) {
         $this->query($sql . ' LIMIT 1', $parameters);
     }
 
@@ -329,7 +329,7 @@ class PDO_MySQL {
     *  @access protected
     *  @return int 
     */
-    protected function _set_fetch_mode($fetch_style, $obj=null) {
+    protected function _set_fetch_mode($fetch_style, $obj = null) {
         switch ( $fetch_style ) {
             case 'assoc':
                 $this->_statement->setFetchMode(\PDO::FETCH_ASSOC);
@@ -363,7 +363,7 @@ class PDO_MySQL {
     *  @access public
     *  @return bool 
     */
-    public function update($obj, $where=null) {
+    public function update($obj, $where = null) {
         $table = get_class($obj);
         $meta = new Meta();
         $properties = $meta->get_protected_vars($obj);

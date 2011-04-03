@@ -20,7 +20,7 @@ class MemcachedCache {
     *  @access public
     *  @return void
     */
-    public function __construct($persistent_id='') {
+    public function __construct($persistent_id = '') {
         $this->_cache = new \Memcached($persistent_id);
     }
 
@@ -37,7 +37,7 @@ class MemcachedCache {
     *  @access public
     *  @return bool 
     */
-    public function add($key, $value, $server_key='', $expiration=0) {
+    public function add($key, $value, $server_key = '', $expiration = 0) {
         return $this->_cache->addByKey($server_key, $key, $value, $expiration);
     }
 
@@ -52,14 +52,14 @@ class MemcachedCache {
     *  @access public
     *  @return bool 
     */
-    public function add_server($host, $weight=0, $port=11211) {
+    public function add_server($host, $weight = 0, $port = 11211) {
         return $this->_cache->addServer($host, $port, $weight);
     }
 
    /**
     *  Adds multiple servers to the server pool.
     *
-    *  @param array $servers                    Array of the servers to add to the pool. (Expected format: array(array($host, $weight=0, $port=11211)))
+    *  @param array $servers                    Array of the servers to add to the pool. (Expected format: array(array($host, $weight = 0, $port = 11211)))
     *  @access public
     *  @return bool 
     */
@@ -85,7 +85,7 @@ class MemcachedCache {
     *  @access public
     *  @return bool 
     */
-    public function append($key, $value, $server_key='') {
+    public function append($key, $value, $server_key = '') {
         return $this->_cache->appendByKey($server_key, $key, $value);
     }
 
@@ -104,7 +104,7 @@ class MemcachedCache {
     *
     *  @see retrieve() for how to obtain the CAS token.
     */
-    public function cas($token, $key, $value, $server_key='', $expiration=0) {
+    public function cas($token, $key, $value, $server_key = '', $expiration = 0) {
         return $this->_cache->casByKey($token, $server_key, $key, $value, $expiration);
     }
 
@@ -117,7 +117,7 @@ class MemcachedCache {
     *  @return int                              If the item's value is not numeric, it is treated as if the value were 0.
     *                                           If the operation would decrease the value below 0, the new value will be 0.
     */
-    public function decrement($key, $offset=1) {
+    public function decrement($key, $offset = 1) {
         return $this->_cache->decrement($key, $offset);
     }
 
@@ -130,7 +130,7 @@ class MemcachedCache {
     *  @access public
     *  @return bool 
     */
-    public function delete($key, $server_key='', $time=0) {
+    public function delete($key, $server_key = '', $time = 0) {
         return $this->_cache->deleteByKey($server_key, $key, $time);
     }
 
@@ -141,7 +141,7 @@ class MemcachedCache {
     *  @access public
     *  @return bool 
     */
-    public function flush($delay=0) {
+    public function flush($delay = 0) {
         return $this->_cache->flush($delay);
     }
 
@@ -153,7 +153,7 @@ class MemcachedCache {
     *  @access public
     *  @return int                              If the item's value is not numeric, it is treated as if the value were 0.
     */
-    public function increment($key, $offset=1) {
+    public function increment($key, $offset = 1) {
         return $this->_cache->increment($key, $offset);
     }
 
@@ -166,7 +166,7 @@ class MemcachedCache {
     *  @access public
     *  @return bool 
     */
-    public function prepend($key, $value, $server_key='') {
+    public function prepend($key, $value, $server_key = '') {
         return $this->_cache->prependByKey($server_key, $key, $value);
     }
 
@@ -183,7 +183,7 @@ class MemcachedCache {
     *  @access public
     *  @return bool 
     */
-    public function replace($key, $value, $server_key='', $expiration=0) {
+    public function replace($key, $value, $server_key = '', $expiration = 0) {
         return $this->_cache->replaceByKey($server_key, $key, $value, $expiration);
     }
 
@@ -199,7 +199,7 @@ class MemcachedCache {
     *
     *  @see cas() for how to use CAS tokens.
     */
-    public function retrieve($key, $server_key='', $cache_callback=null, &$cas_token=null) {
+    public function retrieve($key, $server_key = '', $cache_callback = null, &$cas_token = null) {
         return $this->_cache->getByKey($server_key, $key, $cache_callback, $cas_token);
     }
 
@@ -235,7 +235,7 @@ class MemcachedCache {
     *  @access public
     *  @return bool 
     */
-    public function store($key, $value, $server_key='', $expiration=0) {
+    public function store($key, $value, $server_key = '', $expiration = 0) {
         $result = $this->_cache->setByKey($server_key, $key, $value, $expiration);
     }
 

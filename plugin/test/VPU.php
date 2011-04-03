@@ -80,7 +80,7 @@ class VPU {
     *  @access public
     *  @return void
     */
-    public function __construct($test_dir=null) {
+    public function __construct($test_dir = null) {
         if ( !is_null($test_dir) ) {
             $this->_set_dir($test_dir);
             $file = new File();
@@ -103,7 +103,7 @@ class VPU {
 
         $final = $suite = $test = array();
         
-        foreach ( $results as $key=>$event ) {
+        foreach ( $results as $key => $event ) {
             if ( $event['event'] === 'suiteStart' ) {
                 if ( isset($suite['tests']) ) {
 
@@ -175,13 +175,13 @@ class VPU {
     */
     private function _format_json($json) {
 
-        $result= '';
+        $result = '';
         $level = 0;
         $prev_char = '';
         $out_of_quotes = true;
         $length = strlen($json);
 
-        for ( $i=0; $i<=$length; $i++ ) {
+        for ( $i = 0; $i <= $length; $i++ ) {
             $char = substr($json, $i, 1);
 
             if ( $char == '"' && $prev_char != '\\' ) {
@@ -393,7 +393,7 @@ class VPU {
     *  @access private
     *  @return array
     */
-    private function _load_tests($tests=null) {
+    private function _load_tests($tests = null) {
         if ( is_null($tests) ) {
             $tests = $this->_test_cases;
         } elseif ( is_string($name) ) {
@@ -438,7 +438,7 @@ class VPU {
         $results = json_decode($results, true);
         
         $pu_output = explode('|||', $pu_output);
-        foreach ( $pu_output as $key=>$data ) {
+        foreach ( $pu_output as $key => $data ) {
             if ( isset($results[$key]) ) {
                 $results[$key]['collected'] = $data;
             }
@@ -466,7 +466,7 @@ class VPU {
             $start_mark = 0;
             
             $length = strlen($str);
-            for ( $i=0; $i < $length; $i++ ) { 
+            for ( $i = 0; $i < $length; $i++ ) { 
                 $char = $str{$i};
                 
                 if ( $char == '{' ) {
@@ -526,7 +526,7 @@ class VPU {
     *  @access public
     *  @return array
     */
-    public function run($tests=null) {
+    public function run($tests = null) {
         $suite = new \PHPUnit_Framework_TestSuite();
 
         $loaded_tests = $this->_load_tests($tests);

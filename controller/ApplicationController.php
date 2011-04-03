@@ -12,7 +12,7 @@ class ApplicationController extends core\Controller {
         'user'    => 'model\User'
     );
 
-    public function __construct($get=null, $post=null) {
+    public function __construct($get = null, $post = null) {
         parent::__construct($get, $post);
 
         $session = $this->_classes['session'];
