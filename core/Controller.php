@@ -4,10 +4,9 @@ namespace core;
 
 use lib\Data; 
 use lib\File; 
+use lib\Meta; 
 
 class Controller {
-    protected $_protected            = null; // array of blacklist protected actions
-    protected $_protected_exceptions = null; // array of whitelist unprotected actions
     protected $_handler              = null; // handler for errors, array('controller'=>foo, 'action'=>bar)
 
     protected $_http_get = array();
@@ -31,17 +30,15 @@ class Controller {
 
     public function call($action, $id = null, $additional = null) {
         try {
-            if ( $this->is_protected($action) ) {
-                $this->protect($action); // should throw an exception
-            }
             
-            if ( !method_exists($this, $action) ) {
+            if ( !method_exists($this, $action) || $this->is_protected($action) ) {
                 // TODO: throw 404!
                 die();
             }   
 
             $this->_validation_errors = $this->_validate($action);
 
+            // TODO: Move this?
             $this->_token = sha1(microtime() . CSRF_TOKEN_SALT);
             $_SESSION[$this->_classname . '_token'] = $this->_token;
 
@@ -82,9 +79,8 @@ class Controller {
                 }
             }
 
-        }
-        // TODO: Fix exceptions
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
+            // TODO: Fix exceptions
             if ( $this->_handler ) {
                 render("/" . $this->_handler['controller'] . "/" . $this->_handler['action'] . "/" .$this->id);
             }
@@ -95,25 +91,13 @@ class Controller {
 
     }
     
-    // TODO: Fix this crap, use reflection!
     public function is_protected($action) {
-        if ( is_array($this->_protected) ) {
-            return ( in_array($action, $this->_protected) );
-        }
-            
-        if ( is_array($this->_protected_exceptions) ) {
-            return ( in_array($action, $this->_protected_exceptions) );
-        }
-
-        return false;
+        $meta = new Meta();
+        return ( in_array($action, $meta->get_protected_methods($this)) );
     }
 
     public function preload($action) {
         // preload some stuff
-    }
-
-    public function protect($action) {
-        // override to protect things.
     }
 
    /**

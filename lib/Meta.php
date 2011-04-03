@@ -18,19 +18,29 @@ class Meta {
         return $class->getShortName();
     }
 
+    public function get_protected_methods($obj) {
+        $reflection = new \ReflectionClass($obj);
+        $methods = $reflection->getMethods(\ReflectionMethod::IS_PROTECTED);
+        $collection = array();
+        foreach ( $methods as $method ) {
+            $collection[] = $method->getName();
+        }
+        return $collection;
+    }
+
     public function get_protected_vars($obj) {
         $reflection = new \ReflectionClass($obj);
         $props = $reflection->getProperties(\ReflectionProperty::IS_PROTECTED);
-        $properties = array();
+        $collection = array();
         foreach ( $props as $prop ) {
             // Exclude the variables with a leading underscore
             $name = $prop->getName();
             if ( strpos($name, '_') !== 0 ) {
                 $prop->setAccessible(true);
-                $properties[$name] = $prop->getValue($obj);
+                $collection[$name] = $prop->getValue($obj);
             }
         }
-        return $properties;
+        return $collection;
     }
 
 }

@@ -180,8 +180,10 @@ class PDO_MySQL {
         } elseif ( is_array($where) ) {
             foreach ( $where as $name => $val ) {
                 // $EXAMPLE = array( "i" => array( "\$gt" => 20, "\$lte" => 30 ) );
-                // TODO: Re-order this logic
-                if ( is_array($val) ) {
+                if ( is_string($val) ) {
+                    $sql .= '`' . $name . '`=:' . $name . ' and ';
+                }
+                elseif ( is_array($val) ) {
                     foreach ( $val as $sign => $constraint ) {
                         $new_name = $name .  '__' . $constraint;
                         $sql .=  '`' . $new_name . '` ';
@@ -207,9 +209,6 @@ class PDO_MySQL {
                         $where[$new_name] = $constraint;
                         unset($where[$name]);
                     }
-                } else {
-                    $sql .= '`' . $name . '`=:' . $name . ' and ';
-                }
             }
             $sql = substr($sql, 0, strlen($sql) - strlen(' and '));
         }

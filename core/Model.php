@@ -77,8 +77,9 @@ class Model {
     }
 
     public function delete($where = null) {
+        $key = get_class($this) . '_' . $this->$id;
+        $this->_cache->delete($key);
         $this->_db->delete($this, $where);
-        // TODO: Delete from cache!
     }
 
     public function find_all($where = null, $obj = null) {
