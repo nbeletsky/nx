@@ -40,7 +40,7 @@ class Controller {
 
             // TODO: Move this?
             $this->_token = sha1(microtime() . CSRF_TOKEN_SALT);
-            $_SESSION[$this->_classname . '_token'] = $this->_token;
+            $_SESSION[$this->classname() . '_token'] = $this->_token;
 
             // TODO: Fix preload?  Eliminate it?  Find some other way of preloading?
             $this->preload($action);
@@ -84,6 +84,10 @@ class Controller {
         }  
 
     }
+
+    public function classname() {
+        return $this->_classname;
+    }
     
     public function is_protected($action) {
         $meta = new Meta();
@@ -125,12 +129,12 @@ class Controller {
 
     protected function _validate($action) {
         if ( !empty($this->_http_post) ) {
-            if ( $this->_http_post['token'] !== $_SESSION[$this->_classname . '_token'] ) {
+            if ( $this->_http_post['token'] !== $_SESSION[$this->classname() . '_token'] ) {
                 // CSRF attack
                 die('CSRF detected!');
             }
 
-            $validator = '\\lib\validators\\' . $this->_classname; 
+            $validator = '\\lib\validators\\' . $this->classname(); 
             if ( class_exists($validator) ) {
                 $validator = new $validator($this->_http_post);
                 return $validator->$action();

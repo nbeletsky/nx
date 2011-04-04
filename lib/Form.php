@@ -5,11 +5,12 @@ namespace lib;
 use lib\Meta;
 
 class Form {
-    public function checkbox($object, $name, $type, $value, $attributes = array()) {
-        $html = "<input type='checkbox' name='" . $this->_format_name($object, $name, $type) . "' value='" . $value . "' ";
-        $html .= $this->_parse_attributes($attributes);
 
-        if ( $object->$name == $value ) {
+    public function checkbox($attributes, $binding = null) {
+        $html = "<input type='checkbox' ";
+        $html .= $this->_parse_attributes($attributes, $binding);
+
+        if ( !is_null($binding) && isset($binding->$attributes['name']) && isset($binding->$attributes['name']) && $binding->$attributes['name'] == $attributes['value'] ) {
             $html .= "checked='checked' ";
         }
         $html .= "/>";
@@ -21,38 +22,50 @@ class Form {
         return '</form>';
     }
 
-    protected function _format_name($object, $name, $type) {
-        $meta = new Meta();
-        $classname = $meta->classname_only($object);
-        $id = PRIMARY_KEY;
-        // TODO: Ensure that $type is 's', 'f', or 'i'
-        return '[' . $classname . '][' . $object->$id . '][' . $name . '|' . $type ']';
-    }
-
-    public function hidden($object, $name, $type, $attributes = array()) {
-        $html = "<input type='hidden' name='" . $this->_format_name($object, $name, $type) . "' value='" . $object->$name . "' ";
-        $html .= $this->_parse_attributes($attributes);
+    public function hidden($attributes, $binding = null) {
+        $html = "<input type='hidden' ";
+        $html .= $this->_parse_attributes($attributes, $binding);
         $html .= "/>";
     }
 
-    protected function _parse_attributes($attributes) {
+    protected function _parse_attributes($attributes, $binding) {
         $html = '';
-        foreach ( $attributes as $name => $value ) {
-            if ( !is_numeric($name) ) {
-                $html .= $name . "='" . $value . "' "; 
+        $value_present = false;
+        foreach ( $attributes as $key => $setting ) {
+            if ( !is_numeric($key) ) {
+                switch ( $key ) {
+                    case 'name':
+                        $id = PRIMARY_KEY;
+                        if ( !is_null($binding) ) {
+                            if ( isset($binding->$id) ) {
+                                $setting = '[' . $binding->classname() . '_' . $binding->$id . '][' . $setting . ']';
+                            } else {
+                                $setting = '[' . $binding->classname() . '][][' . $setting . ']';
+                            }
+                        }
+                        break;
+                    case 'value':
+                        $value_present = true;
+                        break;
+                }
+                $html .= $key . "='" . $setting . "' "; 
             } else {
-                $html .= $value . " "; 
+                $html .= $setting . " "; 
             }
         }
+
+        if ( !$value_present && !is_null($binding) && isset($binding->$attributes['name']) ) {
+            $html .= "value='" . htmlentities($binding->$attributes['name'], ENT_QUOTES) . "'";
+        } 
         return $html;
     }
 
-    public function radios($object, $name, $type, $values, $attributes = array()) {
+    public function radios($attributes, $values = array(), $binding = null) {
         $html = '';
         foreach ( $values as $value => $display ) {
-            $html .= "<input type='radio' name='" . $this->_format_name($object, $name, $type) . "' ";
-            $html .= $this->_parse_attributes($attributes);
-            if ( $object->$name == $value ) {
+            $html .= "<input type='radio' ";
+            $html .= $this->_parse_attributes($attributes, $binding);
+            if ( !is_null($binding) && isset($binding->$attributes['name']) && $binding->$attributes['name'] == $value ) {
                 $html .= "checked='checked' ";
             }
             $html.= "/>";
@@ -61,9 +74,9 @@ class Form {
         return $html;
     }
 
-    public function select($object, $name, $type, $options, $attributes = array()) {
-        $html = "<select name='" . $this->_format_name($object, $name, $type) . "' ";
-        $html .= $this->_parse_attributes($attributes);
+    public function select($attributes, $options = array(), $binding = null) {
+        $html = "<select ";
+        $html .= $this->_parse_attributes($attributes, $binding);
         $html .= ">";
         foreach( $options as $value => $display ) {
             $html.= "<option value='" . $value . "' ";
@@ -78,26 +91,32 @@ class Form {
         return $html;
     }
 
-    public function start($action, $attributes = array()) {
-        $html = "<form method='post' action='" . $action . "'";
-        $html .= $this->_parse_attributes($attributes);
+    public function start($attributes) {
+        $html = "<form method='post' ";
+        $html .= $this->_parse_attributes($attributes, $binding);
         $html .= ">";
         
         return $html;
     }
 
-    public function text($object, $name, $type, $attributes = array()) {
-        $html = "<input type='text' name='" . $this->_format_name($object, $name, $type) . "' value='" . htmlentities($object->$name, ENT_QUOTES) . "' "; 
-        $html .= $this->_parse_attributes($attributes);
+    public function text($attributes, $binding = null) {
+        $html = "<input type='text' "; 
+        $html .= $this->_parse_attributes($attributes, $binding);
         $html .= "/>";
         
         return $html; 
     }
 
-    public function textarea($object, $name, $type, $attributes = array()) {
-        $html = "<textarea name='" . $this->_format_name($object, $name, $type) . "' ";
-        $html .= $this->_parse_attributes($attributes);
-        $html .= '>'. htmlentities($object->$name) . "</textarea>"; 
+    public function textarea($attributes, $binding = null) {
+        $html = "<textarea ";
+        $html .= $this->_parse_attributes($attributes, $binding);
+        $html .= '>';
+        if ( isset($attributes['value']) ) {
+            $html .= htmlentities($attributes['value'], ENT_QUOTES); 
+        } elseif ( !is_null($binding) && isset($binding->$attributes['name']) ) {
+            $html .= htmlentities($binding->$attributes['name'], ENT_QUOTES); 
+        }
+        $html .= "</textarea>"; 
         return $html;
     }
 

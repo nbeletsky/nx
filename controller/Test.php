@@ -27,12 +27,12 @@ class Test extends core\Controller {
         return array(
             'suites'       => $suites,
             'sandbox'      => $sandbox,
-            'query_string' => 'controller=' . $this->_classname . '&action=suite'
+            'query_string' => 'controller=' . $this->classname() . '&action=suite'
         );
     }
 
     public function suite() {
-        return array('query_string' => 'controller=' . $this->_classname . '&action=test');
+        return array('query_string' => 'controller=' . $this->classname() . '&action=test');
     }
 
     public function test() {

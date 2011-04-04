@@ -20,6 +20,8 @@ class Model {
     protected $_has_and_belongs_to_many = array(); 
     
     protected $_no_cache = array();
+
+    protected $_classname = null;
         
     // id can either be an unique identifier 
     // or a WHERE relationship
@@ -40,6 +42,8 @@ class Model {
                 $this->cache();
             }
         }
+
+        $this->_classname = get_called_class();
     }
 
     public function __get($field_name) {
@@ -74,6 +78,10 @@ class Model {
         $id = PRIMARY_KEY;
         $key = get_class($this) . '_' . $this->$id;
         $this->_cache->store($key, $data);
+    }
+
+    public function classname() {
+        return $this->_classname;
     }
 
     public function delete($where = null) {
