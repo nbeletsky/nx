@@ -55,21 +55,15 @@ class Controller {
             
             $view_file = "../view/" . $this->_template . '/' . get_class($this) . "/" . $action . VIEW_EXTENSION;
 
-            if ( is_array($additional) ) {
-                if ( !is_array($to_view) ) {
-                    $to_view = $additional;
-                } else {
-                    $to_view = array_merge($to_view, $additional);
-                }
-            }
-
-            if ( is_array($to_view) ) {
-                foreach( $to_view as $NAME_FOR_VIEWS => $value ) {
-                    $$NAME_FOR_VIEWS = $value;
-                }
-            }
-            
             if ( file_exists($view_file) ) {
+                if ( is_array($additional) ) {
+                    extract($additional);
+                }
+
+                if ( is_array($to_view) ) {
+                    extract($to_view);
+                }
+
                 include($view_file);
 
                 if ( $this->_create_snapshot ) {

@@ -14,7 +14,7 @@ class Data {
                         $type = substr($name, strrpos($name, '|') + 1);
                         $obj->$name = $this->sanitize($val, $type);
                     }
-                    $collection[$classname][$id] = $obj; 
+                    $collection[$child_key][$id] = $obj; 
                 }
             } else {
                 $type_loc = strrpos($child_key, '|');
