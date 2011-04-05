@@ -27,6 +27,7 @@ class ApplicationController extends core\Controller {
             $this->_template = DEFAULT_TEMPLATE;
         }
     }
+
 }
 
 ?>

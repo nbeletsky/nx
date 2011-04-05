@@ -8,19 +8,26 @@ class Data {
         $collection = array();
         foreach ( $data as $child_key => $child ) {
             if ( is_array($child) ) {
-                foreach ( $child as $id => $grandchild_array ) {
-                    $obj = new $child_key($id);
-                    foreach ( $grandchild_array as $name => $val ) {
-                        $type = substr($name, strrpos($name, '|') + 1);
-                        $obj->$name = $this->sanitize($val, $type);
+                $loc = strrpos($child_key, '|');
+                if ( $loc !== false ) {
+                    $id = substr($child_key, $loc + 1);
+                    $class = substr($child_key, 0, $loc);
+                    $obj = new $class($id);
+                    foreach ( $child as $key => $value )
+                    {
+                        $obj->$key = $value;
                     }
-                    $collection[$child_key][$id] = $obj; 
+                } else {
+                    foreach ( $child as $grandchild_array ) {
+                        $obj = new $child_key();
+                        foreach ( $grandchild_array as $key => $value ) {
+                            $obj->$key = $value;
+                        }
+                    }
                 }
+                $collection[$child_key][] = $obj; 
             } else {
-                $type_loc = strrpos($child_key, '|');
-                $type = substr($child_key, $type_loc + 1);
-                $id = substr($child_key, 0, $type_loc);
-                $collection[$id] = $this->sanitize($child, $type);
+                $collection[$child_key] = $child; 
             }
         }
 

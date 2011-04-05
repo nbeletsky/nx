@@ -38,7 +38,7 @@ class Form {
                         $id = PRIMARY_KEY;
                         if ( !is_null($binding) ) {
                             if ( isset($binding->$id) ) {
-                                $setting = '[' . $binding->classname() . '_' . $binding->$id . '][' . $setting . ']';
+                                $setting = '[' . $binding->classname() . '|' . $binding->$id . '][' . $setting . ']';
                             } else {
                                 $setting = '[' . $binding->classname() . '][][' . $setting . ']';
                             }

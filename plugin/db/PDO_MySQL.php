@@ -4,7 +4,7 @@ namespace plugin\db;
 
 use lib\Meta;
 
-class PDO_MySQL {
+class PDO_MySQL extends \core\Object {
    /**
     *  The db handle. 
     *
@@ -35,8 +35,18 @@ class PDO_MySQL {
     *  @access public
     *  @return void
     */
-    public function __construct($database, $host, $username, $password) {
-        $this->connect($database, $host, $username, $password);
+    public function __construct(array $config = array()) {
+        $defaults = array(
+            'db'       => DATABASE_NAME,
+            'host'     => DATABASE_HOST, 
+            'username' => DATABASE_USER,
+            'password' => DATABASE_PASS
+        );
+        parent::__construct($config + $defaults);
+    }
+
+    protected function _init() {
+        $this->connect($this->_config['database'], $this->_config['host'], $this->_config['username'], $this->_config['password']);
     }
 
     public function connect($database, $host, $username, $password) {
@@ -209,6 +219,7 @@ class PDO_MySQL {
                         $where[$new_name] = $constraint;
                         unset($where[$name]);
                     }
+                }
             }
             $sql = substr($sql, 0, strlen($sql) - strlen(' and '));
         }

@@ -6,8 +6,9 @@ use lib\Data;
 use lib\File; 
 use lib\Meta; 
 
-class Controller {
-    protected $_handler              = null; // handler for errors, array('controller'=>foo, 'action'=>bar)
+class Controller extends Object {
+
+    protected $_handler = null; // handler for errors, array('controller'=>foo, 'action'=>bar)
 
     protected $_http_get = array();
     protected $_http_post = array();
@@ -16,7 +17,6 @@ class Controller {
 
     protected $_template = DEFAULT_TEMPLATE; 
     protected $_create_snapshot = false; 
-    protected $_classname = null;
 
     protected $_token = null;
 
@@ -24,8 +24,6 @@ class Controller {
         $data = new Data();
         $this->_http_get = ( !is_null($get) ) ? $get : array();
         $this->_http_post = ( isset($post) ) ? $data->extract_post($post) : array();
-
-        $this->_classname = get_called_class(); 
     }
 
     public function call($action, $id = null, $additional = null) {
@@ -85,10 +83,6 @@ class Controller {
 
     }
 
-    public function classname() {
-        return $this->_classname;
-    }
-    
     public function is_protected($action) {
         $meta = new Meta();
         return ( in_array($action, $meta->get_protected_methods($this)) );
@@ -127,20 +121,14 @@ class Controller {
         exit();
     }
 
+    // TODO: Fix this
     protected function _validate($action) {
         if ( !empty($this->_http_post) ) {
             if ( $this->_http_post['token'] !== $_SESSION[$this->classname() . '_token'] ) {
                 // CSRF attack
                 die('CSRF detected!');
             }
-
-            $validator = '\\lib\validators\\' . $this->classname(); 
-            if ( class_exists($validator) ) {
-                $validator = new $validator($this->_http_post);
-                return $validator->$action();
-            }
         }
-
         return array();
     }
     

@@ -34,9 +34,12 @@ class Session extends ApplicationModel {
     *  @access public
     *  @return void
     */
-    public function __construct() {
-        parent::__construct();
+    public function __construct(array $config = array()) {
+        $defaults = array();
+        parent::__construct($config + $defaults);
+    }
 
+    protected function _init() {
         $this->last_active = date('Y-m-d H:i:s', time());
 
         session_set_save_handler(

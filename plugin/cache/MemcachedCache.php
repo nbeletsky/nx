@@ -2,7 +2,7 @@
 
 namespace plugin\cache;
 
-class MemcachedCache {
+class MemcachedCache extends \core\Object {
 
    /**
     *  The Memcached object. 
@@ -20,8 +20,13 @@ class MemcachedCache {
     *  @access public
     *  @return void
     */
-    public function __construct($persistent_id = '') {
-        $this->_cache = new \Memcached($persistent_id);
+    public function __construct(array $config = array()) {
+        $defaults = array('persistent_id' = '');
+        parent::__construct($config + $defaults);
+    }
+
+    protected function _init() {
+        $this->_cache = new \Memcached($this->_config['persistent_id']);
     }
 
    /**
