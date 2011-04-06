@@ -361,7 +361,7 @@ class VPU {
         ob_start(); 
         include 'default/Test/error.html';
         $file = new File(); 
-        $file->write_file(VPU_SANDBOX_FILENAME, ob_get_contents()); 
+        $file->write(VPU_SANDBOX_FILENAME, ob_get_contents()); 
         ob_end_clean();
         return true;
     }

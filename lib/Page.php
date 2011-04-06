@@ -5,7 +5,8 @@ namespace lib;
 use lib\File;
 
 class Page {
-    public function render($query_string, $additional = null) {
+
+    public static function render($query_string, $additional = null) {
         // URL layout
         // foobar.com/
         // foobar.com/controller

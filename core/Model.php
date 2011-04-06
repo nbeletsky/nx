@@ -6,6 +6,7 @@ use lib\Meta;
 
 class Model extends Object {
 
+    // TODO: Fix this class so that these classes are set in the default() and then called via a config
     protected $_classes = array(
         'db'    => 'plugin\db\PDO_MySQL',
         'cache' => 'plugin\cache\MemcachedCache'
@@ -19,8 +20,6 @@ class Model extends Object {
     protected $_belongs_to = array();
     protected $_has_and_belongs_to_many = array(); 
     
-    protected $_no_cache = array();
-        
     // id can either be an unique identifier 
     // or a WHERE relationship
     public function __construct($id = null) {

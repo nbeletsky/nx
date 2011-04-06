@@ -2,6 +2,8 @@
 
 namespace model;
 
+use lib\String;
+
 class Session extends ApplicationModel {
     protected $id;
 
@@ -78,30 +80,7 @@ class Session extends ApplicationModel {
         $_SESSION['uid'] = $user_id;
         $_SESSION['fingerprint'] = $this->_get_fingerprint($user_id); 
         $_SESSION['last_active'] = $this->last_active;
-        setcookie(self::COOKIE_ID_NAME, $this->_encrypt_id($user_id), time() + self::LOGIN_COOKIE_EXPIRE);
-    }
-
-   /**
-    *  Decrypts cookie user ID.
-    *       
-    *  @param string $hex_hash      The hash to be decrypted.
-    *  @access private
-    *  @return int
-    */
-    private function _decrypt_cookie($hex_hash) {
-        $hex_hash = filter_var($hex_hash, FILTER_SANITIZE_STRING);
-        if ( strlen($hex_hash) !== 40 ) {
-            return false;
-        }
-        // Extrapolate hex from hash
-        $cur_pos = 0;
-        $hex_id = '';
-        for ( $i = 0; $i <= 7; $i++ ) {
-            $cur_pos += $i + 1; 
-            $hex_id .= substr($hex_hash, $cur_pos, 1);
-        }
-        // Convert hex to user id
-        return hexdec($hex_id);
+        setcookie(self::COOKIE_ID_NAME, String::encrypt_cookie($user_id), time() + self::LOGIN_COOKIE_EXPIRE);
     }
 
    /**
@@ -115,29 +94,6 @@ class Session extends ApplicationModel {
         $this->delete();
         return true;
     } 
-
-   /**
-    *  Encrypts user ID for cookie use.
-    *       
-    *  @param int $user_id      The user's ID.
-    *  @access private
-    *  @return string
-    */
-    // TODO: Move to lib\Encrypt?
-    private function _encrypt_id($user_id) {
-        // Create the hash
-        $hex_salt = 'R1c?+r.VEfIN';
-        $hex_hash = sha1($hex_salt . $user_id);
-        // Convert user id to 8-digit hex
-        $user_hex = $this->_zeropad(dechex($user_id), 8);
-        // Interpolate hex into hash
-        $cur_pos = 0;
-        for ( $i = 0; $i <= 7; $i++ ) {
-            $cur_pos += $i + 1; 
-            $hex_hash = substr_replace($hex_hash, substr($user_hex, $i, 1), $cur_pos, 1);
-        }
-        return $hex_hash;
-    }
 
    /**
     *  Executes when the garbage collector is executed.
@@ -171,7 +127,7 @@ class Session extends ApplicationModel {
         if ( (!isset($_SESSION['uid'])) || (!isset($_SESSION['fingerprint'])) || (!isset($_SESSION['last_active'])) ) {
             $this->User_id = 0;
             $is_logged_in = false;
-        } elseif ( (!isset($_COOKIE[self::COOKIE_ID_NAME])) || ($_SESSION['uid'] !== $this->_decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME])) || 
+        } elseif ( (!isset($_COOKIE[self::COOKIE_ID_NAME])) || ($_SESSION['uid'] !== String::decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME])) || 
                  ($_SESSION['fingerprint'] !== $this->_get_fingerprint($_SESSION['uid'])) ) {
             $this->User_id = 0;
             $is_logged_in = false;
@@ -293,19 +249,6 @@ class Session extends ApplicationModel {
 
         return $this->store();       
     }
-
-   /**
-    *  Pads a string with leading zeroes.
-    *       
-    *  @param string $num      The string to be padded.
-    *  @param int $limit       The length of the final string.
-    *  @access private
-    *  @return string
-    */
-    private function _zeropad($num, $limit) {
-        return str_repeat('0', max(0, $limit - strlen($num))) . $num;
-    }
-    
 }
 
 ?>

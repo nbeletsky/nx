@@ -7,6 +7,7 @@ class ApplicationController extends core\Controller {
     protected $_session;
     protected $_user;
 
+    // TODO: Fix this class so that these classes are set in the default() and then called via a config
     protected $_classes = array(
         'session' => 'model\Session', 
         'user'    => 'model\User'

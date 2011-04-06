@@ -4,7 +4,7 @@ namespace lib;
 
 class Time {
 
-    public function IntervalTimesForSelect($interval = 15, $military = false) {
+    public static function IntervalTimesForSelect($interval = 15, $military = false) {
         if ( 60 % interval !== 0 ) {
             return false;
         }

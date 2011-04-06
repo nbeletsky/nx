@@ -34,15 +34,13 @@ class Controller extends Object {
                 die();
             }   
 
+            // TODO: Move this into an auth class?
             $this->_validation_errors = $this->_validate($action);
 
-            // TODO: Move this?
+            // TODO: Move this too?
             $this->_token = sha1(microtime() . CSRF_TOKEN_SALT);
             $_SESSION[$this->classname() . '_token'] = $this->_token;
 
-            // TODO: Fix preload?  Eliminate it?  Find some other way of preloading?
-            $this->preload($action);
-            
             $to_view = $this->$action($id);
 
             // AJAX
@@ -86,10 +84,6 @@ class Controller extends Object {
     public function is_protected($action) {
         $meta = new Meta();
         return ( in_array($action, $meta->get_protected_methods($this)) );
-    }
-
-    public function preload($action) {
-        // preload some stuff
     }
 
    /**
