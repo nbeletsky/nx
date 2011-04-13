@@ -83,6 +83,7 @@ class PDO_MySQL extends \core\Object {
         $sql = 'DELETE FROM `' . get_class($obj) . '`';
         if ( is_null($where) ) {
             $id = PRIMARY_KEY;
+            // TODO: Throw exception if id is null?
             $where = array(PRIMARY_KEY => $obj->$id);
         }
 
