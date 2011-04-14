@@ -45,7 +45,10 @@ class Page {
         $whitelist = array_map($strip_ext, $whitelist);
 
         if ( in_array($controller, $whitelist) ) {
-            $controller_obj = new $controller($get, $_POST);
+            $controller = '\\controller\\' . $controller; 
+            // TODO: Fix this!
+            //$controller_obj = new $controller($get, $_POST);
+            $controller_obj = new $controller();
             $controller_obj->call($action, $id, $additional);
         } else {
             // TODO: Throw exception!

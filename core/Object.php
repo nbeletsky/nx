@@ -2,6 +2,8 @@
 
 namespace core;
 
+use lib\Meta;
+
 class Object {
 
     protected $_config = array();
@@ -36,8 +38,13 @@ class Object {
         }
     }
 
-    public function classname() {
-        return $this->_classname;
+    public function classname($with_namespace = true) {
+        if ( $with_namespace ) {
+            return $this->_classname;
+        }
+        else {
+            return Meta::classname_only($this);
+        }
     }
 
 }

@@ -7,9 +7,8 @@
                         </div> 
                         <div class="more <?=$display?>"> 
                             <hr class = "big" /> 
-                            <?  $page = new lib\Page();
-                                foreach ( $tests as $test ) { 
-                                    $page->render($query_string, $test);
+                            <?  foreach ( $tests as $test ) { 
+                                    \lib\Page::render($query_string, $test);
                                 } ?>
                         </div>
                     </div> 

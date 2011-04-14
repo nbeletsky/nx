@@ -20,9 +20,12 @@ class Controller extends Object {
 
     protected $_token = null;
 
-    public function __construct($get = null, $post = null) {
-        $this->_http_get = ( !is_null($get) ) ? $get : array();
-        $this->_http_post = ( isset($post) ) ? Data::extract_post($post) : array();
+    public function __construct($config = array(), $get = null, $post = null) {
+        $defaults = array();
+        parent::__construct($config + $defaults);
+        // TODO: Fix this!
+        //$this->_http_get = ( !is_null($get) ) ? $get : array();
+        //$this->_http_post = ( isset($post) ) ? Data::extract_post($post) : array();
     }
 
     public function call($action, $id = null, $additional = null) {
@@ -48,7 +51,9 @@ class Controller extends Object {
                 exit;
             }
             
-            $view_file = "../view/" . $this->_template . '/' . get_class($this) . "/" . $action . VIEW_EXTENSION;
+            // TODO: Eventually change this to use $this->_classname
+            $classname = Meta::classname_only($this);
+            $view_file = "../view/" . $this->_template . '/' . $classname . "/" . $action . VIEW_EXTENSION;
 
             if ( file_exists($view_file) ) {
                 if ( is_array($additional) ) {
@@ -59,7 +64,7 @@ class Controller extends Object {
                     extract($to_view);
                 }
 
-                include($view_file);
+                include $view_file;
 
                 if ( $this->_create_snapshot ) {
                     $snapshot = ob_get_contents(); 

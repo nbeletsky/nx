@@ -4,7 +4,7 @@ namespace controller;
 
 use plugin\test\VPU;
 
-class Test extends core\Controller {
+class Test extends \core\Controller {
 
     public function index() {   
         $path = realpath(VPU_TEST_DIRECTORY); 	
@@ -27,12 +27,12 @@ class Test extends core\Controller {
         return array(
             'suites'       => $suites,
             'sandbox'      => $sandbox,
-            'query_string' => 'controller=' . $this->classname() . '&action=suite'
+            'query_string' => 'controller=' . $this->classname(false) . '&action=suite'
         );
     }
 
     public function suite() {
-        return array('query_string' => 'controller=' . $this->classname() . '&action=test');
+        return array('query_string' => 'controller=' . $this->classname(false) . '&action=test');
     }
 
     public function test() {

@@ -2,7 +2,7 @@
 
 namespace controller;
 
-class ApplicationController extends core\Controller {
+class ApplicationController extends \core\Controller {
 
     protected $_session;
     protected $_user;

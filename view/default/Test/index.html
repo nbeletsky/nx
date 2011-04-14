@@ -9,9 +9,8 @@
 
 <body>
     <section>
-        <?  $page = new lib\Page();
-            foreach ( $suites as $suite ) { 
-                $page->render($query_string, $suite);
+        <?  foreach ( $suites as $suite ) { 
+                \lib\Page::render($query_string, $suite);
             } 
             echo $sandbox; ?>
     </section>

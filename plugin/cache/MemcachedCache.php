@@ -21,7 +21,7 @@ class MemcachedCache extends \core\Object {
     *  @return void
     */
     public function __construct(array $config = array()) {
-        $defaults = array('persistent_id' = '');
+        $defaults = array('persistent_id' => '');
         parent::__construct($config + $defaults);
     }
 
