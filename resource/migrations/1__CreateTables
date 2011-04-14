@@ -26,7 +26,7 @@ CREATE TABLE  `Entry` (
     `content` TEXT NOT NULL ,
     `created_on` DATETIME NOT NULL ,
     `User_id` INT UNSIGNED NOT NULL
-)
+);
 
 CREATE TABLE  `Tag` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
@@ -34,10 +34,10 @@ CREATE TABLE  `Tag` (
     UNIQUE (
     `tag`
     )
-) 
+); 
 
 CREATE TABLE  `Entry__Tag` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
     `Entry_id` INT UNSIGNED NOT NULL ,
     `Tag_id` INT UNSIGNED NOT NULL
-)
+);
