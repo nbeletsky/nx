@@ -66,8 +66,7 @@ class Model extends Object {
     }
 
     public function cache() {
-        $meta = new Meta();
-        $properties = $meta->get_protected_vars($this);
+        $properties = Meta::get_protected_vars($this);
         $data = json_encode($properties);
 
         $id = PRIMARY_KEY;

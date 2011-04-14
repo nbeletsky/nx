@@ -21,9 +21,8 @@ class Controller extends Object {
     protected $_token = null;
 
     public function __construct($get = null, $post = null) {
-        $data = new Data();
         $this->_http_get = ( !is_null($get) ) ? $get : array();
-        $this->_http_post = ( isset($post) ) ? $data->extract_post($post) : array();
+        $this->_http_post = ( isset($post) ) ? Data::extract_post($post) : array();
     }
 
     public function call($action, $id = null, $additional = null) {
@@ -64,8 +63,7 @@ class Controller extends Object {
 
                 if ( $this->_create_snapshot ) {
                     $snapshot = ob_get_contents(); 
-                    $file = new File(); 
-                    $file->create_snapshot($snapshot, basename(realpath($view_file)));
+                    File::create_snapshot($snapshot, basename(realpath($view_file)));
                 }
             }
 
@@ -82,8 +80,7 @@ class Controller extends Object {
     }
 
     public function is_protected($action) {
-        $meta = new Meta();
-        return ( in_array($action, $meta->get_protected_methods($this)) );
+        return ( in_array($action, Meta::get_protected_methods($this)) );
     }
 
    /**

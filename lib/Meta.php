@@ -9,7 +9,7 @@ class Meta {
     *  @param object  $obj    Object from which to retrieve name.
     *  @return string
     */
-    public function classname_only($obj) {
+    public static function classname_only($obj) {
         if ( !is_object($obj) ) {
             return false;
         }
@@ -18,7 +18,7 @@ class Meta {
         return $class->getShortName();
     }
 
-    public function get_protected_methods($obj) {
+    public static function get_protected_methods($obj) {
         $reflection = new \ReflectionClass($obj);
         $methods = $reflection->getMethods(\ReflectionMethod::IS_PROTECTED);
         $collection = array();
@@ -28,7 +28,7 @@ class Meta {
         return $collection;
     }
 
-    public function get_protected_vars($obj) {
+    public static function get_protected_vars($obj) {
         $reflection = new \ReflectionClass($obj);
         $props = $reflection->getProperties(\ReflectionProperty::IS_PROTECTED);
         $collection = array();

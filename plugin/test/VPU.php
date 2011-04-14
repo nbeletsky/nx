@@ -83,8 +83,7 @@ class VPU {
     public function __construct($test_dir = null) {
         if ( !is_null($test_dir) ) {
             $this->_set_dir($test_dir);
-            $file = new File();
-            $file->empty_file(VPU_SANDBOX_FILENAME);
+            File::empty_file(VPU_SANDBOX_FILENAME);
         }
     }
 
@@ -217,8 +216,7 @@ class VPU {
     */
     private function _get_errors() {
         $errors = file_get_contents(VPU_SANDBOX_FILENAME);
-        $file = new File();
-        $file->empty_file(VPU_SANDBOX_FILENAME);
+        File::empty_file(VPU_SANDBOX_FILENAME);
         return $errors;
     }
 
@@ -360,8 +358,7 @@ class VPU {
         $error['file'] = $err_file;
         ob_start(); 
         include 'default/Test/error.html';
-        $file = new File(); 
-        $file->write(VPU_SANDBOX_FILENAME, ob_get_contents()); 
+        File::write(VPU_SANDBOX_FILENAME, ob_get_contents()); 
         ob_end_clean();
         return true;
     }
@@ -431,8 +428,7 @@ class VPU {
         $results = str_replace('&quot;', '"', $results);
 
         if ( VPU_CREATE_SNAPSHOTS ) {
-            $file = new File(); 
-            $file->create_snapshot($this->_format_json($results), 'vpu_log.json');
+            File::create_snapshot($this->_format_json($results), 'vpu_log.json');
         }
 
         $results = json_decode($results, true);

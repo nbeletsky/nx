@@ -4,7 +4,7 @@ namespace lib;
 
 class Data {
 
-    public function extract_post($data) {
+    public static function extract_post($data) {
         $collection = array();
         foreach ( $data as $child_key => $child ) {
             if ( is_array($child) ) {
@@ -42,7 +42,7 @@ class Data {
     *  @access public
     *  @return string
     */
-    public function sanitize($data, $type) {
+    public static function sanitize($data, $type) {
         switch ( $type ) {
             case 'b':
                 $data = (boolean) filter_var($data, FILTER_SANITIZE_NUMBER_INT);

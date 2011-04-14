@@ -237,8 +237,7 @@ class PDO_MySQL extends \core\Object {
     */
     public function insert($obj) {
         $table = get_class($obj);
-        $meta = new Meta();
-        $properties = $meta->get_protected_vars($obj);
+        $properties = Meta::get_protected_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
         
@@ -376,8 +375,7 @@ class PDO_MySQL extends \core\Object {
     */
     public function update($obj, $where = null) {
         $table = get_class($obj);
-        $meta = new Meta();
-        $properties = $meta->get_protected_vars($obj);
+        $properties = Meta::get_protected_vars($obj);
 
     	$sql = 'UPDATE `' . $table . '` SET ';
     
@@ -418,8 +416,7 @@ class PDO_MySQL extends \core\Object {
     */
     public function upsert($obj) {
         $table = get_class($obj);
-        $meta = new Meta();
-        $properties = $meta->get_protected_vars($obj);
+        $properties = Meta::get_protected_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
         
