@@ -38,13 +38,8 @@ class Object {
         }
     }
 
-    public function classname($with_namespace = true) {
-        if ( $with_namespace ) {
-            return $this->_classname;
-        }
-        else {
-            return Meta::classname_only($this);
-        }
+    public function classname() {
+        return $this->_classname;
     }
 
 }

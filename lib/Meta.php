@@ -6,16 +6,16 @@ class Meta {
    /** 
     *  Returns the classname without the namespace. 
     *
-    *  @param object  $obj    Object from which to retrieve name.
+    *  @param object|string  $object    Object or class name from which to retrieve name.
     *  @return string
     */
-    public static function classname_only($obj) {
-        if ( !is_object($obj) ) {
+    public static function classname_only($object) {
+        if ( !is_object($object) && !is_string($object) ) {
             return false;
         }
-
-        $class = new \ReflectionClass($obj);
-        return $class->getShortName();
+        
+        $class = explode('\\', (is_string($object) ? $object : get_class($object)));
+        return $class[count($class) - 1];
     }
 
     public static function get_protected_methods($obj) {
