@@ -20,7 +20,7 @@ class Controller extends Object {
 
     protected $_token = null;
 
-    public function __construct($config = array(), $get = null, $post = null) {
+    public function __construct($config = array()) {
         $defaults = array();
         parent::__construct($config + $defaults);
         // TODO: Fix this!

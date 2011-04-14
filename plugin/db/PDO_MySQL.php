@@ -37,7 +37,7 @@ class PDO_MySQL extends \core\Object {
     */
     public function __construct(array $config = array()) {
         $defaults = array(
-            'db'       => DATABASE_NAME,
+            'database' => DATABASE_NAME,
             'host'     => DATABASE_HOST, 
             'username' => DATABASE_USER,
             'password' => DATABASE_PASS
@@ -80,7 +80,7 @@ class PDO_MySQL extends \core\Object {
     }
     
     public function delete($obj, $where = null) {
-        $sql = 'DELETE FROM `' . get_class($obj) . '`';
+        $sql = 'DELETE FROM `' . Meta::classname_only($obj) . '`';
         if ( is_null($where) ) {
             $id = PRIMARY_KEY;
             // TODO: Throw exception if id is null?
@@ -148,7 +148,7 @@ class PDO_MySQL extends \core\Object {
         }
 
         if ( is_object($table) ) {
-            $table = get_class($table);
+            $table = Meta::classname_only($table);
         }
 
         $sql .= ' FROM `' . $table . '`';
@@ -236,7 +236,7 @@ class PDO_MySQL extends \core\Object {
     *  @return bool
     */
     public function insert($obj) {
-        $table = get_class($obj);
+        $table = Meta::classname_only($obj);
         $properties = Meta::get_protected_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';
@@ -374,7 +374,7 @@ class PDO_MySQL extends \core\Object {
     *  @return bool 
     */
     public function update($obj, $where = null) {
-        $table = get_class($obj);
+        $table = Meta::classname_only($obj);
         $properties = Meta::get_protected_vars($obj);
 
     	$sql = 'UPDATE `' . $table . '` SET ';
@@ -415,7 +415,7 @@ class PDO_MySQL extends \core\Object {
     *  @return bool 
     */
     public function upsert($obj) {
-        $table = get_class($obj);
+        $table = Meta::classname_only($obj);
         $properties = Meta::get_protected_vars($obj);
 
     	$sql = 'INSERT INTO `' . $table . '` ';

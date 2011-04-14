@@ -13,8 +13,9 @@ class ApplicationController extends \core\Controller {
         'user'    => 'model\User'
     );
 
-    public function __construct($get = null, $post = null) {
-        parent::__construct($get, $post);
+    public function __construct(array $config = array()) {
+        $defaults = array();
+        parent::__construct($config + $defaults);
 
         $session = $this->_classes['session'];
         $this->_session = new $session(); 

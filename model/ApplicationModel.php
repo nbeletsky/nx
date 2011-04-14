@@ -2,7 +2,7 @@
 
 namespace model;
 
-class ApplicationModel extends core\Model {
+class ApplicationModel extends \core\Model {
 
 }
 

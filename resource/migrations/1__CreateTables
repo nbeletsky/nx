@@ -1,4 +1,4 @@
-CREATE TABLE  `journal`.`User` (
+CREATE TABLE  `User` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
     `username` VARCHAR( 16 ) NOT NULL ,
     `password` VARCHAR( 255 ) NOT NULL ,
@@ -10,7 +10,7 @@ CREATE TABLE  `journal`.`User` (
     )
 );
 
-CREATE TABLE  `journal`.`Session` (
+CREATE TABLE  `Session` (
     `id` varchar(255) NOT NULL PRIMARY KEY ,
     `User_id` INT UNSIGNED NOT NULL ,
     `data` MEDIUMBLOB NOT NULL ,
@@ -20,7 +20,7 @@ CREATE TABLE  `journal`.`Session` (
     )
 );
 
-CREATE TABLE  `journal`.`Entry` (
+CREATE TABLE  `Entry` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
     `title` VARCHAR( 255 ) NOT NULL ,
     `content` TEXT NOT NULL ,
@@ -28,7 +28,7 @@ CREATE TABLE  `journal`.`Entry` (
     `User_id` INT UNSIGNED NOT NULL
 )
 
-CREATE TABLE  `journal`.`Tag` (
+CREATE TABLE  `Tag` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
     `tag` VARCHAR( 255 ) NOT NULL ,
     UNIQUE (
@@ -36,7 +36,7 @@ CREATE TABLE  `journal`.`Tag` (
     )
 ) 
 
-CREATE TABLE  `journal`.`Entry__Tag` (
+CREATE TABLE  `Entry__Tag` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
     `Entry_id` INT UNSIGNED NOT NULL ,
     `Tag_id` INT UNSIGNED NOT NULL
