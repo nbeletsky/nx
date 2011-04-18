@@ -15,7 +15,7 @@ class Meta {
         }
         
         $class = explode('\\', (is_string($object) ? $object : get_class($object)));
-        return $class[count($class) - 1];
+        return array_pop($class);
     }
 
     public static function get_protected_methods($obj) {

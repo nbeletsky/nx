@@ -12,6 +12,7 @@ class File {
     *  @access public
     *  @return void
     */
+    // TODO: Fix this
     public static function create_snapshot($data, $filename) {
         $top = BASE_INSTALL . '/' . SNAPSHOT_DIRECTORY;
         if ( $top{strlen($top) - 1} !== '/' ) {

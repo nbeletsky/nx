@@ -8,6 +8,8 @@ use lib\Meta;
 
 class Controller extends Object {
 
+    protected $_auto_config = array('http_get', 'http_post');
+
     protected $_handler = null; // handler for errors, array('controller'=>foo, 'action'=>bar)
 
     protected $_http_get = array();
@@ -16,16 +18,16 @@ class Controller extends Object {
     protected $_validation_errors = array();
 
     protected $_template = DEFAULT_TEMPLATE; 
-    protected $_create_snapshot = false; 
 
     protected $_token = null;
 
     public function __construct($config = array()) {
         $defaults = array();
         parent::__construct($config + $defaults);
-        // TODO: Fix this!
-        //$this->_http_get = ( !is_null($get) ) ? $get : array();
-        //$this->_http_post = ( isset($post) ) ? Data::extract_post($post) : array();
+    }
+
+    protected function _init() {
+
     }
 
     public function call($action, $id = null, $additional = null) {
@@ -39,10 +41,6 @@ class Controller extends Object {
             // TODO: Move this into an auth class?
             $this->_validation_errors = $this->_validate($action);
 
-            // TODO: Move this too?
-            $this->_token = sha1(microtime() . CSRF_TOKEN_SALT);
-            $_SESSION[$this->classname() . '_token'] = $this->_token;
-
             $to_view = $this->$action($id);
 
             // AJAX
@@ -51,9 +49,7 @@ class Controller extends Object {
                 exit;
             }
             
-            // TODO: Eventually change this to use $this->_classname
-            $classname = Meta::classname_only($this);
-            $view_file = "../view/" . $this->_template . '/' . $classname . "/" . $action . VIEW_EXTENSION;
+            $view_file = "../view/" . $this->_template . '/' . $this->classname() . "/" . $action . VIEW_EXTENSION;
 
             if ( file_exists($view_file) ) {
                 if ( is_array($additional) ) {
@@ -65,11 +61,6 @@ class Controller extends Object {
                 }
 
                 include $view_file;
-
-                if ( $this->_create_snapshot ) {
-                    $snapshot = ob_get_contents(); 
-                    File::create_snapshot($snapshot, basename(realpath($view_file)));
-                }
             }
 
         } catch (\Exception $e) {
@@ -125,6 +116,11 @@ class Controller extends Object {
                 die('CSRF detected!');
             }
         }
+
+        // TODO: Pass in CSRF_TOKEN_SALT as a config option?
+        $this->_token = sha1(microtime() . CSRF_TOKEN_SALT);
+        $_SESSION[$this->classname() . '_token'] = $this->_token;
+
         return array();
     }
     

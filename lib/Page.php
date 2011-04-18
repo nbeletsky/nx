@@ -46,9 +46,10 @@ class Page {
 
         if ( in_array($controller, $whitelist) ) {
             $controller = '\\controller\\' . $controller; 
-            // TODO: Fix this!
-            //$controller_obj = new $controller($get, $_POST);
-            $controller_obj = new $controller();
+            $controller_obj = new $controller(array(
+                'http_get'  => $get,
+                'http_post' => ( !empty($_POST) ) ? Data::extract_post($_POST) : array()
+            ));
             $controller_obj->call($action, $id, $additional);
         } else {
             // TODO: Throw exception!

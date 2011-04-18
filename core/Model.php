@@ -6,7 +6,6 @@ use lib\Meta;
 
 class Model extends Object {
 
-    // TODO: Fix this class so that these classes are set in the default() and then called via a config
     protected $_classes = array(
         'db'    => 'plugin\db\PDO_MySQL',
         'cache' => 'plugin\cache\MemcachedCache'
@@ -20,22 +19,28 @@ class Model extends Object {
     protected $_belongs_to = array();
     protected $_has_and_belongs_to_many = array(); 
     
-    // id can either be an unique identifier 
-    // or a WHERE relationship
-    public function __construct($id = null) {
+    public function __construct(array $config = array()) {
+        $defaults = array(
+            'id'    => null,
+            'where' => null 
+        );
+        parent::__construct($config + $defaults);
+    }
+
+    protected function _init() {
         $db = $this->_classes['db'];
         $this->_db = new $db(); 
         $cache = $this->_classes['cache'];
         $this->_cache = new $cache(); 
         
-        if ( !is_numeric($id) && !is_null($id) ) {
-            $result = $this->_db->find_object($this, $id); 
-            $id = $result[PRIMARY_KEY];
+        if ( isset($this->_config['where']) ) {
+            $result = $this->_db->find_object($this, $this->_config['where']); 
+            $this->_config['id'] = $result[PRIMARY_KEY];
         }
 
-        if ( is_numeric($id) ) {
-            if ( !$this->pull_from_cache($this, $id) ) {
-                $this->_db->load_object($this, $id);
+        if ( is_numeric($this->_config['id']) ) {
+            if ( !$this->pull_from_cache($this, $this->_config['id']) ) {
+                $this->_db->load_object($this, $this->_config['id']);
                 $this->cache();
             }
         }
@@ -175,6 +180,8 @@ class Model extends Object {
     public function store() {
         // TODO: Validate data!
         // TODO: Sanitize!
+        $this->validate();
+        $this->sanitize();
         $this->_db->upsert($this);
         $id = PRIMARY_KEY;
         $this->$id = $this->_db->insert_id();

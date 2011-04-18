@@ -18,8 +18,6 @@ class Object {
         if ( $this->_config['init'] ) {
             $this->_init();
         }
-
-        $this->_classname = get_called_class();
     }
 
     protected function _init() {
@@ -36,6 +34,8 @@ class Object {
                 $this->$property = $this->_config[$flag];
             }
         }
+
+        $this->_classname = Meta::classname_only(get_called_class());
     }
 
     public function classname() {
