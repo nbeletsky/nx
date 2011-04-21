@@ -5,6 +5,7 @@ namespace nx\core;
 use nx\lib\Data; 
 use nx\lib\File; 
 use nx\lib\Meta; 
+use nx\lib\Page; 
 
 class Controller extends Object {
 
@@ -34,8 +35,8 @@ class Controller extends Object {
 
     public function call($action, $id = null, $additional = null) {
         if ( !method_exists($this, $action) || $this->is_protected($action) ) {
-            // TODO: throw 404!
-            die();
+            Page::throw_404($this->_template);
+            exit;
         }   
 
         // TODO: Move this into an auth class?
@@ -94,7 +95,7 @@ class Controller extends Object {
         } else {
             header("Location: $redirect_location");
         }
-        exit();
+        exit;
     }
 
     public function sanitize($data) {

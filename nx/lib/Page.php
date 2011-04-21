@@ -52,7 +52,15 @@ class Page {
             ));
             $controller_obj->call($action, $id, $additional);
         } else {
-            // TODO: Throw exception!
+            Page::throw_404(DEFAULT_TEMPLATE);
+            exit;
+        }
+    }
+
+    public static function throw_404($template) {
+        $view_file = '../view/' . $template . '/404' . VIEW_EXTENSION;
+        if ( file_exists($view_file) ) {
+            include $view_file;
         }
     }
 
