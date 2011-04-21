@@ -40,12 +40,12 @@ class Page {
             parse_str($args, $get);
         }
 
-        $whitelist = File::get_filenames_within(BASE_INSTALL . '/controller');
+        $whitelist = File::get_filenames_within(BASE_INSTALL . '/app/controller');
         $strip_ext = create_function('$val', 'return basename($val, ".php");');
         $whitelist = array_map($strip_ext, $whitelist);
 
         if ( in_array($controller, $whitelist) ) {
-            $controller = '\\controller\\' . $controller; 
+            $controller = '\\app\\controller\\' . $controller; 
             $controller_obj = new $controller(array(
                 'http_get'  => $get,
                 'http_post' => ( !empty($_POST) ) ? Data::extract_post($_POST) : array()

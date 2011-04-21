@@ -4,7 +4,7 @@ namespace nx\plugin\db;
 
 use nx\lib\Meta;
 
-class PDO_MySQL extends \core\Object {
+class PDO_MySQL extends \nx\core\Object {
    /**
     *  The db handle. 
     *

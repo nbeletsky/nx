@@ -2,7 +2,7 @@
 
 namespace nx\plugin\cache;
 
-class MemcachedCache extends \core\Object {
+class MemcachedCache extends \nx\core\Object {
 
    /**
     *  The Memcached object. 

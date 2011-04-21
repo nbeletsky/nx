@@ -8,8 +8,8 @@ use nx\lib\Meta;
 class Model extends Object {
 
     protected $_classes = array(
-        'db'    => 'plugin\db\PDO_MySQL',
-        'cache' => 'plugin\cache\MemcachedCache'
+        'db'    => 'nx\plugin\db\PDO_MySQL',
+        'cache' => 'nx\plugin\cache\MemcachedCache'
     );
 
     protected $_db;
@@ -189,7 +189,7 @@ class Model extends Object {
 
     public function store() {
         // TODO: Validate data!
-        $this->validate();
+        //$this->validate();
         $this->_db->upsert($this);
         $id = PRIMARY_KEY;
         $this->$id = $this->_db->insert_id();

@@ -8,8 +8,8 @@ class ApplicationController extends \nx\core\Controller {
     protected $_user;
 
     protected $_classes = array(
-        'session' => 'model\Session', 
-        'user'    => 'model\User'
+        'session' => 'app\model\Session', 
+        'user'    => 'app\model\User'
     );
 
     public function __construct(array $config = array()) {

@@ -3,14 +3,8 @@
     // Default base install is two directories above where this config file is stored
     define("BASE_INSTALL", realpath(__DIR__ . '/../..')); 
 
-    set_include_path(get_include_path().PATH_SEPARATOR.
-                     BASE_INSTALL."/app/model".PATH_SEPARATOR.
-                     BASE_INSTALL."/app/controller".PATH_SEPARATOR.
-                     BASE_INSTALL."/app/view".PATH_SEPARATOR.
-                     BASE_INSTALL."/nx/core".PATH_SEPARATOR.
-                     BASE_INSTALL."/nx/lib".PATH_SEPARATOR.
-                     BASE_INSTALL."/nx/plugin".PATH_SEPARATOR.
-                     BASE_INSTALL."/nx/test");
+    set_include_path(get_include_path() . PATH_SEPARATOR.
+                     BASE_INSTALL . PATH_SEPARATOR);
 
     ini_set('display_errors', 1);
     date_default_timezone_set('America/Los_Angeles');
