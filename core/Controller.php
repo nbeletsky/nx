@@ -8,8 +8,6 @@ use lib\Meta;
 
 class Controller extends Object {
 
-    protected $_auto_config = array('http_get', 'http_post');
-
     protected $_http_get = array();
     protected $_http_post = array();
 
@@ -19,9 +17,19 @@ class Controller extends Object {
 
     protected $_token = null;
 
-    public function __construct($config = array()) {
+    protected $_sanitizers = array();
+
+    protected $_auto_config = array('http_get', 'http_post');
+
+    public function __construct(array $config = array()) {
         $defaults = array();
         parent::__construct($config + $defaults);
+    }
+
+    protected function _init() {
+        parent::_init();
+        $this->_http_post = $this->sanitize($this->_http_post);
+        $this->_http_get = $this->sanitize($this->_http_get);
     }
 
     public function call($action, $id = null, $additional = null) {
@@ -41,7 +49,7 @@ class Controller extends Object {
             exit;
         }
         
-        $view_file = "../view/" . $this->_template . '/' . $this->classname() . "/" . $action . VIEW_EXTENSION;
+        $view_file = "../view/" . $this->_template . '/' . lcfirst($this->classname()) . "/" . $action . VIEW_EXTENSION;
 
         if ( file_exists($view_file) ) {
             if ( is_array($additional) ) {
@@ -87,6 +95,19 @@ class Controller extends Object {
             header("Location: $redirect_location");
         }
         exit();
+    }
+
+    public function sanitize($data) {
+        foreach ( $data as $key => $val ) {
+            if ( !is_array($key) ) {
+                $data[$key] = Data::sanitize($val, $this->_sanitizers[$key]);
+            } else {
+                foreach ( $key as $id => $obj ) {
+                    $data[$key][$id] = $obj->sanitize();
+                }
+            }
+        }
+        return $data;
     }
 
     // TODO: Fix this

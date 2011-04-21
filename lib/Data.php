@@ -7,9 +7,11 @@ class Data {
     public static function extract_post($data) {
         $collection = array();
         foreach ( $data as $child_key => $child ) {
-            if ( is_array($child) ) {
+            if ( !is_array($child) ) { // name = 'username'
+                $collection[$child_key] = $child; 
+            } else {
                 $loc = strrpos($child_key, '|');
-                if ( $loc !== false ) {
+                if ( $loc !== false ) { // name = '[User|id][username]'
                     $id = substr($child_key, $loc + 1);
                     $class = substr($child_key, 0, $loc);
                     $obj = new $class($id);
@@ -17,17 +19,16 @@ class Data {
                     {
                         $obj->$key = $value;
                     }
-                } else {
+                    $collection[$class][] = $obj; 
+                } else { // name = '[User][][username]'
                     foreach ( $child as $grandchild_array ) {
                         $obj = new $child_key();
                         foreach ( $grandchild_array as $key => $value ) {
                             $obj->$key = $value;
                         }
                     }
+                    $collection[$child_key][] = $obj; 
                 }
-                $collection[$child_key][] = $obj; 
-            } else {
-                $collection[$child_key] = $child; 
             }
         }
 

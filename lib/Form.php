@@ -32,11 +32,15 @@ class Form {
         $html = '';
         $value_present = false;
         foreach ( $attributes as $key => $setting ) {
-            if ( !is_numeric($key) ) {
+            // An attribute passed alone without a key (e.g., array('autofocus'))
+            // will be assigned a numeric key by PHP
+            if ( is_numeric($key) ) {
+                $html .= $setting . " "; 
+            } else {
                 switch ( $key ) {
                     case 'name':
-                        $id = PRIMARY_KEY;
                         if ( !is_null($binding) ) {
+                            $id = PRIMARY_KEY;
                             if ( isset($binding->$id) ) {
                                 $setting = '[' . $binding->classname() . '|' . $binding->$id . '][' . $setting . ']';
                             } else {
@@ -49,9 +53,7 @@ class Form {
                         break;
                 }
                 $html .= $key . "='" . $setting . "' "; 
-            } else {
-                $html .= $setting . " "; 
-            }
+            } 
         }
 
         if ( !$value_present && !is_null($binding) && isset($binding->$attributes['name']) ) {

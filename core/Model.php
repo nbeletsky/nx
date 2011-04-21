@@ -2,6 +2,7 @@
 
 namespace core;
 
+use lib\Data;
 use lib\Meta;
 
 class Model extends Object {
@@ -19,6 +20,8 @@ class Model extends Object {
     protected $_belongs_to = array();
     protected $_has_and_belongs_to_many = array(); 
     
+    protected $_sanitizers = array();
+
     public function __construct(array $config = array()) {
         $defaults = array(
             'id'    => null,
@@ -177,11 +180,16 @@ class Model extends Object {
         return $obj;
     }
 
+    public function sanitize() {
+        foreach ( $this->_sanitizers as $property => $type ) {
+            $this->$property = Data::sanitize($this->$property, $type);
+        }
+        return $this;
+    }
+
     public function store() {
         // TODO: Validate data!
-        // TODO: Sanitize!
         $this->validate();
-        $this->sanitize();
         $this->_db->upsert($this);
         $id = PRIMARY_KEY;
         $this->$id = $this->_db->insert_id();
