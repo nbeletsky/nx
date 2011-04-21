@@ -42,6 +42,7 @@ class Session extends ApplicationModel {
     }
 
     protected function _init() {
+        parent::_init();
         $this->last_active = date('Y-m-d H:i:s', time());
 
         session_set_save_handler(

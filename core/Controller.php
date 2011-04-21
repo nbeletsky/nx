@@ -10,8 +10,6 @@ class Controller extends Object {
 
     protected $_auto_config = array('http_get', 'http_post');
 
-    protected $_handler = null; // handler for errors, array('controller'=>foo, 'action'=>bar)
-
     protected $_http_get = array();
     protected $_http_post = array();
 
@@ -26,53 +24,36 @@ class Controller extends Object {
         parent::__construct($config + $defaults);
     }
 
-    protected function _init() {
-
-    }
-
     public function call($action, $id = null, $additional = null) {
-        try {
-            
-            if ( !method_exists($this, $action) || $this->is_protected($action) ) {
-                // TODO: throw 404!
-                die();
-            }   
+        if ( !method_exists($this, $action) || $this->is_protected($action) ) {
+            // TODO: throw 404!
+            die();
+        }   
 
-            // TODO: Move this into an auth class?
-            $this->_validation_errors = $this->_validate($action);
+        // TODO: Move this into an auth class?
+        $this->_validation_errors = $this->_validate($action);
 
-            $to_view = $this->$action($id);
+        $to_view = $this->$action($id);
 
-            // AJAX
-            if ( is_string($to_view) ) {
-                echo $to_view;
-                exit;
-            }
-            
-            $view_file = "../view/" . $this->_template . '/' . $this->classname() . "/" . $action . VIEW_EXTENSION;
+        // AJAX
+        if ( is_string($to_view) ) {
+            echo $to_view;
+            exit;
+        }
+        
+        $view_file = "../view/" . $this->_template . '/' . $this->classname() . "/" . $action . VIEW_EXTENSION;
 
-            if ( file_exists($view_file) ) {
-                if ( is_array($additional) ) {
-                    extract($additional);
-                }
-
-                if ( is_array($to_view) ) {
-                    extract($to_view);
-                }
-
-                include $view_file;
+        if ( file_exists($view_file) ) {
+            if ( is_array($additional) ) {
+                extract($additional);
             }
 
-        } catch (\Exception $e) {
-            // TODO: Fix exceptions
-            if ( $this->_handler ) {
-                render("/" . $this->_handler['controller'] . "/" . $this->_handler['action'] . "/" .$this->id);
+            if ( is_array($to_view) ) {
+                extract($to_view);
             }
-            
-            print_r("<pre>" . $e->getMessage() . $e->getTraceAsString() . '</pre>');
-            exit();
-        }  
 
+            include $view_file;
+        }
     }
 
     public function is_protected($action) {
