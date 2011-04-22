@@ -104,6 +104,7 @@ class Controller extends Object {
     }
 
     // TODO: Fix this
+    // TODO: Prevent XSS attacks
     protected function _validate($action) {
         if ( !empty($this->_http_post) ) {
             if ( $this->_http_post['token'] !== $_SESSION[$this->classname() . '_token'] ) {
