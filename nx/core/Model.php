@@ -31,6 +31,7 @@ class Model extends Object {
     }
 
     protected function _init() {
+        parent::_init();
         $db = $this->_classes['db'];
         $this->_db = new $db(); 
         $cache = $this->_classes['cache'];
