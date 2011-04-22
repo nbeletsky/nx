@@ -56,7 +56,5 @@
 
     define("VIEW_EXTENSION", ".html");
 
-    define("DEBUG_LEVEL", 1);
-
     require "config.application.php";
 ?>

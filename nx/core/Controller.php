@@ -2,6 +2,7 @@
 
 namespace nx\core;
 
+use nx\core\View; 
 use nx\lib\Data; 
 use nx\lib\File; 
 use nx\lib\Meta; 
@@ -12,13 +13,12 @@ class Controller extends Object {
     protected $_http_get = array();
     protected $_http_post = array();
 
-    protected $_validation_errors = array();
-
     protected $_template = DEFAULT_TEMPLATE; 
 
     protected $_token = null;
 
     protected $_sanitizers = array();
+    protected $_validators = array();
 
     protected $_auto_config = array('http_get', 'http_post');
 
@@ -33,14 +33,14 @@ class Controller extends Object {
         $this->_http_get = $this->sanitize($this->_http_get);
     }
 
-    public function call($action, $id = null, $additional = null) {
+    public function call($action, $id = null, $additional = array()) {
         if ( !method_exists($this, $action) || $this->is_protected($action) ) {
             Page::throw_404($this->_template);
             exit;
         }   
 
         // TODO: Move this into an auth class?
-        $this->_validation_errors = $this->_validate($action);
+        $this->_validate($action);
 
         $to_view = $this->$action($id);
 
@@ -53,15 +53,8 @@ class Controller extends Object {
         $view_file = "../view/" . $this->_template . '/' . lcfirst($this->classname()) . "/" . $action . VIEW_EXTENSION;
 
         if ( file_exists($view_file) ) {
-            if ( is_array($additional) ) {
-                extract($additional);
-            }
-
-            if ( is_array($to_view) ) {
-                extract($to_view);
-            }
-
-            include $view_file;
+            $view = new View();
+            $view->output($view_file, $to_view + $additional); 
         }
     }
 

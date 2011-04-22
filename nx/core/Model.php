@@ -188,12 +188,24 @@ class Model extends Object {
     }
 
     public function store() {
-        // TODO: Validate data!
-        //$this->validate();
+        if ( !$this->validate() ) {
+            // TODO: Err?
+            return false;
+        }
         $this->_db->upsert($this);
         $id = PRIMARY_KEY;
         $this->$id = $this->_db->insert_id();
         $this->cache();
+    }
+
+    public function validate() {
+        if ( empty($this->_validators) ) {
+            return true;
+        }
+
+        foreach ( $this->_validators as $validator ) {
+            // TODO: Do stuff...
+        }
     }
 
 }

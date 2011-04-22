@@ -7,4 +7,6 @@ define('DATABASE_NAME', 'journal');
 
 define('MEMCACHED_HOST', '127.0.0.1');
 
+define('CSRF_TOKEN_SALT', 'JU7]h{I^Wic)');
+
 ?>

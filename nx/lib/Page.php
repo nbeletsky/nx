@@ -6,7 +6,7 @@ use nx\lib\File;
 
 class Page {
 
-    public static function render($query_string, $additional = null) {
+    public static function render($query_string, $additional = array()) {
         // URL layout
         // foobar.com/
         // foobar.com/controller
