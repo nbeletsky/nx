@@ -14,11 +14,9 @@ class User extends ApplicationModel
     protected $last_login;
 
     protected $_validators = array(
-        'username' => array(
-            array('notEmpty', 'message' => 'email is empty'),
-            array('email', 'message' => 'email is not valid'),
-        ),
-        'ip' => array('ip', 'message' => 'ip is invalid')
+        'username' => array('not_empty', 'message' => 'Username cannot be blank.'),
+        'username' => array('length_between', 'options' => array('min' => '5', 'max' => 16), 'message' => 'Username must be between 5 and 16 characters.'),
+        'ip' => array('ip', 'message' => 'ip is invalid.')
     );
 }
 

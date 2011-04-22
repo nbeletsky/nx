@@ -18,7 +18,6 @@ class Controller extends Object {
     protected $_token = null;
 
     protected $_sanitizers = array();
-    protected $_validators = array();
 
     protected $_auto_config = array('http_get', 'http_post');
 

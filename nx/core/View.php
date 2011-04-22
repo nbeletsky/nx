@@ -6,7 +6,7 @@ use nx\lib\Form;
 
 class View extends Object {
 
-    protected $_form;
+    protected $form;
 
     public function __construct(array $config = array()) {
         $defaults = array();
@@ -15,7 +15,7 @@ class View extends Object {
 
     protected function _init() {
         parent::_init();
-        $this->_form = new Form();
+        $this->form = new Form();
     }
 
     public function output($file, $variables) {

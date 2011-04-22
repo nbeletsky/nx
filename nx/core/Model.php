@@ -4,6 +4,7 @@ namespace nx\core;
 
 use nx\lib\Data;
 use nx\lib\Meta;
+use nx\lib\Validator;
 
 class Model extends Object {
 
@@ -21,6 +22,8 @@ class Model extends Object {
     protected $_has_and_belongs_to_many = array(); 
     
     protected $_sanitizers = array();
+    protected $_validators = array();
+    protected $_errors = array();
 
     public function __construct(array $config = array()) {
         $defaults = array(
@@ -190,10 +193,10 @@ class Model extends Object {
 
     public function store() {
         if ( !$this->validate() ) {
-            // TODO: Err?
             return false;
         }
         $this->_db->upsert($this);
+        // TODO: Check that caching works with UPDATEd objects!
         $id = PRIMARY_KEY;
         $this->$id = $this->_db->insert_id();
         $this->cache();
@@ -204,9 +207,26 @@ class Model extends Object {
             return true;
         }
 
-        foreach ( $this->_validators as $validator ) {
-            // TODO: Do stuff...
+        $errors = array();
+        foreach ( $this->_validators as $field => $validator ) {
+            if ( !is_array($errors[$field]) ) {
+                $errors[$field] = array() ;
+            }
+
+            $method = $validator[0];
+            if ( isset($validator['options']) ) {
+                $is_valid = Validator::$method($this->$field, $validator['options']);
+            } else {
+                $is_valid = Validator::$method($this->$field);
+            }
+
+            if ( !$is_valid ) {
+                $errors[$field][] = $validator['message'];
+            }
         }
+        $this->_errors = array_filter($errors);
+
+        return ( empty($this->_errors) );
     }
 
 }
