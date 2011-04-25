@@ -3,6 +3,7 @@
 namespace nx\core;
 
 use nx\core\View; 
+use nx\lib\Auth; 
 use nx\lib\Data; 
 use nx\lib\File; 
 use nx\lib\Meta; 
@@ -28,8 +29,18 @@ class Controller extends Object {
 
     protected function _init() {
         parent::_init();
+
         $this->_http_post = $this->sanitize($this->_http_post);
+        if ( !this->_is_valid_request($this->_http_post) ) {
+            $this->handle_CSRF();
+        }
+
         $this->_http_get = $this->sanitize($this->_http_get);
+        if ( !this->_is_valid_request($this->_http_get) ) {
+            $this->handle_CSRF();
+        }
+
+        $this->_token = Auth::create_token(CSRF_TOKEN_SALT, $this->classname());
     }
 
     public function call($action, $id = null, $additional = array()) {
@@ -37,9 +48,6 @@ class Controller extends Object {
             Page::throw_404($this->_template);
             exit;
         }   
-
-        // TODO: Move this into an auth class?
-        $this->_validate($action);
 
         $to_view = $this->$action($id);
 
@@ -57,8 +65,20 @@ class Controller extends Object {
         }
     }
 
+    public function handle_CSRF() {
+        // TODO: Handle CSRF more elegantly
+        die('CSRF attack!');
+    }
+
     public function is_protected($action) {
         return ( in_array($action, Meta::get_protected_methods($this)) );
+    }
+
+    protected function _is_valid_request($request) {
+        if ( is_empty($request) ) {
+            return true;
+        }
+        return Auth::is_token_valid($request, $this->classname());
     }
 
    /**
@@ -103,23 +123,6 @@ class Controller extends Object {
         return $data;
     }
 
-    // TODO: Fix this
-    // TODO: Prevent XSS attacks
-    protected function _validate($action) {
-        if ( !empty($this->_http_post) ) {
-            if ( $this->_http_post['token'] !== $_SESSION[$this->classname() . '_token'] ) {
-                // CSRF attack
-                die('CSRF detected!');
-            }
-        }
-
-        // TODO: Pass in CSRF_TOKEN_SALT as a config option?
-        $this->_token = sha1(microtime() . CSRF_TOKEN_SALT);
-        $_SESSION[$this->classname() . '_token'] = $this->_token;
-
-        return array();
-    }
-    
 }
 
 ?>

@@ -209,10 +209,6 @@ class Model extends Object {
 
         $errors = array();
         foreach ( $this->_validators as $field => $validator ) {
-            if ( !is_array($errors[$field]) ) {
-                $errors[$field] = array() ;
-            }
-
             $method = $validator[0];
             if ( isset($validator['options']) ) {
                 $is_valid = Validator::$method($this->$field, $validator['options']);
@@ -221,6 +217,9 @@ class Model extends Object {
             }
 
             if ( !$is_valid ) {
+                if ( !is_array($errors[$field]) ) {
+                    $errors[$field] = array();
+                }
                 $errors[$field][] = $validator['message'];
             }
         }
