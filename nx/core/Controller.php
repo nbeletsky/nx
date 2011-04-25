@@ -13,6 +13,7 @@ class Controller extends Object {
 
     protected $_http_get = array();
     protected $_http_post = array();
+    protected $_form;
 
     protected $_template = DEFAULT_TEMPLATE; 
 
@@ -20,7 +21,7 @@ class Controller extends Object {
 
     protected $_sanitizers = array();
 
-    protected $_auto_config = array('http_get', 'http_post');
+    protected $_auto_config = array('http_get', 'http_post', 'form');
 
     public function __construct(array $config = array()) {
         $defaults = array();
@@ -31,12 +32,12 @@ class Controller extends Object {
         parent::_init();
 
         $this->_http_post = $this->sanitize($this->_http_post);
-        if ( !this->_is_valid_request($this->_http_post) ) {
+        if ( !$this->_is_valid_request($this->_http_post) ) {
             $this->handle_CSRF();
         }
 
         $this->_http_get = $this->sanitize($this->_http_get);
-        if ( !this->_is_valid_request($this->_http_get) ) {
+        if ( !$this->_is_valid_request($this->_http_get) ) {
             $this->handle_CSRF();
         }
 
@@ -60,8 +61,8 @@ class Controller extends Object {
         $view_file = "../view/" . $this->_template . '/' . lcfirst($this->classname()) . "/" . $action . VIEW_EXTENSION;
 
         if ( file_exists($view_file) ) {
-            $view = new View();
-            $view->output($view_file, $to_view + $additional); 
+            extract($to_view + $additional);
+            include $view_file;
         }
     }
 
@@ -75,7 +76,7 @@ class Controller extends Object {
     }
 
     protected function _is_valid_request($request) {
-        if ( is_empty($request) ) {
+        if ( empty($request) ) {
             return true;
         }
         return Auth::is_token_valid($request, $this->classname());

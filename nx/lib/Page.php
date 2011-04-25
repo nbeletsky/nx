@@ -3,6 +3,7 @@
 namespace nx\lib;
 
 use nx\lib\File;
+use nx\lib\Form;
 
 class Page {
 
@@ -48,7 +49,8 @@ class Page {
             $controller = '\\app\\controller\\' . $controller; 
             $controller_obj = new $controller(array(
                 'http_get'  => $get,
-                'http_post' => ( !empty($_POST) ) ? Data::extract_post($_POST) : array()
+                'http_post' => ( !empty($_POST) ) ? Data::extract_post($_POST) : array(),
+                'form'      => new Form()
             ));
             $controller_obj->call($action, $id, $additional);
         } else {
