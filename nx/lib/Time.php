@@ -4,7 +4,15 @@ namespace nx\lib;
 
 class Time {
 
-    public static function IntervalTimesForSelect($interval = 15, $military = false) {
+   /**
+    *  Returns an array of times separated by a constant interval.
+    *
+    *  @param int $interval          The interval between each time in the list.
+    *  @param bool $military         Whether or not to output time using 24-hour format.
+    *  @access public
+    *  @return array
+    */
+    public static function get_with_interval($interval = 15, $military = false) {
         if ( 60 % interval !== 0 ) {
             return false;
         }

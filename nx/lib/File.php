@@ -35,6 +35,13 @@ class File {
         self::write($filename, '', 'w');
     }
 
+   /**
+    *  Returns the names of all of the files within a directory.
+    *
+    *  @param string $directory        The directory from which to retrieve the filenames.
+    *  @access public
+    *  @return array
+    */
     public static function get_filenames_within($directory) {
         $filenames = array();
         foreach (new \DirectoryIterator($directory) as $file) {
@@ -53,7 +60,7 @@ class File {
     *  @param string $data            The data to be written.
     *  @param string $mode            The type of access to be granted to the file handle.
     *  @access public
-    *  @return string
+    *  @return bool
     */
     public static function write($filename, $data, $mode = 'a') {
         $handle = @fopen($filename, $mode);

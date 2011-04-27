@@ -7,6 +7,14 @@ use nx\lib\Form;
 
 class Page {
 
+   /**
+    *  Renders a page.
+    *
+    *  @param string $query_string        The query string from the url.
+    *  @param array $additional           Any additional variables that should be passed to the view.
+    *  @access public
+    *  @return array
+    */
     public static function render($query_string, $additional = array()) {
         // URL layout
         // foobar.com/
@@ -54,11 +62,18 @@ class Page {
             ));
             $controller_obj->call($action, $id, $additional);
         } else {
-            Page::throw_404(DEFAULT_TEMPLATE);
+            self::throw_404(DEFAULT_TEMPLATE);
             exit;
         }
     }
 
+   /**
+    *  Renders a 404 page.
+    *
+    *  @param string $template            The view template to use.
+    *  @access public
+    *  @return void
+    */
     public static function throw_404($template) {
         $view_file = '../view/' . $template . '/404' . VIEW_EXTENSION;
         if ( file_exists($view_file) ) {

@@ -4,6 +4,15 @@ namespace nx\lib;
 
 class Data {
 
+   /**
+    *  Extracts $_POST data and returns it as a collection of objects (if an
+    *  object was bound to it via the form) and `key` => `value` pairs (if no 
+    *  object is bound).
+    * 
+    *  @param array $data      The $_POST data.
+    *  @access public
+    *  @return mixed
+    */
     public static function extract_post($data) {
         $collection = array();
         foreach ( $data as $child_key => $child ) {
@@ -41,7 +50,7 @@ class Data {
     *  @param mixed $data      The data to be sanitized.
     *  @param string $type     The type of validation.
     *  @access public
-    *  @return string
+    *  @return mixed
     */
     public static function sanitize($data, $type) {
         switch ( $type ) {

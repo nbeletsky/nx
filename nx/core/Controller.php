@@ -41,7 +41,7 @@ class Controller extends Object {
             $this->handle_CSRF();
         }
 
-        $this->_token = Auth::create_token(CSRF_TOKEN_SALT, $this->classname());
+        $this->_token = Auth::create_token($this->classname());
     }
 
     public function call($action, $id = null, $additional = array()) {
