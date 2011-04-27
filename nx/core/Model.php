@@ -153,30 +153,6 @@ class Model extends Object {
         return new $field_name($obj_id); 
     }
 
-    // TODO: Fix all this crap
-    public function get_validation_errors() {
-        $errors = array();
-        foreach ( $this->_validators as $field => $validators ) {
-            if ( !isset($errors[$field]) ) {
-                $errors[$field] = array();
-            }
-
-            foreach ( $validators as $validator ) {
-                $method = $validator[0];
-                if ( isset($validator['options']) ) {
-                    $valid = Validator::$method($this->$field, $validator['options']);
-                } else {
-                    $valid = Validator::$method($this->$field);
-                }
-
-                if ( !$valid ) {
-                    $errors[$field][] = $validator['message'];
-                }
-            }
-        }
-        return $errors;
-    }
-
     public function habtm($field_name) {
         return ( in_array($field_name, $this->_has_and_belongs_to_many) );
     }
@@ -199,7 +175,7 @@ class Model extends Object {
             return true;
         }
 
-        $errors = array_filter($this->get_validation_errors());
+        $errors = $this->validate();
         return ( empty($errors) );
     }
 
@@ -233,6 +209,28 @@ class Model extends Object {
         $id = PRIMARY_KEY;
         $this->$id = $this->_db->insert_id();
         $this->cache();
+    }
+
+    public function validate() {
+        $this->_validation_errors = array();
+        foreach ( $this->_validators as $field => $validators ) {
+            foreach ( $validators as $validator ) {
+                $method = $validator[0];
+                if ( isset($validator['options']) ) {
+                    $valid = Validator::$method($this->$field, $validator['options']);
+                } else {
+                    $valid = Validator::$method($this->$field);
+                }
+
+                if ( !$valid ) {
+                    if ( !isset($this->_validation_errors[$field]) ) {
+                        $this->_validation_errors[$field] = array();
+                    }
+                    $this->_validation_errors[$field][] = $validator['message'];
+                }
+            }
+        }
+        return $this->_validation_errors;
     }
 
 }
