@@ -23,7 +23,7 @@ class Model extends Object {
     
     protected $_sanitizers = array();
     protected $_validators = array();
-    protected $_errors = array();
+    protected $_validation_errors = array();
 
     public function __construct(array $config = array()) {
         $defaults = array(
@@ -153,6 +153,30 @@ class Model extends Object {
         return new $field_name($obj_id); 
     }
 
+    // TODO: Fix all this crap
+    public function get_validation_errors() {
+        $errors = array();
+        foreach ( $this->_validators as $field => $validators ) {
+            if ( !isset($errors[$field]) ) {
+                $errors[$field] = array();
+            }
+
+            foreach ( $validators as $validator ) {
+                $method = $validator[0];
+                if ( isset($validator['options']) ) {
+                    $valid = Validator::$method($this->$field, $validator['options']);
+                } else {
+                    $valid = Validator::$method($this->$field);
+                }
+
+                if ( !$valid ) {
+                    $errors[$field][] = $validator['message'];
+                }
+            }
+        }
+        return $errors;
+    }
+
     public function habtm($field_name) {
         return ( in_array($field_name, $this->_has_and_belongs_to_many) );
     }
@@ -168,6 +192,15 @@ class Model extends Object {
     public function is_foreign($field_name) {
         return ( $this->has_many($field_name) || $this->has_one($field_name) || 
                  $this->habtm($field_name) || $this->belongs_to($field_name) );
+    }
+
+    public function is_valid() {
+        if ( empty($this->_validators) ) {
+            return true;
+        }
+
+        $errors = array_filter($this->get_validation_errors());
+        return ( empty($errors) );
     }
 
     public function pull_from_cache($obj, $id) {
@@ -192,7 +225,7 @@ class Model extends Object {
     }
 
     public function store() {
-        if ( !$this->validate() ) {
+        if ( !$this->is_valid() ) {
             return false;
         }
         $this->_db->upsert($this);
@@ -200,32 +233,6 @@ class Model extends Object {
         $id = PRIMARY_KEY;
         $this->$id = $this->_db->insert_id();
         $this->cache();
-    }
-
-    public function validate() {
-        if ( empty($this->_validators) ) {
-            return true;
-        }
-
-        $errors = array();
-        foreach ( $this->_validators as $field => $validator ) {
-            $method = $validator[0];
-            if ( isset($validator['options']) ) {
-                $is_valid = Validator::$method($this->$field, $validator['options']);
-            } else {
-                $is_valid = Validator::$method($this->$field);
-            }
-
-            if ( !$is_valid ) {
-                if ( !is_array($errors[$field]) ) {
-                    $errors[$field] = array();
-                }
-                $errors[$field][] = $validator['message'];
-            }
-        }
-        $this->_errors = array_filter($errors);
-
-        return ( empty($this->_errors) );
     }
 
 }

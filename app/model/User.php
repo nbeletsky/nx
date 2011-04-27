@@ -14,10 +14,23 @@ class User extends ApplicationModel
     protected $last_login;
 
     protected $_validators = array(
-        'username' => array('not_empty', 'message' => 'Username cannot be blank.'),
-        'username' => array('length_between', 'options' => array('min' => '5', 'max' => 16), 'message' => 'Username must be between 5 and 16 characters.'),
-        'ip' => array('ip', 'message' => 'ip is invalid.')
+        'username' => array(
+            array('not_empty', 'message' => 'Username cannot be blank.'),
+            array('length_between', 'options' => array('min' => '5', 'max' => 16), 'message' => 'Username must be between 5 and 16 characters.'),
+        ),
+        'ip' => array(
+            array('ip', 'message' => 'ip is invalid.')
+        )
     );
+
+    protected $_options = array(
+        'username_max_length' => 16,
+        'username_min_length' => 5
+    );
+
+    public function get_option($option) {
+        return $this->_options[$option];
+    }
 }
 
 ?>
