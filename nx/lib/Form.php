@@ -52,7 +52,6 @@ class Form {
     */
     protected function _parse_attributes($attributes, $binding) {
         $html = '';
-        $name_present = false;
         $value_present = false;
         foreach ( $attributes as $key => $setting ) {
             // An attribute passed alone without a key (e.g., array('autofocus'))
@@ -62,7 +61,14 @@ class Form {
             } else {
                 switch ( $key ) {
                     case 'name':
-                        $name_present = true;
+                        if ( !is_null($binding) ) {
+                            $id = PRIMARY_KEY;
+                            if ( isset($binding->$id) ) {
+                                $setting = "[" . $binding->classname() . '|' . $binding->$id . '][' . $setting . "]";
+                            } else {
+                                $setting = "[" . $binding->classname() . '][][' . $setting . "]";
+                            }
+                        }
                         break;
                     case 'value':
                         $value_present = true;
@@ -70,15 +76,6 @@ class Form {
                 }
                 $html .= $key . "='" . $setting . "' "; 
             } 
-        }
-
-        if ( !$name_present && !is_null($binding) ) {
-            $id = PRIMARY_KEY;
-            if ( isset($binding->$id) ) {
-                $html .= "name='[" . $binding->classname() . '|' . $binding->$id . '][' . $setting . "]'";
-            } else {
-                $html .= "name='[" . $binding->classname() . '][][' . $setting . "]'";
-            }
         }
 
         // TODO: $binding->$attributes['name'] is always going to return false because it is accessing a protected property

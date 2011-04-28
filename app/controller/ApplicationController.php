@@ -15,7 +15,9 @@ class ApplicationController extends \nx\core\Controller {
     public function __construct(array $config = array()) {
         $defaults = array();
         parent::__construct($config + $defaults);
+    }
 
+    protected function _init() {
         $session = $this->_classes['session'];
         $this->_session = new $session(); 
 
@@ -27,6 +29,8 @@ class ApplicationController extends \nx\core\Controller {
             $this->_user = null;
             $this->_template = DEFAULT_TEMPLATE;
         }
+
+        parent::_init();
     }
 
 }
