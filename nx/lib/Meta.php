@@ -21,6 +21,26 @@ class Meta {
     }
 
    /** 
+    *  Returns all of the columns (protected properties that are not prefixed with an underscore) of a given object.
+    *
+    *  @param object $obj                 The object from which to retrieve the properties.
+    *  @access public
+    *  @return array
+    */
+    public static function get_columns($obj) {
+        $reflection = new \ReflectionClass($obj);
+        $props = $reflection->getProperties(\ReflectionProperty::IS_PROTECTED);
+        $collection = array();
+        foreach ( $props as $prop ) {
+            $name = $prop->getName();
+            if ( strpos($name, '_') !== 0 ) {
+                $collection[$name] = $obj->$name;
+            }
+        }
+        return $collection;
+    }
+
+   /** 
     *  Returns all of the protected methods in a given class.
     *
     *  @param object $obj                 The object from which to retrieve the methods.
@@ -33,28 +53,6 @@ class Meta {
         $collection = array();
         foreach ( $methods as $method ) {
             $collection[] = $method->getName();
-        }
-        return $collection;
-    }
-
-   /** 
-    *  Returns all of the protected properties in a given class.
-    *
-    *  @param object $obj                 The object from which to retrieve the properties.
-    *  @access public
-    *  @return array
-    */
-    public static function get_protected_vars($obj) {
-        $reflection = new \ReflectionClass($obj);
-        $props = $reflection->getProperties(\ReflectionProperty::IS_PROTECTED);
-        $collection = array();
-        foreach ( $props as $prop ) {
-            // Exclude the variables with a leading underscore
-            $name = $prop->getName();
-            if ( strpos($name, '_') !== 0 ) {
-                $prop->setAccessible(true);
-                $collection[$name] = $prop->getValue($obj);
-            }
         }
         return $collection;
     }

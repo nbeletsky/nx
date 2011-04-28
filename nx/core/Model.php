@@ -78,7 +78,7 @@ class Model extends Object {
     }
 
     public function cache() {
-        $properties = Meta::get_protected_vars($this);
+        $properties = $this->get_columns();
         $data = json_encode($properties);
 
         $id = PRIMARY_KEY;
@@ -112,6 +112,10 @@ class Model extends Object {
         $obj_id = $this->$lookup_id;
 
         return new $field_name($obj_id); 
+    }
+
+    public function get_columns() {
+        return Meta::get_columns($this);
     }
 
     protected function _get_habtm($field_name) {
@@ -151,10 +155,6 @@ class Model extends Object {
         $obj_id = $result[PRIMARY_KEY];
 
         return new $field_name($obj_id); 
-    }
-
-    public function get_validation_errors() {
-        return $this->_validation_errors;
     }
 
     public function habtm($field_name) {

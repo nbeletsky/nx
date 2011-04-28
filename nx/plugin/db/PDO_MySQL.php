@@ -2,8 +2,6 @@
 
 namespace nx\plugin\db;
 
-use nx\lib\Meta;
-
 class PDO_MySQL extends \nx\core\Object {
    /**
     *  The db handle. 
@@ -80,7 +78,7 @@ class PDO_MySQL extends \nx\core\Object {
     }
     
     public function delete($obj, $where = null) {
-        $sql = 'DELETE FROM `' . Meta::classname_only($obj) . '`';
+        $sql = 'DELETE FROM `' . $obj->classname() . '`';
         if ( is_null($where) ) {
             $id = PRIMARY_KEY;
             // TODO: Throw exception if id is null?
@@ -148,7 +146,7 @@ class PDO_MySQL extends \nx\core\Object {
         }
 
         if ( is_object($table) ) {
-            $table = Meta::classname_only($table);
+            $table = $table->classname();
         }
 
         $sql .= ' FROM `' . $table . '`';
@@ -236,10 +234,9 @@ class PDO_MySQL extends \nx\core\Object {
     *  @return bool
     */
     public function insert($obj) {
-        $table = Meta::classname_only($obj);
-        $properties = Meta::get_protected_vars($obj);
+        $properties = $obj->get_columns();
 
-    	$sql = 'INSERT INTO `' . $table . '` ';
+        $sql = 'INSERT INTO `' . $obj->classname() . '` ';
         
         $property_names = array_keys($properties);
     	$fields = '`' . implode('`, `', $property_names) . '`';
@@ -374,11 +371,10 @@ class PDO_MySQL extends \nx\core\Object {
     *  @return bool 
     */
     public function update($obj, $where = null) {
-        $table = Meta::classname_only($obj);
-        $properties = Meta::get_protected_vars($obj);
+        $properties = $obj->get_columns();
 
-    	$sql = 'UPDATE `' . $table . '` SET ';
-    
+        $sql = 'UPDATE `' . $obj->classname() . '` SET ';
+
         $property_names = array_keys($properties);
     	foreach ( $property_names as $name ) {
             $sql .= '`' . $name . '`=:' . $name . ', ';
@@ -415,11 +411,10 @@ class PDO_MySQL extends \nx\core\Object {
     *  @return bool 
     */
     public function upsert($obj) {
-        $table = Meta::classname_only($obj);
-        $properties = Meta::get_protected_vars($obj);
+        $properties = $obj->get_columns();
 
-    	$sql = 'INSERT INTO `' . $table . '` ';
-        
+        $sql = 'INSERT INTO `' . $obj->classname() . '` ';
+
         $property_names = array_keys($properties);
     	$fields = '`' . implode('`, `', $property_names) . '`';
         $values = ':' . implode(', :', $property_names);
