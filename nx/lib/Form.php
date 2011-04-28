@@ -27,6 +27,22 @@ class Form {
     }
 
    /**
+    * Creates an email textbox. 
+    * 
+    * @param array $attributes          The HTML attributes. 
+    * @param obj $binding               The object to which the value of the textbox should be mapped.
+    * @access public
+    * @return string
+    */
+    public function email($attributes, $binding = null) {
+        $html = "<input type='email' "; 
+        $html .= $this->_parse_attributes($attributes, $binding);
+        $html .= "/>";
+        
+        return $html; 
+    }
+
+   /**
     * Creates a hidden input. 
     * 
     * @param array $attributes          The HTML attributes. 
@@ -106,6 +122,22 @@ class Form {
         }
 
         return $html;
+    }
+
+   /**
+    * Creates a search textbox. 
+    * 
+    * @param array $attributes          The HTML attributes. 
+    * @param obj $binding               The object to which the value of the textbox should be mapped.
+    * @access public
+    * @return string
+    */
+    public function search($attributes, $binding = null) {
+        $html = "<input type='search' "; 
+        $html .= $this->_parse_attributes($attributes, $binding);
+        $html .= "/>";
+        
+        return $html; 
     }
 
    /**
