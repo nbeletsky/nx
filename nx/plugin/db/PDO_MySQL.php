@@ -80,9 +80,8 @@ class PDO_MySQL extends \nx\core\Object {
     public function delete($obj, $where = null) {
         $sql = 'DELETE FROM `' . $obj->classname() . '`';
         if ( is_null($where) ) {
-            $id = PRIMARY_KEY;
             // TODO: Throw exception if id is null?
-            $where = array(PRIMARY_KEY => $obj->$id);
+            $where = array(PRIMARY_KEY => $obj->get_pk());
         }
 
         $sql .= $this->_format_where($where);
@@ -159,20 +158,18 @@ class PDO_MySQL extends \nx\core\Object {
 
     public function find_all_objects($obj, $where = null) {
         $results = array();
-        $id = PRIMARY_KEY;
 
-        $this->find('`' . $id . '`', $obj, $where);
+        $this->find('`' . PRIMARY_KEY . '`', $obj, $where);
         $this->_set_fetch_mode('assoc');
         while ( $row = $this->_statement->fetch() ) {
-            $results[] = $row[$id];
+            $results[] = $row[PRIMARY_KEY];
         }
         $this->_statement->closeCursor();
         return $results;
     }
 
     public function find_object($obj, $where = null) {
-        $id = PRIMARY_KEY;
-        $this->find('`' . $id . '`', $obj, $where, 'LIMIT 1');
+        $this->find('`' . PRIMARY_KEY . '`', $obj, $where, 'LIMIT 1');
         return $this->fetch('assoc');
     }
 

@@ -182,8 +182,7 @@ class Session extends ApplicationModel {
         $user->last_login = date('Y-m-d H:i:s');
         $user->store();
        
-        $id = PRIMARY_KEY;
-        $this->_create($user->$id); 
+        $this->_create($user->get_pk()); 
 
         return true;
     }

@@ -81,13 +81,12 @@ class Model extends Object {
         $properties = $this->get_columns();
         $data = json_encode($properties);
 
-        $id = PRIMARY_KEY;
-        $key = get_class($this) . '_' . $this->$id;
+        $key = get_class($this) . '_' . $this->get_pk();
         $this->_cache->store($key, $data);
     }
 
     public function delete($where = null) {
-        $key = get_class($this) . '_' . $this->$id;
+        $key = get_class($this) . '_' . $this->get_pk();
         $this->_cache->delete($key);
         $this->_db->delete($this, $where);
     }
@@ -123,8 +122,7 @@ class Model extends Object {
         $table_name = ( $class_name < $field_name ) ? $class_name . HABTM_SEPARATOR . $field_name : $field_name . HABTM_SEPARATOR . $class_name;
 
         $lookup_id = $class_name . PK_SEPARATOR . PRIMARY_KEY;
-        $id = PRIMARY_KEY;
-        $where = array($lookup_id => $this->$id);
+        $where = array($lookup_id => $this->get_pk());
 
         $target_id = $field_name . PK_SEPARATOR . PRIMARY_KEY;
         $this->_db->find('`' . $target_id . '`', $table_name, $where);
@@ -140,21 +138,24 @@ class Model extends Object {
 
     protected function _get_has_many($field_name) {
         $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
-        $id = PRIMARY_KEY;
-        $where = array($lookup_id => $this->$id);
+        $where = array($lookup_id => $this->get_pk());
 
         return $this->find_all($where, $field_name);
     }
 
     protected function _get_has_one($field_name) {
         $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
-        $id = PRIMARY_KEY;
-        $where = array($lookup_id => $this->$id);
+        $where = array($lookup_id => $this->get_pk());
 
         $result = $this->_db->find_object($field_name, $where);
         $obj_id = $result[PRIMARY_KEY];
 
         return new $field_name($obj_id); 
+    }
+
+    public function get_pk() {
+        $id = PRIMARY_KEY;
+        return $this->$id;
     }
 
     public function habtm($field_name) {

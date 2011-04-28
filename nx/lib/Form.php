@@ -62,8 +62,7 @@ class Form {
                 switch ( $key ) {
                     case 'name':
                         if ( !is_null($binding) ) {
-                            $id = PRIMARY_KEY;
-                            if ( isset($binding->$id) ) {
+                            if ( isset($binding->get_pk()) ) {
                                 $setting = "[" . $binding->classname() . '|' . $binding->$id . '][' . $setting . "]";
                             } else {
                                 $setting = "[" . $binding->classname() . '][][' . $setting . "]";
