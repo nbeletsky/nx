@@ -153,6 +153,10 @@ class Model extends Object {
         return new $field_name($obj_id); 
     }
 
+    public function get_validation_errors() {
+        return $this->_validation_errors;
+    }
+
     public function habtm($field_name) {
         return ( in_array($field_name, $this->_has_and_belongs_to_many) );
     }

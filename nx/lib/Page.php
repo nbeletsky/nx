@@ -63,8 +63,8 @@ class Page {
             $controller_obj->call($action, $id, $additional);
         } else {
             self::throw_404(DEFAULT_TEMPLATE);
-            exit;
         }
+
     }
 
    /**

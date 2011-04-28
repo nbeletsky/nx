@@ -24,8 +24,10 @@ class User extends ApplicationModel
     );
 
     protected $_options = array(
+        'username_min_length' => 5,
         'username_max_length' => 16,
-        'username_min_length' => 5
+        'password_min_length' => 5,
+        'password_max_length' => 16
     );
 
     public function get_option($option) {

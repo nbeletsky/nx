@@ -47,7 +47,7 @@ class Controller extends Object {
     public function call($action, $id = null, $additional = array()) {
         if ( !method_exists($this, $action) || $this->is_protected($action) ) {
             Page::throw_404($this->_template);
-            exit;
+            return false;
         }   
 
         $to_view = $this->$action($id);
@@ -55,15 +55,17 @@ class Controller extends Object {
         // AJAX
         if ( is_string($to_view) ) {
             echo $to_view;
-            exit;
+            return true;
         }
         
         $view_file = "../view/" . $this->_template . '/' . lcfirst($this->classname()) . "/" . $action . VIEW_EXTENSION;
-
-        if ( file_exists($view_file) ) {
-            extract($to_view + $additional);
-            include $view_file;
+        if ( !file_exists($view_file) ) {
+            return false;
         }
+
+        extract($to_view + $additional);
+        include $view_file;
+        return true;
     }
 
     public function handle_CSRF() {
@@ -108,7 +110,7 @@ class Controller extends Object {
         } else {
             header("Location: $redirect_location");
         }
-        exit;
+        return false;
     }
 
     public function sanitize($data) {
