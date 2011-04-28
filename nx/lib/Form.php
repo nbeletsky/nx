@@ -59,6 +59,22 @@ class Form {
     }
 
    /**
+    * Creates a number textbox. 
+    * 
+    * @param array $attributes          The HTML attributes. 
+    * @param obj $binding               The object to which the value of the textbox should be mapped.
+    * @access public
+    * @return string
+    */
+    public function number($attributes, $binding = null) {
+        $html = "<input type='number' "; 
+        $html .= $this->_parse_attributes($attributes, $binding);
+        $html .= "/>";
+        
+        return $html; 
+    }
+
+   /**
     * Parses HTML attributes and binds an object's value to an element. 
     * 
     * @param array $attributes          The HTML attributes. 
