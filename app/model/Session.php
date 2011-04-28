@@ -43,15 +43,16 @@ class Session extends ApplicationModel {
 
     protected function _init() {
         parent::_init();
+
         $this->last_active = date('Y-m-d H:i:s', time());
 
         session_set_save_handler(
-            array($this,'open'),
-            array($this,'close'),
-            array($this,'read'),
-            array($this,'write'),
-            array($this,'destroy'),
-            array($this,'gc')
+            array($this, 'open'),
+            array($this, 'close'),
+            array($this, 'read'),
+            array($this, 'write'),
+            array($this, 'destroy'),
+            array($this, 'gc')
         );
 
         session_start();
