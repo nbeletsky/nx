@@ -53,28 +53,28 @@ class Model extends Object {
         }
     }
 
-    public function __get($field_name) {
-        if ( !$this->is_foreign($field_name) ) {
-            return $this->$field_name;
+    public function __get($field) {
+        if ( !$this->is_foreign($field) ) {
+            return $this->$field;
         }
 
-        if ( $this->belongs_to($field_name) ) {
-            return $this->_get_belongs_to($field_name);
-        } elseif ( $this->has_many($field_name) ) {
-            return $this->_get_has_many($field_name);
-        } elseif ( $this->has_one($field_name) ) {
-            return $this->_get_has_one($field_name);
-        } elseif ( $this->habtm($field_name) ) {
-            return $this->_get_habtm($field_name);
+        if ( $this->belongs_to($field) ) {
+            return $this->_get_belongs_to($field);
+        } elseif ( $this->has_many($field) ) {
+            return $this->_get_has_many($field);
+        } elseif ( $this->has_one($field) ) {
+            return $this->_get_has_one($field);
+        } elseif ( $this->habtm($field) ) {
+            return $this->_get_habtm($field);
         }
     }
     
-    public function __set($field_name, $value) {
-        $this->$field_name = $value;
+    public function __set($field, $value) {
+        $this->$field = $value;
     }
 
-    public function belongs_to($field_name) {
-        return ( in_array($field_name, $this->_belongs_to) );
+    public function belongs_to($field) {
+        return ( in_array($field, $this->_belongs_to) );
     }
 
     public function cache() {
@@ -101,56 +101,56 @@ class Model extends Object {
         $collection = array();
         $obj_name = get_class($obj);
         foreach ( $all_obj_ids as $obj_id ) {
-            $collection[$obj_id] = new $obj_name($obj_id);
+            $collection[$obj_id] = new $obj_name(array('id' => $obj_id));
         }
         return $collection;
     }
 
-    protected function _get_belongs_to($field_name) {
-        $lookup_id = $field_name . PK_SEPARATOR . PRIMARY_KEY;
+    protected function _get_belongs_to($field) {
+        $lookup_id = $field . PK_SEPARATOR . PRIMARY_KEY;
         $obj_id = $this->$lookup_id;
 
-        return new $field_name($obj_id); 
+        return new $field(array('id' => $obj_id)); 
     }
 
     public function get_columns() {
         return Meta::get_columns($this);
     }
 
-    protected function _get_habtm($field_name) {
+    protected function _get_habtm($field) {
         $class_name = get_class($this);
-        $table_name = ( $class_name < $field_name ) ? $class_name . HABTM_SEPARATOR . $field_name : $field_name . HABTM_SEPARATOR . $class_name;
+        $table_name = ( $class_name < $field ) ? $class_name . HABTM_SEPARATOR . $field : $field . HABTM_SEPARATOR . $class_name;
 
         $lookup_id = $class_name . PK_SEPARATOR . PRIMARY_KEY;
         $where = array($lookup_id => $this->get_pk());
 
-        $target_id = $field_name . PK_SEPARATOR . PRIMARY_KEY;
+        $target_id = $field . PK_SEPARATOR . PRIMARY_KEY;
         $this->_db->find('`' . $target_id . '`', $table_name, $where);
 
         $rows = $this->_db->fetch_all('assoc');
         $collection = array();
         foreach ( $rows as $row ) {
             $new_id = $row[$target_id];
-            $collection[$new_id] = new $field_name($new_id); 
+            $collection[$new_id] = new $field(array('id' => $new_id)); 
         }
         return $collection;
     }
 
-    protected function _get_has_many($field_name) {
+    protected function _get_has_many($field) {
         $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
         $where = array($lookup_id => $this->get_pk());
 
-        return $this->find_all($where, $field_name);
+        return $this->find_all($where, $field);
     }
 
-    protected function _get_has_one($field_name) {
+    protected function _get_has_one($field) {
         $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
         $where = array($lookup_id => $this->get_pk());
 
-        $result = $this->_db->find_object($field_name, $where);
+        $result = $this->_db->find_object($field, $where);
         $obj_id = $result[PRIMARY_KEY];
 
-        return new $field_name($obj_id); 
+        return new $field(array('id' => $obj_id)); 
     }
 
     public function get_pk() {
@@ -158,30 +158,41 @@ class Model extends Object {
         return $this->$id;
     }
 
-    public function habtm($field_name) {
-        return ( in_array($field_name, $this->_has_and_belongs_to_many) );
+    protected function _get_validators($field) {
+        return $this->_validators[$field] ?: array();
+    }
+
+    public function habtm($field) {
+        return ( in_array($field, $this->_has_and_belongs_to_many) );
     }
     
-    public function has_many($field_name) {
-        return ( in_array($field_name, $this->_has_many) );
+    public function has_many($field) {
+        return ( in_array($field, $this->_has_many) );
     }
 
-    public function has_one($field_name) {
-        return ( in_array($field_name, $this->_has_one) );
+    public function has_one($field) {
+        return ( in_array($field, $this->_has_one) );
     }
 
-    public function is_foreign($field_name) {
-        return ( $this->has_many($field_name) || $this->has_one($field_name) || 
-                 $this->habtm($field_name) || $this->belongs_to($field_name) );
+    public function is_foreign($field) {
+        return ( $this->has_many($field) || $this->has_one($field) || 
+                 $this->habtm($field) || $this->belongs_to($field) );
     }
 
-    public function is_valid() {
+    public function is_valid($field = null) {
         if ( empty($this->_validators) ) {
             return true;
         }
-
-        $errors = $this->validate();
-        return ( empty($errors) );
+        
+        if ( !is_null($field) ) {
+            $this->_validation_errors = $this->_validate($field);
+        } else {
+            $this->_validation_errors = array();
+            foreach ( $this->get_columns() as $field ) {
+                $this->_validation_errors += $this->_validate($field); 
+            }
+        }
+        return ( empty($this->_validation_errors) );
     }
 
     public function pull_from_cache($obj, $id) {
@@ -216,26 +227,29 @@ class Model extends Object {
         $this->cache();
     }
 
-    public function validate() {
-        $this->_validation_errors = array();
-        foreach ( $this->_validators as $field => $validators ) {
-            foreach ( $validators as $validator ) {
-                $method = $validator[0];
-                if ( isset($validator['options']) ) {
-                    $valid = Validator::$method($this->$field, $validator['options']);
-                } else {
-                    $valid = Validator::$method($this->$field);
-                }
+    protected function _validate($field) {
+        $errors = array();
+        $validators = $this->_get_validators($field);
+        if ( empty($validators) ) {
+            return $errors;
+        }
 
-                if ( !$valid ) {
-                    if ( !isset($this->_validation_errors[$field]) ) {
-                        $this->_validation_errors[$field] = array();
-                    }
-                    $this->_validation_errors[$field][] = $validator['message'];
+        foreach ( $validators as $validator ) {
+            $method = $validator[0];
+            if ( isset($validator['options']) ) {
+                $valid = Validator::$method($this->$field, $validator['options']);
+            } else {
+                $valid = Validator::$method($this->$field);
+            }
+
+            if ( !$valid ) {
+                if ( !isset($errors[$field]) ) {
+                    $errors[$field] = array();
                 }
+                $errors[$field][] = $validator['message'];
             }
         }
-        return $this->_validation_errors;
+        return $errors;
     }
 
 }

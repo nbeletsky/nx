@@ -31,6 +31,49 @@ class Time {
         return $list;
     }
 
+   /**
+    *  Calculates the amount of time remaining between now and a date in the future.
+    * 
+    *  @param string $end_date       The date in the future.
+    *  @return string
+    */
+    public static function remaining($end_date) {
+        $time = strtotime($end_date) - time();
+        if ( $time < 0 ) {
+            return false;
+        }
+        
+        if ( ($time >= 0) && ($time <= 59) ) {
+            $time_left = $time . 's';
+        } elseif ( ($time >= 60) && ($time <= 3599) ) {
+            $total_min = $time / 60;
+            $min = floor($total_min);
+            
+            $sec = floor(($total_min - $min) * 60);
+            
+            $time_left = $min . 'm ' . $sec . 's';
+        } elseif ( ($time >= 3600) && ($time <= 86399) ) {               
+            $total_hour = $time / 3600;
+            $hour = floor($total_hour);
+            
+            $min = floor(($total_hour - $hour) * 60);
+
+            $time_left = $hour . 'h ' . $min . 'm';
+        } elseif ( $time >= 86400 ) {
+            $total_day = $time / 86400;
+            $day = floor($total_day);
+
+            $total_hour = $total_day - $day;
+            $hour = floor(($total_hour * 24)); 
+
+            $total_min = ($total_hour * 24) - $hour;
+            $min = floor(($total_min * 60));
+            
+            $time_left = $day . 'd ' . $hour . 'h ' . $min . 'm';
+        }
+        return $time_left;
+    }
+
 }
 
 ?>

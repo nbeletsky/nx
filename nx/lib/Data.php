@@ -23,7 +23,7 @@ class Data {
                 if ( $loc !== false ) { // name = '[User|id][username]'
                     $id = substr($child_key, $loc + 1);
                     $class = substr($child_key, 0, $loc);
-                    $obj = new $class($id);
+                    $obj = new $class(array('id' => $id));
                     foreach ( $child as $key => $value )
                     {
                         $obj->$key = $value;

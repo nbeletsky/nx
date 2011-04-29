@@ -16,6 +16,7 @@ class User extends ApplicationModel
     protected $_validators = array(
         'username' => array(
             array('not_empty', 'message' => 'Username cannot be blank.'),
+            array('alphanumeric', 'message' => 'Username must contain only alphanumeric characters.'),
             array('length_between', 'options' => array('min' => '5', 'max' => 16), 'message' => 'Username must be between 5 and 16 characters.'),
         ),
         'ip' => array(
@@ -30,9 +31,6 @@ class User extends ApplicationModel
         'password_max_length' => 16
     );
 
-    public function get_option($option) {
-        return $this->_options[$option];
-    }
 }
 
 ?>

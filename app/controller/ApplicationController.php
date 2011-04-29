@@ -25,7 +25,7 @@ class ApplicationController extends \nx\core\Controller {
 
         if ( $this->_session->is_logged_in() ) {
             $user = $this->_classes['user'];
-            $this->_user = new $user($this->_session->get_user_id());
+            $this->_user = new $user(array('id' => $this->_session->get_user_id()));
             $this->_template = $this->_user->get_template();
         } else {
             $this->_user = null;

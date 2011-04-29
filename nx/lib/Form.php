@@ -35,11 +35,7 @@ class Form {
     * @return string
     */
     public function email($attributes, $binding = null) {
-        $html = "<input type='email' "; 
-        $html .= $this->_parse_attributes($attributes, $binding);
-        $html .= "/>";
-        
-        return $html; 
+        return $this->_input($attributes + array('type' => __FUNCTION__), $binding);
     }
 
    /**
@@ -51,7 +47,19 @@ class Form {
     * @return string
     */
     public function hidden($attributes, $binding = null) {
-        $html = "<input type='hidden' ";
+        return $this->_input($attributes + array('type' => __FUNCTION__), $binding);
+    }
+
+   /**
+    * Creates an input field.
+    *
+    * @param array $attributes          The HTML attributes.
+    * @param obj $binding               The object to which the value of the input should be mapped.
+    * @access protected
+    * @return string
+    */
+    protected function _input($attributes, $binding = null) {
+        $html = "<input ";
         $html .= $this->_parse_attributes($attributes, $binding);
         $html .= "/>";
 
@@ -67,11 +75,7 @@ class Form {
     * @return string
     */
     public function number($attributes, $binding = null) {
-        $html = "<input type='number' "; 
-        $html .= $this->_parse_attributes($attributes, $binding);
-        $html .= "/>";
-        
-        return $html; 
+        return $this->_input($attributes + array('type' => __FUNCTION__), $binding);
     }
 
    /**
@@ -149,11 +153,7 @@ class Form {
     * @return string
     */
     public function search($attributes, $binding = null) {
-        $html = "<input type='search' "; 
-        $html .= $this->_parse_attributes($attributes, $binding);
-        $html .= "/>";
-        
-        return $html; 
+        return $this->_input($attributes + array('type' => __FUNCTION__), $binding);
     }
 
    /**
@@ -191,11 +191,7 @@ class Form {
     * @return string
     */
     public function text($attributes, $binding = null) {
-        $html = "<input type='text' "; 
-        $html .= $this->_parse_attributes($attributes, $binding);
-        $html .= "/>";
-        
-        return $html; 
+        return $this->_input($attributes + array('type' => __FUNCTION__), $binding);
     }
 
    /**
