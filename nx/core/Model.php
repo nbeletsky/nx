@@ -44,7 +44,9 @@ class Model extends Object {
         
         if ( isset($this->_config['where']) ) {
             $result = $this->_db->find_object($this, $this->_config['where']); 
-            $this->_config['id'] = $result[PRIMARY_KEY];
+            if ( $result ) {
+                $this->_config['id'] = $result[PRIMARY_KEY];
+            }
         }
 
         if ( is_numeric($this->_config['id']) ) {

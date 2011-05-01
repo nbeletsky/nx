@@ -18,8 +18,6 @@ class ApplicationController extends \nx\core\Controller {
     }
 
     protected function _init() {
-        parent::_init();
-
         $session = $this->_classes['session'];
         $this->_session = new $session(); 
 
@@ -31,6 +29,8 @@ class ApplicationController extends \nx\core\Controller {
             $this->_user = null;
             $this->_template = DEFAULT_TEMPLATE;
         }
+
+        parent::_init();
     }
 
 }
