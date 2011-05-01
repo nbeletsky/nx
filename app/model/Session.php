@@ -25,6 +25,8 @@ class Session extends ApplicationModel {
     */
     protected $User_id = 0;
 
+    protected $_no_cache = true;
+
     const SESSION_LIFETIME    = 3600;            // 60 minutes
     const LOGIN_COOKIE_EXPIRE = 2592000;         // Cookie expiration date (30 days)
     const SESSION_SALT        = 'M^mc?(9%ZKx[';  // Session salt

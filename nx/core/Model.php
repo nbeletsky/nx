@@ -25,6 +25,8 @@ class Model extends Object {
     protected $_validators = array();
     protected $_validation_errors = array();
 
+    protected $_no_cache = false;
+
     public function __construct(array $config = array()) {
         $defaults = array(
             'id'    => null,
@@ -78,11 +80,15 @@ class Model extends Object {
     }
 
     public function cache() {
+        if ( $this->_no_cache ) {
+            return false;
+        }
+
         $properties = $this->get_columns();
         $data = json_encode($properties);
 
         $key = get_class($this) . '_' . $this->get_pk();
-        $this->_cache->store($key, $data);
+        return $this->_cache->store($key, $data);
     }
 
     public function delete($where = null) {
@@ -223,7 +229,9 @@ class Model extends Object {
         $this->_db->upsert($this);
         // TODO: Check that caching works with UPDATEd objects!
         $id = PRIMARY_KEY;
-        $this->$id = $this->_db->insert_id();
+        if ( !$this->$id ) {
+            $this->$id = $this->_db->insert_id();
+        }
         $this->cache();
     }
 
