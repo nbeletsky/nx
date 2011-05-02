@@ -1,10 +1,11 @@
 <?php
 
     // Default base install is two directories above where this config file is stored
-    define("BASE_INSTALL", realpath(__DIR__ . '/../..')); 
+    define('ROOT_DIR', realpath(__DIR__ . '/../..')); 
 
-    set_include_path(get_include_path() . PATH_SEPARATOR.
-                     BASE_INSTALL . PATH_SEPARATOR);
+    set_include_path(get_include_path() . PATH_SEPARATOR .
+                     ROOT_DIR . PATH_SEPARATOR . 
+                     ROOT_DIR . '/app/view' . PATH_SEPARATOR);
 
     ini_set('display_errors', 1);
     date_default_timezone_set('America/Los_Angeles');

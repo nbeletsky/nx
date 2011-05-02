@@ -6,6 +6,8 @@ use nx\lib\Meta;
 
 class Form {
 
+    protected $_binding_counter;
+
    /**
     * Creates a checkbox. 
     * 
@@ -99,9 +101,16 @@ class Form {
                     case 'name':
                         if ( !is_null($binding) ) {
                             if ( !is_null($binding->get_pk()) ) {
-                                $setting = "[" . $binding->classname() . '|' . $binding->$id . '][' . $setting . "]";
+                                $setting = $binding->classname() . '|' . $binding->$id . '[' . $setting . "]";
                             } else {
-                                $setting = "[" . $binding->classname() . '][][' . $setting . "]";
+                                if ( !array_key_exists($binding->classname(), $this->_binding_counter) ) {
+                                    $this->_binding_counter[$binding->classname()] = array($setting);
+                                } else {
+                                    $this->_binding_counter[$binding->classname()][] = $setting;
+                                }
+                                $count = array_count_values($this->_binding_counter[$binding->classname()]);
+                                $index = $count[$setting] - 1;
+                                $setting = $binding->classname() . '[' . $index . '][' . $setting . "]";
                             }
                         }
                         break;

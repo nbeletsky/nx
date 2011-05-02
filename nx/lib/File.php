@@ -14,7 +14,7 @@ class File {
     */
     // TODO: Fix this
     public static function create_snapshot($data, $filename) {
-        $top = BASE_INSTALL . '/' . SNAPSHOT_DIRECTORY;
+        $top = ROOT_DIR . '/' . SNAPSHOT_DIRECTORY;
         if ( $top{strlen($top) - 1} !== '/' ) {
             $top .= '/';
         }

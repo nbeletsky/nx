@@ -49,7 +49,7 @@ class Page {
             parse_str($args, $get);
         }
 
-        $whitelist = File::get_filenames_within(BASE_INSTALL . '/app/controller');
+        $whitelist = File::get_filenames_within(ROOT_DIR . '/app/controller');
         $strip_ext = create_function('$val', 'return basename($val, ".php");');
         $whitelist = array_map($strip_ext, $whitelist);
 

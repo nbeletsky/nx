@@ -1,29 +1,26 @@
 <?php
 
-    // Default base install is two directories above where this config file is stored
-    define("BASE_INSTALL", realpath(__DIR__ . '/../..')); 
+    // Default root directory is two directories above where this config file is stored
+    define('ROOT_DIR', realpath(__DIR__ . '/../..')); 
 
-    set_include_path(get_include_path() . PATH_SEPARATOR.
-                     BASE_INSTALL . PATH_SEPARATOR);
+    set_include_path(get_include_path() . PATH_SEPARATOR .
+                     ROOT_DIR . PATH_SEPARATOR . 
+                     ROOT_DIR . '/app/view' . PATH_SEPARATOR);
 
     ini_set('display_errors', 1);
     date_default_timezone_set('America/Los_Angeles');
 
-    function file_exists_in_include_path($file)
-    {
-        if ( file_exists($file) ) 
-        {
+    function file_exists_in_include_path($file) {
+        if ( file_exists($file) ) {
             return realpath($file);
         }
 
         $paths = explode(PATH_SEPARATOR, get_include_path());
 
-        foreach ($paths as $path) 
-        {
+        foreach ( $paths as $path ) {
             $fullpath = $path . DIRECTORY_SEPARATOR . $file;
 
-            if ( file_exists($fullpath) ) 
-            {
+            if ( file_exists($fullpath) ) {
                 return realpath($fullpath);
             }
         }
@@ -31,15 +28,11 @@
         return false;
     }
 
-    function autoload($class) 
-    {
+    function autoload($class) {
         $file = str_replace("\\", "/", $class) . ".php";
-        if ( file_exists_in_include_path($file) )
-        {
+        if ( file_exists_in_include_path($file) ) {
             require_once $file;
-        }
-        else
-        {
+        } else {
             // TODO: Throw exception!
         }
     }
