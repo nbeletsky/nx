@@ -114,16 +114,19 @@ class Controller extends Object {
     }
 
     public function sanitize($data) {
+        $sanitized = array();
         foreach ( $data as $key => $val ) {
             if ( !is_array($key) ) {
-                $data[$key] = Data::sanitize($val, $this->_sanitizers[$key]);
+                if ( isset($this->_sanitizers[$key]) ) {
+                    $sanitized[$key] = Data::sanitize($val, $this->_sanitizers[$key]);
+                }
             } else {
                 foreach ( $key as $id => $obj ) {
-                    $data[$key][$id] = $obj->sanitize();
+                    $sanitized[$key][$id] = $obj->sanitize();
                 }
             }
         }
-        return $data;
+        return $sanitized;
     }
 
 }
