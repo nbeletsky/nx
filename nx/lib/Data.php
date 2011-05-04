@@ -4,6 +4,8 @@ namespace nx\lib;
 
 class Data {
 
+    protected static $_model_location = 'app\model\\';
+
    /**
     *  Extracts $_POST data and returns it as a collection of objects (if an
     *  object was bound to it via the form) and `key` => `value` pairs (if no 
@@ -31,7 +33,8 @@ class Data {
                     $collection[$class][] = $obj; 
                 } else { // name = 'User[][username]'
                     foreach ( $child as $grandchild_array ) {
-                        $obj = new $child_key();
+                        $obj_name = self::$_model_location . $child_key;
+                        $obj = new $obj_name();
                         foreach ( $grandchild_array as $key => $value ) {
                             $obj->$key = $value;
                         }
