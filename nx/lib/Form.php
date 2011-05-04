@@ -6,7 +6,7 @@ use nx\lib\Meta;
 
 class Form {
 
-    protected $_binding_counter;
+    protected $_binding_counter = array();
 
    /**
     * Creates a checkbox. 
@@ -37,7 +37,7 @@ class Form {
     * @return string
     */
     public function email($attributes, $binding = null) {
-        return $this->_input($attributes + array('type' => __FUNCTION__), $binding);
+        return $this->_input(array('type' => __FUNCTION__) + $attributes, $binding);
     }
 
    /**
@@ -49,7 +49,7 @@ class Form {
     * @return string
     */
     public function hidden($attributes, $binding = null) {
-        return $this->_input($attributes + array('type' => __FUNCTION__), $binding);
+        return $this->_input(array('type' => __FUNCTION__) + $attributes, $binding);
     }
 
    /**
@@ -77,7 +77,7 @@ class Form {
     * @return string
     */
     public function number($attributes, $binding = null) {
-        return $this->_input($attributes + array('type' => __FUNCTION__), $binding);
+        return $this->_input(array('type' => __FUNCTION__) + $attributes, $binding);
     }
 
    /**
@@ -162,7 +162,7 @@ class Form {
     * @return string
     */
     public function search($attributes, $binding = null) {
-        return $this->_input($attributes + array('type' => __FUNCTION__), $binding);
+        return $this->_input(array('type' => __FUNCTION__) + $attributes, $binding);
     }
 
    /**
@@ -200,7 +200,7 @@ class Form {
     * @return string
     */
     public function text($attributes, $binding = null) {
-        return $this->_input($attributes + array('type' => __FUNCTION__), $binding);
+        return $this->_input(array('type' => __FUNCTION__) + $attributes, $binding);
     }
 
    /**
