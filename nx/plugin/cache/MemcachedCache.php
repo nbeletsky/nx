@@ -21,12 +21,23 @@ class MemcachedCache extends \nx\core\Object {
     *  @return void
     */
     public function __construct(array $config = array()) {
-        $defaults = array('persistent_id' => '');
+        $defaults = array(
+            'host'          => MEMCACHED_HOST,
+            'persistent_id' => ''
+        );
         parent::__construct($config + $defaults);
     }
 
     protected function _init() {
-        $this->_cache = new \Memcached($this->_config['persistent_id']);
+        if ( $this->_config['persistent_id'] ) {
+            $this->_cache = new \Memcached($this->_config['persistent_id']);
+        } else {
+            $this->_cache = new \Memcached();
+        }
+
+        if ( !count($this->_cache->getServerList()) ) {
+            $this->add_server($this->_config['host']);
+        }
     }
 
    /**
