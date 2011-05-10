@@ -43,8 +43,7 @@ class MemcachedCacheTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($retrieved_value, 'Adding a value to the cache using an existing key did not return false.');
     }
 
-    public function test_DeleteKeyAndGetFromCache_ReturnsFalse()
-    {
+    public function test_DeleteKeyAndGetFromCache_ReturnsFalse() {
         $original_key = 'test';
         $original_value = 'value';
         $this->_cache->add($original_key, $original_value);
@@ -53,8 +52,7 @@ class MemcachedCacheTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($retrieved_value, 'Adding a value to the cache, deleting it, and then retrieving it did not return false.');
     }
 
-    public function test_FlushCacheAndGetFromCache_ReturnsFalse()
-    {
+    public function test_FlushCacheAndGetFromCache_ReturnsFalse() {
         $original_key = 'test';
         $original_value = 'value';
         $this->_cache->store($original_key, $original_value);
@@ -63,8 +61,7 @@ class MemcachedCacheTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($retrieved_value, 'Adding a value to the cache, flushing the whole cache, and then retrieving it did not return false.');
     }
 
-    public function test_ReplaceInCache_ReturnsOriginalValue()
-    {
+    public function test_ReplaceInCache_ReturnsOriginalValue() {
         $original_key = 'test';
         $original_value = 'value';
         $replaced_value = 'replaced';

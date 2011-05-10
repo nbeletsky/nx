@@ -35,6 +35,17 @@ class Validator {
     }
 
    /**
+    *  Checks an email address.
+    *
+    *  @param mixed $value          The email address to be checked.
+    *  @access public
+    *  @return bool
+    */
+    public static function email($value) {
+        return filter_var($value, FILTER_VALIDATE_EMAIL);
+    }
+
+   /**
     *  Checks an ip address.
     *
     *  @param string $value          The ip address to be checked.
@@ -85,6 +96,27 @@ class Validator {
     }
 
    /**
+    *  Checks that a password is constructed properly
+    *  and has an acceptable length.
+    * 
+    *  @param string $value          The password to be checked.
+    *  @param array $options         The options by which to constrain the check.  Takes `special_chars`, `min_length`, 
+    *                                and/or `max_length` as keys.
+    *  @access public
+    *  @return bool
+    */
+    public static function password($value, $options = array()) {
+        $options += array('special_chars' => '#@!$%._', 'min_length' => 5, 'max_length' => 16);
+
+        $preg_pass = '/^(((?=.*[A-Za-z])(?=.*[\d])(?!.*[^A-Za-z\d]))|' . 
+                     '((?=.*[A-Za-z])(?=.*[' . $options['special_chars'] . '])(?!.*[^A-Za-z' . $options['special_chars'] . ']))|' .
+                     '((?=.*[\d])(?=.*[' . $options['special_chars'] . '])(?!.*[^\d' . $options['special_chars'] . ']))|' .
+                     '((?=.*[A-Za-z])(?=.*[\d])(?=.*[' . $options['special_chars'] . '])(?!.*[^A-Za-z\d' . 
+                     $options['special_chars'] . ']))).{' . $options['min_length'] . ',' . $options['max_length'] . '}$/';
+        return preg_match($preg_pass, $value);
+    }
+
+   /**
     *  Checks that a number is within certain bounds.
     *
     *  @param mixed $value           The value to be checked.
@@ -108,6 +140,17 @@ class Validator {
         }
 
         return is_finite($value);
+    }
+
+   /**
+    *  Checks a zip code.
+    * 
+    *  @param string $value            The zip code to be checked.
+    *  @access public
+    *  @return bool
+    */
+    public static function zip($value) {
+        return preg_match('/^\d{5}([\-]\d{4})?$/', $value); 
     }
 
 }
