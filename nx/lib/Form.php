@@ -122,8 +122,7 @@ class Form {
             } 
         }
 
-        // TODO: $binding->$attributes['name'] is always going to return false because it is accessing a protected property
-        if ( !$value_present && !is_null($binding) && isset($binding->$attributes['name']) ) {
+        if ( !$value_present && !is_null($binding) && !is_null($binding->$attributes['name']) ) {
             $html .= "value='" . htmlentities($binding->$attributes['name'], ENT_QUOTES) . "'";
         } 
 

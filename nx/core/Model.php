@@ -167,7 +167,7 @@ class Model extends Object {
     }
 
     protected function _get_validators($field) {
-        return $this->_validators[$field] ?: array();
+        return ( isset($this->_validators[$field]) ) ? $this->_validators[$field] : array();
     }
 
     public function habtm($field) {
