@@ -29,7 +29,7 @@
     }
 
     function autoload($class) {
-        $file = str_replace("\\", "/", $class) . ".php";
+        $file = str_replace("\\", "/", $class) . '.php';
         if ( file_exists_in_include_path($file) ) {
             require_once $file;
         } else {
@@ -39,15 +39,15 @@
 
     spl_autoload_register('autoload');
 
-    define("DEFAULT_CONTROLLER", "Dashboard");
-    define("DEFAULT_ACTION", "index");
-    define("DEFAULT_TEMPLATE", "default");
+    define('DEFAULT_CONTROLLER', 'Dashboard');
+    define('DEFAULT_ACTION', 'index');
+    define('DEFAULT_TEMPLATE', 'default');
 
-    define("PRIMARY_KEY", "id");
-    define("PK_SEPARATOR", "_");
-    define("HABTM_SEPARATOR", "__");
+    define('PRIMARY_KEY', 'id');
+    define('PK_SEPARATOR', '_');
+    define('HABTM_SEPARATOR', '__');
 
-    define("VIEW_EXTENSION", ".html");
+    define('VIEW_EXTENSION', '.html');
 
-    require "config.application.php";
+    require 'config.application.php';
 ?>
