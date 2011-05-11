@@ -204,6 +204,10 @@ class Model extends Object {
     }
 
     public function pull_from_cache($obj, $id) {
+        if ( $this->_no_cache ) {
+            return false;
+        }
+
         $key = get_class($obj) . '_' . $id;
         $cached_data = $obj->_cache->retrieve($key);
         if ( !$cached_data ) {
