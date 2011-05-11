@@ -246,8 +246,8 @@ class PDO_MySQL extends \nx\core\Object {
         try {
             $statement->execute($properties);
     	} catch ( \PDOException $e ) {
-            die($e->getMessage());
             // TODO: How to handle error reporting?
+            die($e->getMessage() . $sql . var_dump($properties) . var_dump($e->getTrace()));
             return false;
         }
 
@@ -302,8 +302,8 @@ class PDO_MySQL extends \nx\core\Object {
         try {
             $statement->execute();
     	} catch ( \PDOException $e ) {
-            die($e->getMessage());
             // TODO: How to handle error reporting?
+            die($e->getMessage() . $sql . var_dump($properties) . var_dump($e->getTrace()));
             $this->_affected_rows = 0;
             return false;
         }
@@ -391,8 +391,8 @@ class PDO_MySQL extends \nx\core\Object {
         try {
             $statement->execute($properties);
     	} catch ( \PDOException $e ) {
-            die($e->getMessage());
             // TODO: How to handle error reporting?
+            die($e->getMessage() . $sql . var_dump($properties) . var_dump($e->getTrace()));
             return false;
         }
     
@@ -429,8 +429,8 @@ class PDO_MySQL extends \nx\core\Object {
         try {
             $statement->execute($properties);
     	} catch ( \PDOException $e ) {
-            die($e->getMessage() . $sql . var_dump($properties));
             // TODO: How to handle error reporting?
+            die($e->getMessage() . $sql . var_dump($properties) . var_dump($e->getTrace()));
             return false;
         }
 
