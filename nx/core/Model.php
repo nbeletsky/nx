@@ -239,6 +239,7 @@ class Model extends Object {
             $this->$id = $this->_db->insert_id();
         }
         $this->cache();
+        return true;
     }
 
     protected function _validate($field) {
