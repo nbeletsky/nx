@@ -135,8 +135,8 @@ class Session extends ApplicationModel {
         if ( (!isset($_SESSION['uid'])) || (!isset($_SESSION['fingerprint'])) || (!isset($_SESSION['last_active'])) ) {
             $this->User_id = 0;
             $is_logged_in = false;
-        } elseif ( (!isset($_COOKIE[self::COOKIE_ID_NAME])) || ($_SESSION['uid'] !== String::decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME])) || 
-                 ($_SESSION['fingerprint'] !== $this->_get_fingerprint($_SESSION['uid'])) ) {
+        } elseif ( (!isset($_COOKIE[self::COOKIE_ID_NAME])) || ($_SESSION['uid'] != String::decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME])) || 
+                 ($_SESSION['fingerprint'] != $this->_get_fingerprint($_SESSION['uid'])) ) {
             $this->User_id = 0;
             $is_logged_in = false;
             $this->kill();
