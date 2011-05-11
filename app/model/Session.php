@@ -75,16 +75,19 @@ class Session extends ApplicationModel {
     *       
     *  @param int $user_id     The user's ID.
     *  @access private
-    *  @return void
+    *  @return bool
     */
     private function _create($user_id) {
         $this->User_id = $user_id;
+
         session_regenerate_id(true);
         $_SESSION = array();
         $_SESSION['uid'] = $user_id;
         $_SESSION['fingerprint'] = $this->_get_fingerprint($user_id); 
         $_SESSION['last_active'] = $this->last_active;
         setcookie(self::COOKIE_ID_NAME, String::encrypt_cookie($user_id), time() + self::LOGIN_COOKIE_EXPIRE);
+
+        return true;
     }
 
    /**
@@ -95,7 +98,8 @@ class Session extends ApplicationModel {
     *  @return bool
     */
     public function destroy($session_id) {
-        $this->delete();
+        $where = array(PRIMARY_KEY => $session_id);
+        $this->delete($where);
         return true;
     } 
 
@@ -174,13 +178,11 @@ class Session extends ApplicationModel {
             return false; 
         }
 
-        // Check that password matches
         if ( $user->password !== $hashed_password ) {
             return false;
         }
 
-        // Format data
-        $user->ip = sprintf("%u", ip2long($ip));
+        $user->ip = sprintf('%u', ip2long($ip));
         $user->last_login = date('Y-m-d H:i:s');
         $user->store();
        
@@ -244,10 +246,11 @@ class Session extends ApplicationModel {
     *  @param string $session_id        The session id.
     *  @param string $data              The session data.
     *  @access public
-    *  @return int                      The lastInsertID.
+    *  @return bool
     */
     public function write($session_id, $data) {
-        $this->id = $session_id;
+        $id = PRIMARY_KEY;
+        $this->$id = $session_id;
         $this->data = $data;
 
         return $this->store();       
