@@ -2,9 +2,11 @@ CREATE TABLE  `User` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
     `username` VARCHAR( 16 ) NOT NULL ,
     `password` VARCHAR( 255 ) NOT NULL ,
+    `email` VARCHAR( 255 ) NOT NULL ,
     `ip` INT UNSIGNED NOT NULL ,
     `join_date` DATE NOT NULL ,
     `last_login` DATETIME NOT NULL ,
+    `template` VARCHAR( 255 ) NOT NULL ,
     UNIQUE (
     `username`
     )
@@ -14,30 +16,5 @@ CREATE TABLE  `Session` (
     `id` varchar(255) NOT NULL PRIMARY KEY ,
     `User_id` INT UNSIGNED NOT NULL ,
     `data` MEDIUMBLOB NOT NULL ,
-    `last_active` DATETIME NOT NULL ,
-    UNIQUE (
-    `User_id`
-    )
-);
-
-CREATE TABLE  `Entry` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-    `title` VARCHAR( 255 ) NOT NULL ,
-    `content` TEXT NOT NULL ,
-    `created_on` DATETIME NOT NULL ,
-    `User_id` INT UNSIGNED NOT NULL
-);
-
-CREATE TABLE  `Tag` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-    `tag` VARCHAR( 255 ) NOT NULL ,
-    UNIQUE (
-    `tag`
-    )
-); 
-
-CREATE TABLE  `Entry__Tag` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-    `Entry_id` INT UNSIGNED NOT NULL ,
-    `Tag_id` INT UNSIGNED NOT NULL
+    `last_active` DATETIME NOT NULL 
 );

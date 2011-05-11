@@ -12,8 +12,12 @@ class User extends ApplicationModel
     protected $ip;
     protected $join_date;
     protected $last_login;
+    protected $template;
 
     protected $_validators = array(
+        'email' => array(
+            array('email', 'message' => 'Email is invalid.')
+        ),
         'username' => array(
             array('not_empty', 'message' => 'Username cannot be blank.'),
             array('alphanumeric', 'message' => 'Username must contain only alphanumeric characters.'),
@@ -25,11 +29,16 @@ class User extends ApplicationModel
     );
 
     protected $_options = array(
-        'username_min_length' => 5,
-        'username_max_length' => 16,
-        'password_min_length' => 5,
-        'password_max_length' => 16
+        'username_min_length'    => 5,
+        'username_max_length'    => 16,
+        'password_min_length'    => 5,
+        'password_max_length'    => 16,
+        'password_special_chars' => '#@!$%._'
     );
+
+    public function get_template() {
+        return ( $this->template ) ?: DEFAULT_TEMPLATE;
+    }
 
 }
 
