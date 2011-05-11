@@ -11,6 +11,10 @@ use nx\lib\Page;
 
 class Controller extends Object {
 
+    protected $_classes = array(
+        'form' => 'nx\lib\Form' 
+    );
+
     protected $_http_get = array();
     protected $_http_post = array();
     protected $_form;
@@ -21,15 +25,17 @@ class Controller extends Object {
 
     protected $_sanitizers = array();
 
-    protected $_auto_config = array('http_get', 'http_post', 'form');
+    protected $_auto_config = array('http_get', 'http_post', 'classes' => 'merge');
 
     public function __construct(array $config = array()) {
-        $defaults = array();
+        $defaults = array('classes' => $this->_classes);
         parent::__construct($config + $defaults);
     }
 
     protected function _init() {
         parent::_init();
+
+        $this->_form = $this->_classes['form'];
 
         $this->_http_post = $this->sanitize($this->_http_post);
         if ( !$this->_is_valid_request($this->_http_post) ) {

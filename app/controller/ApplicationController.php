@@ -12,8 +12,10 @@ class ApplicationController extends \nx\core\Controller {
         'user'    => 'app\model\User'
     );
 
+    protected $_auto_config = array('classes' => 'merge');
+
     public function __construct(array $config = array()) {
-        $defaults = array();
+        $defaults = array('classes' => $this->_classes);
         parent::__construct($config + $defaults);
     }
 

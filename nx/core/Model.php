@@ -13,6 +13,8 @@ class Model extends Object {
         'cache' => 'nx\plugin\cache\MemcachedCache'
     );
 
+    protected $_auto_config = array('classes' => 'merge');
+
     protected $_db;
     protected $_cache;
 
@@ -29,8 +31,9 @@ class Model extends Object {
 
     public function __construct(array $config = array()) {
         $defaults = array(
-            'id'    => null,
-            'where' => null 
+            'id'      => null,
+            'where'   => null,
+            'classes' => $this->_classes
         );
         parent::__construct($config + $defaults);
     }

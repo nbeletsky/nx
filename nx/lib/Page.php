@@ -7,6 +7,8 @@ use nx\lib\Form;
 
 class Page {
 
+    protected static $_controller_location = 'app\controller\\';
+
    /**
     *  Renders a page.
     *
@@ -54,11 +56,10 @@ class Page {
         $whitelist = array_map($strip_ext, $whitelist);
 
         if ( in_array($controller, $whitelist) ) {
-            $controller = '\\app\\controller\\' . $controller; 
+            $controller = self::$_controller_location . $controller; 
             $controller_obj = new $controller(array(
                 'http_get'  => $get,
-                'http_post' => ( !empty($_POST) ) ? Data::extract_post($_POST) : array(),
-                'form'      => new Form()
+                'http_post' => ( !empty($_POST) ) ? Data::extract_post($_POST) : array()
             ));
             $controller_obj->call($action, $id, $additional);
         } else {
