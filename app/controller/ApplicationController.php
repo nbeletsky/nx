@@ -6,10 +6,12 @@ class ApplicationController extends \nx\core\Controller {
 
     protected $_session;
     protected $_user;
+    protected $_form;
 
     protected $_classes = array(
         'session' => 'app\model\Session', 
-        'user'    => 'app\model\User'
+        'user'    => 'app\model\User',
+        'form'    => 'nx\lib\Form' 
     );
 
     protected $_auto_config = array('classes' => 'merge');
@@ -31,6 +33,9 @@ class ApplicationController extends \nx\core\Controller {
             $this->_user = null;
             $this->_template = DEFAULT_TEMPLATE;
         }
+
+        $form = $this->_classes['form'];
+        $this->_form = new $form();
 
         parent::_init();
     }

@@ -1,7 +1,5 @@
 <?php
 
-// TODO: Move this class out of lib?
-
 namespace nx\lib;
 
 use nx\lib\Meta;

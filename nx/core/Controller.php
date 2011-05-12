@@ -7,17 +7,12 @@ use nx\lib\Auth;
 use nx\lib\Data; 
 use nx\lib\File; 
 use nx\lib\Meta; 
-use nx\lib\Page; 
+use nx\lib\Dispatcher; 
 
 class Controller extends Object {
 
-    protected $_classes = array(
-        'form' => 'nx\lib\Form' 
-    );
-
     protected $_http_get = array();
     protected $_http_post = array();
-    protected $_form;
 
     protected $_template = DEFAULT_TEMPLATE; 
 
@@ -25,17 +20,15 @@ class Controller extends Object {
 
     protected $_sanitizers = array();
 
-    protected $_auto_config = array('http_get', 'http_post', 'classes' => 'merge');
+    protected $_auto_config = array('http_get', 'http_post');
 
     public function __construct(array $config = array()) {
-        $defaults = array('classes' => $this->_classes);
+        $defaults = array();
         parent::__construct($config + $defaults);
     }
 
     protected function _init() {
         parent::_init();
-
-        $this->_form = $this->_classes['form'];
 
         $this->_http_post = $this->sanitize($this->_http_post);
         if ( !$this->_is_valid_request($this->_http_post) ) {
@@ -52,7 +45,7 @@ class Controller extends Object {
 
     public function call($action, $id = null, $additional = array()) {
         if ( !method_exists($this, $action) || $this->is_protected($action) ) {
-            Page::throw_404($this->_template);
+            Dispatcher::throw_404($this->_template);
             return false;
         }   
 

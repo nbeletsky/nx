@@ -5,19 +5,43 @@ namespace nx\lib;
 use nx\lib\File;
 use nx\lib\Form;
 
-class Page {
+class Dispatcher {
 
     protected static $_controller_location = 'app\controller\\';
+
+    public static function is_whitelisted($controller) {
+        $whitelist = File::get_filenames_within(ROOT_DIR . '/app/controller');
+        $strip_ext = create_function('$val', 'return basename($val, ".php");');
+        $whitelist = array_map($strip_ext, $whitelist);
+        return in_array($controller, $whitelist);
+    }
+
+    public static function parse_query_string($query_string) {
+
+        parse_str($query_string, $query);
+
+        $controller = ( isset($query['controller']) ) ? ucfirst($query['controller']) : DEFAULT_CONTROLLER;
+        $action =     ( isset($query['action']) )     ? $query['action']              : DEFAULT_ACTION;
+        $id =         ( isset($query['id']) )         ? $query['id']                  : null;
+
+        $get = array();
+        if ( isset($query['args']) ) {
+            $args = substr($query_string, strpos($query_string, $query['args']));
+            parse_str($args, $get);
+        }
+        return compact('controller', 'action', 'id', 'get');
+    }
 
    /**
     *  Renders a page.
     *
-    *  @param string $query_string        The query string from the url.
+    *  @see nx\lib\Dispatcher::parse_query_string()
+    *  @param array $args                 The data parsed from the query string.
     *  @param array $additional           Any additional variables that should be passed to the view.
     *  @access public
     *  @return array
     */
-    public static function render($query_string, $additional = array()) {
+    public static function render($args, $additional = array()) {
         // URL layout
         // foobar.com/
         // foobar.com/controller
@@ -39,33 +63,16 @@ class Page {
         )
         */
 
-        parse_str($query_string, $query);
-
-        $controller = ( isset($query['controller']) ) ? ucfirst($query['controller']) : DEFAULT_CONTROLLER;
-        $action =     ( isset($query['action']) )     ? $query['action']              : DEFAULT_ACTION;
-        $id =         ( isset($query['id']) )         ? $query['id']                  : null;
-
-        $get = array();
-        if ( isset($query['args']) ) {
-            $args = substr($query_string, strpos($query_string, $query['args']));
-            parse_str($args, $get);
-        }
-
-        $whitelist = File::get_filenames_within(ROOT_DIR . '/app/controller');
-        $strip_ext = create_function('$val', 'return basename($val, ".php");');
-        $whitelist = array_map($strip_ext, $whitelist);
-
-        if ( in_array($controller, $whitelist) ) {
-            $controller = self::$_controller_location . $controller; 
-            $controller_obj = new $controller(array(
-                'http_get'  => $get,
-                'http_post' => ( !empty($_POST) ) ? Data::extract_post($_POST) : array()
-            ));
-            $controller_obj->call($action, $id, $additional);
-        } else {
+        if ( !self::is_whitelisted($args['controller']) ) {
             self::throw_404(DEFAULT_TEMPLATE);
+        } else {
+            $controller_name = self::$_controller_location . $args['controller']; 
+            $controller = new $controller_name(array(
+                'http_get'  => $args['get'],
+                'http_post' => $args['post']
+            ));
+            $controller->call($args['action'], $args['id'], $additional);
         }
-
     }
 
    /**

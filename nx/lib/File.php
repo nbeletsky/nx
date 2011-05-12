@@ -5,26 +5,6 @@ namespace nx\lib;
 class File {
 
    /**
-    *  Creates a snapshot of the test results.
-    *
-    *  @param string $data            The data to be written.
-    *  @param string $filename        The filename to be used. 
-    *  @access public
-    *  @return void
-    */
-    // TODO: Fix this
-    public static function create_snapshot($data, $filename) {
-        $top = ROOT_DIR . '/' . SNAPSHOT_DIRECTORY;
-        if ( $top{strlen($top) - 1} !== '/' ) {
-            $top .= '/';
-        }
-        $ext = pathinfo($filename, PATHINFO_EXTENSION);
-        $final_name = $top .  $ext . '/' . basename($filename, '.' . $ext) . '_' . date('d-m-Y G:i') . '.' . $ext;
-        self::write($final_name, $data);
-        chmod($filename, 0777);
-    }
-
-   /**
     *  Erases the contents of a file. 
     *
     *  @param string $filename        The file to be emptied.
