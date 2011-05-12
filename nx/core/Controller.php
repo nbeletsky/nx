@@ -43,28 +43,16 @@ class Controller extends Object {
         $this->_token = Auth::create_token($this->classname());
     }
 
-    public function call($action, $id = null, $additional = array()) {
+    public function call($action, $id = null) {
         if ( !method_exists($this, $action) || $this->is_protected($action) ) {
-            Dispatcher::throw_404($this->_template);
             return false;
         }   
 
-        $to_view = $this->$action($id);
+        return $this->$action($id);
+    }
 
-        // AJAX
-        if ( is_string($to_view) ) {
-            echo $to_view;
-            return true;
-        }
-        
-        $view_file = "../view/" . $this->_template . '/' . lcfirst($this->classname()) . "/" . $action . VIEW_EXTENSION;
-        if ( !file_exists($view_file) ) {
-            return false;
-        }
-
-        extract($to_view + $additional);
-        include $view_file;
-        return true;
+    public function get_template() {
+        return $this->_template;
     }
 
     public function handle_CSRF() {

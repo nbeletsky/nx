@@ -7,8 +7,13 @@ use nx\lib\Form;
 
 class Dispatcher {
 
-    protected static $_controller_location = 'app\controller\\';
-
+   /**
+    *  Checks to see if a controller is whitelisted for use.
+    *
+    *  @param string $controller          The controller name.
+    *  @access public
+    *  @return bool
+    */
     public static function is_whitelisted($controller) {
         $whitelist = File::get_filenames_within(ROOT_DIR . '/app/controller');
         $strip_ext = create_function('$val', 'return basename($val, ".php");');
@@ -16,6 +21,14 @@ class Dispatcher {
         return in_array($controller, $whitelist);
     }
 
+   /**
+    *  Parses a query string and returns the controller, action, 
+    *  id, and any additional arguments passed via $_GET. 
+    *
+    *  @param string $query_string        The controller name.
+    *  @access public
+    *  @return array
+    */
     public static function parse_query_string($query_string) {
 
         parse_str($query_string, $query);
@@ -37,11 +50,10 @@ class Dispatcher {
     *
     *  @see nx\lib\Dispatcher::parse_query_string()
     *  @param array $args                 The data parsed from the query string.
-    *  @param array $additional           Any additional variables that should be passed to the view.
     *  @access public
     *  @return array
     */
-    public static function render($args, $additional = array()) {
+    public static function render($args) {
         // URL layout
         // foobar.com/
         // foobar.com/controller
@@ -65,14 +77,37 @@ class Dispatcher {
 
         if ( !self::is_whitelisted($args['controller']) ) {
             self::throw_404(DEFAULT_TEMPLATE);
-        } else {
-            $controller_name = self::$_controller_location . $args['controller']; 
-            $controller = new $controller_name(array(
-                'http_get'  => $args['get'],
-                'http_post' => $args['post']
-            ));
-            $controller->call($args['action'], $args['id'], $additional);
+            return false;
+        } 
+
+        $controller_name = CONTROLLER_LOCATION . $args['controller']; 
+        $controller = new $controller_name(array(
+            'http_get'  => $args['get'],
+            'http_post' => $args['post']
+        ));
+
+        $results = $controller->call($args['action'], $args['id']);
+        if ( !$results ) {
+            self::throw_404($controller->get_template());
+            return false;
         }
+
+        // AJAX
+        if ( is_string($results) ) {
+            echo $to_view;
+            return true;
+        }
+
+        $view_file = "../view/" . $controller->get_template() . '/' . 
+                     lcfirst($controller->classname()) . "/" . $args['action'] . VIEW_EXTENSION;
+        if ( !file_exists($view_file) ) {
+            self::throw_404($controller->get_template());
+            return false;
+        }
+
+        extract($results);
+        include $view_file;
+        return true;
     }
 
    /**
