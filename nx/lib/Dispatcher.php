@@ -56,23 +56,16 @@ class Dispatcher {
     public static function render($args) {
         // URL layout
         // foobar.com/
-        // foobar.com/controller
-        // foobar.com/controller/id
-        // foobar.com/controller/action/id
-        // foobar.com/controller/action/id/args
+        // foobar.com/controller[?args]
+        // foobar.com/controller/id[?args]
+        // foobar.com/controller/action[?args]
+        // foobar.com/controller/action/id[?args]
         /* 
-        server.document-root = "/srv/http/YOURSITE/public"
-        url.rewrite-once = (
-            "^/$"=>"/index.php",
-            "^/([A-Za-z0-9\-]+)/?$"=>"/index.php?controller=$1",
-            "^/([A-Za-z0-9\-]+)/([\d]+)/?$"=>"/index.php?controller=$1&id=$2",
-            "^/([A-Za-z0-9\-]+)\?(.+)$"=>"/index.php?controller=$1&args=$2",
-            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/?$"=>"/index.php?controller=$1&action=$2",
-            "^/([A-Za-z0-9\-]+)/([\d]+)\?(.+)$"=>"/index.php?controller=$1&id=$2&args=$3",
-            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/([\d]+)/?$"=>"/index.php?controller=$1&action=$2&id=$3",
-            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)\?(.+)$"=>"/index.php?controller=$1&action=$2&args=$3",
-            "^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/([\d]+)\?(.+)$"=>"/index.php?controller=$1&action=$2&id=$3&args=$4"
-        )
+        rewrite ^/$ index.php;
+        rewrite ^/([A-Za-z0-9\-]+)/?$ index.php?controller=$1&args=$args? break;
+        rewrite ^/([A-Za-z0-9\-]+)/([\d]+)/?$ index.php?controller=$1&id=$2&args=$args? break;
+        rewrite ^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/?$ index.php?controller=$1&action=$2&args=$args? break;
+        rewrite ^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/([\d]+)/?$ index.php?controller=$1&action=$2&id=$3&args=$args? break;
         */
 
         if ( !self::is_whitelisted($args['controller']) ) {
