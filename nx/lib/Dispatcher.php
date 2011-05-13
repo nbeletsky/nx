@@ -51,7 +51,7 @@ class Dispatcher {
     *  @see nx\lib\Dispatcher::parse_query_string()
     *  @param array $args                 The data parsed from the query string.
     *  @access public
-    *  @return array
+    *  @return bool
     */
     public static function render($args) {
         // URL layout
@@ -92,21 +92,6 @@ class Dispatcher {
             return false;
         }
 
-        // AJAX
-        if ( is_string($results) ) {
-            echo $to_view;
-            return true;
-        }
-
-        $view_file = "../view/" . $controller->get_template() . '/' . 
-                     lcfirst($controller->classname()) . "/" . $args['action'] . VIEW_EXTENSION;
-        if ( !file_exists($view_file) ) {
-            self::throw_404($controller->get_template());
-            return false;
-        }
-
-        extract($results);
-        include $view_file;
         return true;
     }
 
