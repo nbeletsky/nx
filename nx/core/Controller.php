@@ -60,7 +60,7 @@ class Controller extends Object {
             return true;
         }
 
-        $view_file = "../view/" . $this->_template . '/' . lcfirst($this->classname()) . "/" . $action . VIEW_EXTENSION;
+        $view_file = ROOT_DIR . '/app/view/' . $this->_template . '/' . lcfirst($this->classname()) . '/' . $action . VIEW_EXTENSION;
         if ( !file_exists($view_file) ) {
             return false;
         }
