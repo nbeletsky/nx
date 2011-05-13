@@ -48,7 +48,26 @@ class Controller extends Object {
             return false;
         }   
 
-        return $this->$action($id);
+        $to_view = $this->$action($id);
+
+        if ( !$to_view ) {
+            return false;
+        }
+
+        // AJAX
+        if ( is_string($to_view) ) {
+            echo $to_view;
+            return true;
+        }
+
+        $view_file = ROOT_DIR . '/app/view/' . $this->_template . '/' . lcfirst($this->classname()) . '/' . $action . VIEW_EXTENSION;
+        if ( !file_exists($view_file) ) {
+            return false;
+        }
+
+        extract($to_view);
+        include $view_file;
+        return true;
     }
 
     public function get_template() {
