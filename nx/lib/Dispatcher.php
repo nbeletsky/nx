@@ -38,7 +38,7 @@ class Dispatcher {
         $id =         ( isset($query['id']) )         ? $query['id']                  : null;
 
         $get = array();
-        if ( isset($query['args']) ) {
+        if ( isset($query['args']) && $query['args'] != '' ) {
             $args = substr($query_string, strpos($query_string, $query['args']));
             parse_str($args, $get);
         }
