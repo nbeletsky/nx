@@ -13,6 +13,12 @@ class User extends ApplicationModel {
     protected $last_login;
     protected $template;
 
+    protected $_sanitizers = array(
+        'username'         => 's',
+        'email'            => 's',
+        'password'         => 's'
+    );
+
     protected $_validators = array(
         'email' => array(
             array('email', 'message' => 'Email is invalid.')
