@@ -51,7 +51,7 @@ class Controller extends Object {
 
         $to_view = $this->$action($id);
 
-        if ( !$to_view ) {
+        if ( $to_view === false ) {
             return false;
         }
 
