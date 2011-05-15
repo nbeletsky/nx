@@ -180,7 +180,7 @@ class Form {
         foreach( $options as $value => $display ) {
             $html.= "<option value='" . $value . "' ";
                 
-            if ( $object->$name == $value ) {
+            if ( !is_null($binding) && isset($binding->$attributes['name']) && $binding->$attributes['name'] == $value ) {
                 $html.= "selected='selected' ";
             }
             $html.= ">" . $display . "</option>";
