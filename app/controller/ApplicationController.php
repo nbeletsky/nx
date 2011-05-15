@@ -14,19 +14,19 @@ class ApplicationController extends \nx\core\Controller {
         'form'    => 'nx\lib\Form' 
     );
 
-    protected $_auto_config = array('classes' => 'merge');
-
     public function __construct(array $config = array()) {
-        $defaults = array('classes' => $this->_classes);
+        $defaults = array(
+            'classes' => $this->_classes
+        );
         parent::__construct($config + $defaults);
     }
 
     protected function _init() {
-        $session = $this->_classes['session'];
+        $session = $this->_config['classes']['session'];
         $this->_session = new $session(); 
 
         if ( $this->_session->is_logged_in() ) {
-            $user = $this->_classes['user'];
+            $user = $this->_config['classes']['user'];
             $this->_user = new $user(array('id' => $this->_session->get_user_id()));
             $this->_template = $this->_user->get_template();
         } else {
@@ -34,7 +34,7 @@ class ApplicationController extends \nx\core\Controller {
             $this->_template = DEFAULT_TEMPLATE;
         }
 
-        $form = $this->_classes['form'];
+        $form = $this->_config['classes']['form'];
         $this->_form = new $form();
 
         parent::_init();

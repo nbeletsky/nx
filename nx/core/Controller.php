@@ -20,23 +20,24 @@ class Controller extends Object {
 
     protected $_sanitizers = array();
 
-    protected $_auto_config = array('http_get', 'http_post');
-
     public function __construct(array $config = array()) {
-        $defaults = array();
+        $defaults = array(
+            'http_get'  => $this->_http_get,
+            'http_post' => $this->_http_post
+        );
         parent::__construct($config + $defaults);
     }
 
     protected function _init() {
         parent::_init();
 
-        $this->_http_post = $this->sanitize($this->_http_post);
-        if ( !$this->_is_valid_request($this->_http_post) ) {
+        $this->_http_get = $this->sanitize($this->_config['http_get']);
+        if ( !$this->_is_valid_request($this->_http_get) ) {
             $this->handle_CSRF();
         }
 
-        $this->_http_get = $this->sanitize($this->_http_get);
-        if ( !$this->_is_valid_request($this->_http_get) ) {
+        $this->_http_post = $this->sanitize($this->_config['http_post']);
+        if ( !$this->_is_valid_request($this->_http_post) ) {
             $this->handle_CSRF();
         }
 
