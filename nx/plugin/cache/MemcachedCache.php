@@ -13,10 +13,12 @@ class MemcachedCache extends \nx\core\Object {
     protected $_cache;
 
    /**
-    *  Creates a new instance of Memcached. 
+    *  Loads the configuration settings for Memcached.
     *
-    *  @param string $persistent_id             A unique ID used to allow persistence between requests.
-    *                                           By default, instances are destroyed at the end of the request.
+    *  @param array $config                     The configuration settings, which can take two options:
+    *                                           `host` - The hostname of the memcached server.
+    *                                           `persistent_id` -  A unique ID used to allow persistence between requests.
+    *                                           (By default, instances are destroyed at the end of the request.)
     *  @access public
     *  @return void
     */
@@ -28,6 +30,12 @@ class MemcachedCache extends \nx\core\Object {
         parent::__construct($config + $defaults);
     }
 
+   /**
+    *  Creates a new instance of Memcached and adds a server if one does not exist. 
+    *
+    *  @access protected
+    *  @return void
+    */
     protected function _init() {
         if ( $this->_config['persistent_id'] ) {
             $this->_cache = new \Memcached($this->_config['persistent_id']);
