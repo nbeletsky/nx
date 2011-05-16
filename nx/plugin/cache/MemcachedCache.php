@@ -43,7 +43,16 @@ class MemcachedCache extends \nx\core\Object {
             $this->_cache = new \Memcached();
         }
 
-        if ( !count($this->_cache->getServerList()) ) {
+        $server_list = $this->server_list();
+        $found_server = false;
+        foreach ( $server_list as $server ) {
+            if ( $server['host'] == $this->_config['host'] ) {
+                $found_server = true;
+                break;
+            }
+        }
+
+        if ( !$found_server ) {
             $this->add_server($this->_config['host']);
         }
     }
@@ -83,17 +92,24 @@ class MemcachedCache extends \nx\core\Object {
    /**
     *  Adds multiple servers to the server pool.
     *
-    *  @param array $servers                    Array of the servers to add to the pool. (Expected format: array(array($host, $weight = 0, $port = 11211)))
+    *  @param array $servers                    Array of the servers to add to the pool. 
+    *                                           Expected format: array(
+    *                                                                array(
+    *                                                                    'host'   => $host, 
+    *                                                                    'weight' => $weight [ = 0], 
+    *                                                                    'port'   => $port [ = 11211]
+    *                                                                )
+    *                                                            )
     *  @access public
     *  @return bool 
     */
     public function add_servers($servers) {
         $reassembled = array();
-        foreach ( array_values($servers) as $server ) {
+        foreach ( $servers as $server ) {
             $reassembled[] = array(
-                $server[0], 
-                (isset($server[2])) ? $server[2] : 11211, 
-                (isset($server[1])) ? $server[1] : 0
+                $server['host'], 
+                (isset($server['port'])) ? $server['port'] : 11211, 
+                (isset($server['weight'])) ? $server['weight'] : 0
             );
         }
 
