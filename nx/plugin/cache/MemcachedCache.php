@@ -31,7 +31,8 @@ class MemcachedCache extends \nx\core\Object {
     }
 
    /**
-    *  Creates a new instance of Memcached and adds a server if one does not exist. 
+    *  Creates a new instance of Memcached and adds a server if one does not exist using
+    *  the provided host. 
     *
     *  @access protected
     *  @return void
