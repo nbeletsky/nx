@@ -27,12 +27,6 @@ class PDO_MySQL extends \nx\core\Object {
     */
     protected $_statement;
 
-   /**
-    *  Connects and selects database.
-    *
-    *  @access public
-    *  @return void
-    */
     public function __construct(array $config = array()) {
         $defaults = array(
             'database' => DATABASE_NAME,
@@ -47,13 +41,25 @@ class PDO_MySQL extends \nx\core\Object {
         $this->connect($this->_config['database'], $this->_config['host'], $this->_config['username'], $this->_config['password']);
     }
 
+   /**
+    *  Connects and selects database.
+    *
+    *  @param string $database     The name of the database.
+    *  @param string $host         The database host.
+    *  @param string $username     The database username.
+    *  @param string $password     The database password.
+    *  @access public
+    *  @return bool
+    */
     public function connect($database, $host, $username, $password) {
         $dsn = 'mysql:host=' . $host . ';dbname=' . $database; 
         try {
             $this->_dbh = new \PDO($dsn, $username, $password);
             $this->_dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            return true;
         } catch ( PDOException $e ) {
             // TODO: How to handle error reporting?
+            return false;
         }
     }
 
@@ -71,12 +77,21 @@ class PDO_MySQL extends \nx\core\Object {
     *  Closes the connection.
     *
     *  @access public
-    *  @return void
+    *  @return bool
     */
     public function close() {
         $this->_dbh = null;
+        return true;
     }
     
+   /**
+    *  Deletes an object from the database.
+    *
+    *  @param obj $obj           The object to be deleted.
+    *  @param string $where      The WHERE clause to be included in the DELETE query.
+    *  @access public
+    *  @return bool       
+    */
     public function delete($obj, $where = null) {
         $sql = 'DELETE FROM `' . $obj->classname() . '`';
         if ( is_null($where) ) {
@@ -173,6 +188,13 @@ class PDO_MySQL extends \nx\core\Object {
         return $this->fetch('assoc');
     }
 
+   /**
+    *  Parses a //TODO: Finish this!
+    *
+    *  @param string|array $obj        The object to be inserted. 
+    *  @access protected
+    *  @return string
+    */
     protected function _format_where($where = null) {
         $sql = '';
 
@@ -185,7 +207,7 @@ class PDO_MySQL extends \nx\core\Object {
             $sql .= $where;
         } elseif ( is_array($where) ) {
             foreach ( $where as $name => $val ) {
-                // $EXAMPLE = array( "i" => array( "\$gt" => 20, "\$lte" => 30 ) );
+                // $EXAMPLE = array( "i" => array( "gt" => 20, "lte" => 30 ) );
                 if ( is_string($val) ) {
                     $sql .= '`' . $name . '`=:' . $name . ' and ';
                 }
@@ -265,6 +287,14 @@ class PDO_MySQL extends \nx\core\Object {
         return $this->_dbh->lastInsertId();
     }
 
+   /**
+    *  Loads the supplied object with its values in the database.
+    *
+    *  @param obj $obj           The object to be loaded.
+    *  @param int $id            The primary key of the object.
+    *  @access public
+    *  @return obj       
+    */
     public function load_object($obj, $id) {
         $where = array(PRIMARY_KEY => $id);
         $this->find('*', $obj, $where);
