@@ -3,6 +3,7 @@
 namespace nx\plugin\db;
 
 class PDO_MySQL extends \nx\core\Object {
+
    /**
     *  The db handle. 
     *
@@ -27,6 +28,18 @@ class PDO_MySQL extends \nx\core\Object {
     */
     protected $_statement;
 
+   /**
+    *  Loads the configuration settings for a MySQL connection.
+    *
+    *  @param array $config                     The configuration settings, which can take four options:
+    *                                           `database` - The name of the database.
+    *                                           `host` - The database host.
+    *                                           `username` -  The database username.
+    *                                           `password` -  The database password.
+    *                                           (By default, instances are destroyed at the end of the request.)
+    *  @access public
+    *  @return void
+    */
     public function __construct(array $config = array()) {
         $defaults = array(
             'database' => DATABASE_NAME,
@@ -37,6 +50,12 @@ class PDO_MySQL extends \nx\core\Object {
         parent::__construct($config + $defaults);
     }
 
+   /**
+    *  Connects to the database.
+    *
+    *  @access protected
+    *  @return void
+    */
     protected function _init() {
         $this->connect($this->_config['database'], $this->_config['host'], $this->_config['username'], $this->_config['password']);
     }
@@ -87,8 +106,9 @@ class PDO_MySQL extends \nx\core\Object {
    /**
     *  Deletes an object from the database.
     *
-    *  @param obj $obj           The object to be deleted.
-    *  @param string $where      The WHERE clause to be included in the DELETE query.
+    *  @see PDO_MySQL->_format_where()
+    *  @param obj $obj                   The object to be deleted.
+    *  @param string|array $where        The WHERE clause to be included in the DELETE query.
     *  @access public
     *  @return bool       
     */
@@ -151,6 +171,19 @@ class PDO_MySQL extends \nx\core\Object {
         return $column; 
     }
 
+   /**
+    *  Performs a `SELECT FROM` query.
+    *
+    *  @see PDO_MySQL->query()
+    *  @see PDO_MySQL->fetch() 
+    *  @see PDO_MySQL->_format_where()
+    *  @param string|array $fields       The fields to be retrieved.
+    *  @param string|obj $table          The table to SELECT from.
+    *  @param string|array $where        The WHERE clause of the SQL query.
+    *  @param string $additional         Any additional SQL to be added at the end of the query.
+    *  @access public
+    *  @return void
+    */
     public function find($fields, $table, $where = null, $additional = null) {
         $sql = 'SELECT ';
         if ( is_array($fields) ) {
@@ -171,6 +204,17 @@ class PDO_MySQL extends \nx\core\Object {
         $this->query($sql, $where); 
     }
 
+   /**
+    *  Retrieves the primary key of all objects that match the criteria
+    *  supplied in `$where`.
+    *
+    *  @see PDO_MySQL->find() 
+    *  @see PDO_MySQL->_format_where()
+    *  @param string|array $obj         The objects to find.
+    *  @param string|array $where       The WHERE clause of the SQL query.
+    *  @access public
+    *  @return array
+    */
     public function find_all_objects($obj, $where = null) {
         $results = array();
 
@@ -183,15 +227,41 @@ class PDO_MySQL extends \nx\core\Object {
         return $results;
     }
 
+   /**
+    *  Retrieves the primary key of the object matched by the criteria
+    *  supplied in `$where`.
+    *
+    *  @see PDO_MySQL->find() 
+    *  @see PDO_MySQL->_format_where()
+    *  @param string|array $obj         The object to find.
+    *  @param string|array $where       The WHERE clause of the SQL query.
+    *  @access public
+    *  @return array
+    */
     public function find_object($obj, $where = null) {
         $this->find('`' . PRIMARY_KEY . '`', $obj, $where, 'LIMIT 1');
         return $this->fetch('assoc');
     }
 
    /**
-    *  Parses a //TODO: Finish this!
+    *  Parses a WHERE clause, which can be of any of the following formats:
+    *  $where = 'id = 3';
+    *  (produces ` WHERE id = 3`)
+    *  $where = array(
+    *      'id'       => 3,
+    *      'username' => 'test'
+    *  );
+    *  (produces ` WHERE id = 3 and username = 'test'`)
+    *  $where = array(
+    *      'id' => array(
+    *          'gte' => 20,
+    *          'lt' => 30
+    *      ),
+    *      'username' => 'test'
+    *  );
+    *  (produces ` WHERE id >= 20 and id < 30 and username = 'test'`)
     *
-    *  @param string|array $obj        The object to be inserted. 
+    *  @param string|array $where        The clause to be parsed.
     *  @access protected
     *  @return string
     */
@@ -393,7 +463,7 @@ class PDO_MySQL extends \nx\core\Object {
     *  Updates an object in the database.
     *
     *  @param obj $obj              The object to be updated.
-    *  @param string $where         The WHERE clause of the SQL query.
+    *  @param array $where          The WHERE clause of the SQL query.
     *  @access public
     *  @return bool 
     */
