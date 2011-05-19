@@ -118,7 +118,7 @@ class Controller extends Object {
 
         // AJAX
         if ( is_string($to_view) ) {
-            echo $to_view;
+            echo htmlspecialchars($to_view, ENT_QUOTES, 'UTF-8');
             return true;
         }
 
