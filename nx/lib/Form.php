@@ -41,6 +41,20 @@ class Form {
     }
 
    /**
+    * Escapes a value for output in an HTML context.
+    *
+    * @param mixed $value
+    * @access public
+    * @return mixed
+    */
+    public function escape($value) {
+        if ( is_array($value) ) {
+            return array_map(array($this, __FUNCTION__), $value);
+        }
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    }
+
+   /**
     * Creates a hidden input. 
     * 
     * @param array $attributes          The HTML attributes. 
@@ -118,12 +132,12 @@ class Form {
                         $value_present = true;
                         break;
                 }
-                $html .= $key . "='" . $setting . "' "; 
+                $html .= $key . "='" . $this->escape($setting) . "' "; 
             } 
         }
 
         if ( !$value_present && !is_null($binding) && !is_null($binding->$attributes['name']) ) {
-            $html .= "value='" . htmlentities($binding->$attributes['name'], ENT_QUOTES) . "'";
+            $html .= "value='" . $this->escape($binding->$attributes['name']) . "'";
         } 
 
         return $html;
@@ -178,12 +192,12 @@ class Form {
         $html .= $this->_parse_attributes($attributes, $binding);
         $html .= ">";
         foreach( $options as $value => $display ) {
-            $html.= "<option value='" . $value . "' ";
+            $html.= "<option value='" . $this->escape($value) . "' ";
                 
             if ( !is_null($binding) && isset($binding->$attributes['name']) && $binding->$attributes['name'] == $value ) {
                 $html.= "selected='selected' ";
             }
-            $html.= ">" . $display . "</option>";
+            $html.= ">" . $this->escape($display) . "</option>";
         }
         $html.= "</select>";
 
@@ -215,9 +229,9 @@ class Form {
         $html .= $this->_parse_attributes($attributes, $binding);
         $html .= '>';
         if ( isset($attributes['value']) ) {
-            $html .= htmlentities($attributes['value'], ENT_QUOTES); 
+            $html .= $this->escape($attributes['value']); 
         } elseif ( !is_null($binding) && isset($binding->$attributes['name']) ) {
-            $html .= htmlentities($binding->$attributes['name'], ENT_QUOTES); 
+            $html .= $this->escape($binding->$attributes['name']); 
         }
         $html .= "</textarea>"; 
 
