@@ -1,7 +1,21 @@
 <?php
 
+/**
+ * NX
+ *
+ * @author    Nick Sinopoli <NSinopoli@gmail.com>
+ * @copyright Copyright (c) 2011, Nick Sinopoli
+ * @license   http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace nx\lib;
 
+/*
+ *  The `Data` class is a collection of data-oriented methods, which
+ *  help sanitize and organize remote data. 
+ *
+ *  @package lib
+ */
 class Data {
 
    /**

@@ -1,11 +1,36 @@
 <?php
 
+/**
+ * NX
+ *
+ * @author    Nick Sinopoli <NSinopoli@gmail.com>
+ * @copyright Copyright (c) 2011, Nick Sinopoli
+ * @license   http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace nx\lib;
 
-use nx\lib\Meta;
-
+/*
+ *  The `Form` class is used to generate common HTML elements.
+ *  All helper creation methods accept an optional `$binding` parameter,
+ *  which can be used to autopopulate an instance of that object 
+ *  with the element's values upon form submission. 
+ *
+ *  @see /nx/lib/Data::extract_post()
+ *  @package lib
+ */
 class Form {
 
+   /**
+    *  Maintains the array index of bindings.
+    *  (This is used when a Form method [e.g., Form::text()] is called 
+    *  multiple times with the same parameters.  An index is needed 
+    *  to ensure that both inputs are passed to the server
+    *  under unique names.)
+    *
+    *  @var array
+    *  @access protected
+    */
     protected $_binding_counter = array();
 
    /**

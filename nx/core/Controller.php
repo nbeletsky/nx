@@ -1,13 +1,18 @@
 <?php
 
+/**
+ * NX
+ *
+ * @author    Nick Sinopoli <NSinopoli@gmail.com>
+ * @copyright Copyright (c) 2011, Nick Sinopoli
+ * @license   http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace nx\core;
 
-use nx\core\View; 
 use nx\lib\Auth; 
 use nx\lib\Data; 
-use nx\lib\File; 
 use nx\lib\Meta; 
-use nx\lib\Dispatcher; 
 
 class Controller extends Object {
 
