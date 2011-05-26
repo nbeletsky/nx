@@ -143,7 +143,7 @@ class MemcachedCache extends \nx\core\Object {
     *  @access public
     *  @return bool 
     *
-    *  @see retrieve() for how to obtain the CAS token.
+    *  @see MemcachedCache->retrieve() for how to obtain the CAS token.
     */
     public function cas($token, $key, $value, $server_key = '', $expiration = 0) {
         return $this->_cache->casByKey($token, $server_key, $key, $value, $expiration);
@@ -238,7 +238,7 @@ class MemcachedCache extends \nx\core\Object {
     *  @access public
     *  @return mixed 
     *
-    *  @see cas() for how to use CAS tokens.
+    *  @see MemcachedCache->cas() for how to use CAS tokens.
     */
     public function retrieve($key, $server_key = '', $cache_callback = null, &$cas_token = null) {
         return $this->_cache->getByKey($server_key, $key, $cache_callback, $cas_token);

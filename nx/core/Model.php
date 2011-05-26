@@ -59,10 +59,6 @@ class Model extends Object {
     }
 
     public function __get($field) {
-        if ( !$this->is_foreign($field) ) {
-            return $this->$field;
-        }
-
         if ( $this->belongs_to($field) ) {
             return $this->_get_belongs_to($field);
         } elseif ( $this->has_many($field) ) {
@@ -72,16 +68,35 @@ class Model extends Object {
         } elseif ( $this->habtm($field) ) {
             return $this->_get_habtm($field);
         }
+
+        return $this->$field;
     }
     
     public function __set($field, $value) {
         $this->$field = $value;
     }
 
+   /**
+    *  Checks if `$this` has a "belongs to" relationship with the
+    *  object defined in `$field`.
+    *
+    *  @param string $field        The class name of the foreign object. 
+    *  @access public
+    *  @return bool
+    */
     public function belongs_to($field) {
         return ( in_array($field, $this->_belongs_to) );
     }
 
+   /**
+    *  Stores an object in the cache.  Only the object's
+    *  "columns" (i.e., protected properties that are not prefixed 
+    *  with an underscore) are serialized and stored.
+    *
+    *  @see /nx/lib/Meta::get_columns()
+    *  @access public
+    *  @return bool
+    */
     public function cache() {
         if ( $this->_no_cache ) {
             return false;
@@ -94,12 +109,32 @@ class Model extends Object {
         return $this->_cache->store($key, $data);
     }
 
+   /**
+    *  Deletes an object from both the cache and the database.
+    *       
+    *  @param string|array $where        The WHERE clause to be included in the DELETE query.
+    *  @access public
+    *  @return bool
+    */
     public function delete($where = null) {
         $key = get_class($this) . '_' . $this->get_pk();
-        $this->_cache->delete($key);
-        $this->_db->delete($this, $where);
+        if ( !$this->_cache->delete($key) ) {
+            // TODO: Throw exception!
+        }
+        if ( !$this->_db->delete($this, $where) ) {
+            // TODO: Throw exception!
+        }
+        return true;
     }
 
+   /**
+    *  Finds and returns an array of all the objects in the 
+    *  database that match the conditions provided in `$where`. 
+    *       
+    *  @param string|array $where        The WHERE clause of the SQL query.
+    *  @access public
+    *  @return array
+    */
     public function find_all($where = null, $obj = null) {
         if ( is_null($obj) ) {
             $obj = $this;
@@ -122,6 +157,14 @@ class Model extends Object {
         return new $field(array('id' => $obj_id)); 
     }
 
+   /**
+    *  Retrieves the "columns" (i.e., protected properties 
+    *  that are not prefixed with an underscore) belonging
+    *  to `$this`.
+    *
+    *  @access public
+    *  @return array
+    */
     public function get_columns() {
         return Meta::get_columns($this);
     }
@@ -162,32 +205,75 @@ class Model extends Object {
         return new $field(array('id' => $obj_id)); 
     }
 
+   /**
+    *  Returns the primary key associated with `$this`.
+    *       
+    *  @access public
+    *  @return int
+    */
     public function get_pk() {
         $id = PRIMARY_KEY;
         return $this->$id;
     }
 
+   /**
+    *  Retrieves the validators associated with a given property.
+    *
+    *  @param string $field        The object property.
+    *  @access protected
+    *  @return array
+    */
     protected function _get_validators($field) {
         return ( isset($this->_validators[$field]) ) ? $this->_validators[$field] : array();
     }
 
+   /**
+    *  Checks if `$this` has a "has and belongs to many" 
+    *  relationship with the object defined in `$field`.
+    *
+    *  @param string $field        The class name of the foreign object. 
+    *  @access public
+    *  @return bool
+    */
     public function habtm($field) {
         return ( in_array($field, $this->_has_and_belongs_to_many) );
     }
     
+   /**
+    *  Checks if `$this` has a "has many" relationship with the
+    *  object defined in `$field`.
+    *
+    *  @param string $field        The class name of the foreign object. 
+    *  @access public
+    *  @return bool
+    */
     public function has_many($field) {
         return ( in_array($field, $this->_has_many) );
     }
 
+   /**
+    *  Checks if `$this` has a "has one" relationship with the
+    *  object defined in `$field`.
+    *
+    *  @param string $field        The class name of the foreign object. 
+    *  @access public
+    *  @return bool
+    */
     public function has_one($field) {
         return ( in_array($field, $this->_has_one) );
     }
 
-    public function is_foreign($field) {
-        return ( $this->has_many($field) || $this->has_one($field) || 
-                 $this->habtm($field) || $this->belongs_to($field) );
-    }
-
+   /**
+    *  Checks that a specific object property is valid.  If no property
+    *  is supplied, then all of the object's "columns" (i.e., protected 
+    *  properties that are not prefixed with an underscore) will be validated.  
+    *  Corresponding errors are stored in $this->_validation_errors.
+    *       
+    *  @see /nx/lib/Validator
+    *  @param string|null $field        The object property to be validated.
+    *  @access public
+    *  @return bool
+    */
     public function is_valid($field = null) {
         if ( empty($this->_validators) ) {
             return true;
@@ -197,13 +283,21 @@ class Model extends Object {
             $this->_validation_errors = $this->_validate($field);
         } else {
             $this->_validation_errors = array();
-            foreach ( $this->get_columns() as $field ) {
+            foreach ( array_key_values($this->get_columns()) as $field ) {
                 $this->_validation_errors += $this->_validate($field); 
             }
         }
         return ( empty($this->_validation_errors) );
     }
 
+   /**
+    *  Retrieves an object from the cache.
+    *
+    *  @param object $obj        The object to be populated with the retrieved values.
+    *  @param int $id            The unique identifier of the object to be retrieved.
+    *  @access public
+    *  @return object
+    */
     public function pull_from_cache($obj, $id) {
         if ( $this->_no_cache ) {
             return false;
@@ -222,6 +316,13 @@ class Model extends Object {
         return $obj;
     }
 
+   /**
+    *  Sanitizes an object's properties in accordance with the sanitizers
+    *  defined in $this->_sanitzers.
+    *       
+    *  @access public
+    *  @return object
+    */
     public function sanitize() {
         foreach ( $this->_sanitizers as $property => $type ) {
             $this->$property = Data::sanitize($this->$property, $type);
@@ -229,6 +330,12 @@ class Model extends Object {
         return $this;
     }
 
+   /**
+    *  Stores an object in both the database and the cache.
+    *       
+    *  @access public
+    *  @return bool
+    */
     public function store() {
         if ( !$this->is_valid() ) {
             return false;
@@ -243,6 +350,15 @@ class Model extends Object {
         return true;
     }
 
+   /**
+    *  Validates a property of an object in accordance with the
+    *  validators defined in $this->_validators.  Returns an array
+    *  of error messages.
+    *       
+    *  @param string $field        The object property to be validated.
+    *  @access protected
+    *  @return array
+    */
     protected function _validate($field) {
         $errors = array();
         $validators = $this->_get_validators($field);

@@ -21,7 +21,8 @@ class Meta {
     }
 
    /** 
-    *  Returns all of the columns (protected properties that are not prefixed with an underscore) of a given object.
+    *  Returns all of the columns (protected properties that are 
+    *  not prefixed with an underscore) of a given object.
     *
     *  @param object $obj                 The object from which to retrieve the properties.
     *  @access public
