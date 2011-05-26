@@ -1,7 +1,21 @@
 <?php
 
+/**
+ * NX
+ *
+ * @author    Nick Sinopoli <NSinopoli@gmail.com>
+ * @copyright Copyright (c) 2011, Nick Sinopoli
+ * @license   http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace nx\lib;
 
+/*
+ *  The `Time` class contains methods that deal with
+ *  presentation of data involving time.
+ *
+ *  @package lib
+ */
 class Time {
 
    /**

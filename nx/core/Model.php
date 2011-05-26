@@ -27,6 +27,24 @@ class Model extends Object {
 
     protected $_no_cache = false;
 
+   /**
+    *  Initializes an object.  Takes three configuration options:
+    *  `id`      - The primary key of an existing object, used if you 
+    *              want to load an instance of an object with its 
+    *              properties from the cache/database.
+    *  `where`   - A WHERE clause to be used if the primary key of the
+    *              object desired is unknown.  Also used if you
+    *              want to load an instance of an object with its 
+    *              properties from the cache/database.
+    *  `classes` - Used to set custom cache or database classes. 
+    *              Defaults are defined in /nx/core/Model::$_classes.
+    *
+    *  @see /nx/core/Model->_init()
+    *  @see /nx/plugin/db/PDO_MySQL->_format_where()
+    *  @param array $config        The configuration options.
+    *  @access public
+    *  @return void
+    */
     public function __construct(array $config = array()) {
         $defaults = array(
             'id'      => null,
@@ -36,6 +54,16 @@ class Model extends Object {
         parent::__construct($config + $defaults);
     }
 
+   /**
+    *  Initializes an object.  Object properties are populated 
+    *  automatically - first by checking the cache, and then, if that
+    *  fails, by retrieving the values from the database.
+    *
+    *  @see /nx/core/Model->__construct()
+    *  @access protected
+    *  @return void
+    */
+    // TODO: Get the db/cache construction out of here!  Put it in a bootstrap!
     protected function _init() {
         parent::_init();
         $db = $this->_config['classes']['db'];
@@ -58,6 +86,20 @@ class Model extends Object {
         }
     }
 
+   /**
+    *  Returns an object's property.  If the property is bound to `$this`
+    *  via an object relationship, the appropriate object (or array of objects)
+    *  is returned.  If the property is an actual property belonging to `$this`,
+    *  it will be returned.
+    *
+    *  @see /nx/core/Model->_get_belongs_to()
+    *  @see /nx/core/Model->_get_has_many()
+    *  @see /nx/core/Model->_get_has_one()
+    *  @see /nx/core/Model->_get_habtm()
+    *  @param string $field        The property name.
+    *  @access public
+    *  @return mixed
+    */
     public function __get($field) {
         if ( $this->belongs_to($field) ) {
             return $this->_get_belongs_to($field);
@@ -72,6 +114,14 @@ class Model extends Object {
         return $this->$field;
     }
     
+   /**
+    *  Sets an object's property.
+    *
+    *  @param string $field        The property name.
+    *  @param mixed $value         The property value.
+    *  @access public
+    *  @return mixed
+    */
     public function __set($field, $value) {
         $this->$field = $value;
     }
@@ -150,6 +200,14 @@ class Model extends Object {
         return $collection;
     }
 
+   /**
+    *  Returns the object associated with `$this` via a
+    *  "belongs to" relationship.
+    *       
+    *  @param string $field        The object name.
+    *  @access protected
+    *  @return object
+    */
     protected function _get_belongs_to($field) {
         $lookup_id = $field . PK_SEPARATOR . PRIMARY_KEY;
         $obj_id = $this->$lookup_id;
@@ -169,6 +227,14 @@ class Model extends Object {
         return Meta::get_columns($this);
     }
 
+   /**
+    *  Returns an array of objects associated with `$this` via a
+    *  "has and belongs to many" relationship.
+    *       
+    *  @param string $field        The object name.
+    *  @access protected
+    *  @return array
+    */
     protected function _get_habtm($field) {
         $class_name = get_class($this);
         $table_name = ( $class_name < $field ) ? $class_name . HABTM_SEPARATOR . $field : $field . HABTM_SEPARATOR . $class_name;
@@ -188,6 +254,14 @@ class Model extends Object {
         return $collection;
     }
 
+   /**
+    *  Returns an array of objects associated with `$this` via a
+    *  "has many" relationship.
+    *       
+    *  @param string $field        The object name.
+    *  @access protected
+    *  @return array
+    */
     protected function _get_has_many($field) {
         $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
         $where = array($lookup_id => $this->get_pk());
@@ -195,6 +269,14 @@ class Model extends Object {
         return $this->find_all($where, $field);
     }
 
+   /**
+    *  Returns the object associated with `$this` via a
+    *  "has one" relationship.
+    *       
+    *  @param string $field        The object name.
+    *  @access protected
+    *  @return object
+    */
     protected function _get_has_one($field) {
         $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
         $where = array($lookup_id => $this->get_pk());

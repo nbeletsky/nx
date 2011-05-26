@@ -1,7 +1,21 @@
 <?php
 
+/**
+ * NX
+ *
+ * @author    Nick Sinopoli <NSinopoli@gmail.com>
+ * @copyright Copyright (c) 2011, Nick Sinopoli
+ * @license   http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace nx\plugin\cache;
 
+/*
+ *  The `MemcachedCache` class is used to facilitate storage
+ *  and retrieval of data from a Memcached server.
+ *
+ *  @package plugin
+ */
 class MemcachedCache extends \nx\core\Object {
 
    /**
@@ -143,7 +157,7 @@ class MemcachedCache extends \nx\core\Object {
     *  @access public
     *  @return bool 
     *
-    *  @see MemcachedCache->retrieve() for how to obtain the CAS token.
+    *  @see /nx/plugin/cache/MemcachedCache->retrieve() for how to obtain the CAS token.
     */
     public function cas($token, $key, $value, $server_key = '', $expiration = 0) {
         return $this->_cache->casByKey($token, $server_key, $key, $value, $expiration);
@@ -238,7 +252,7 @@ class MemcachedCache extends \nx\core\Object {
     *  @access public
     *  @return mixed 
     *
-    *  @see MemcachedCache->cas() for how to use CAS tokens.
+    *  @see /nx/plugin/cache/MemcachedCache->cas() for how to use CAS tokens.
     */
     public function retrieve($key, $server_key = '', $cache_callback = null, &$cas_token = null) {
         return $this->_cache->getByKey($server_key, $key, $cache_callback, $cas_token);

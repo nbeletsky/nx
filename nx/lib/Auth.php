@@ -1,7 +1,23 @@
 <?php
 
+/**
+ * NX
+ *
+ * @author    Nick Sinopoli <NSinopoli@gmail.com>
+ * @copyright Copyright (c) 2011, Nick Sinopoli
+ * @license   http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace nx\lib;
 
+/*
+ *  The `Auth` class is used to create and validate
+ *  form tokens.  These tokens help to ensure that 
+ *  any remote data sent to the server comes from the 
+ *  actual sender, and not via a CSRF.
+ *
+ *  @package lib
+ */
 class Auth {
 
    /**

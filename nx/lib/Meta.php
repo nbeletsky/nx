@@ -1,7 +1,21 @@
 <?php
 
+/**
+ * NX
+ *
+ * @author    Nick Sinopoli <NSinopoli@gmail.com>
+ * @copyright Copyright (c) 2011, Nick Sinopoli
+ * @license   http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace nx\lib;
 
+/*
+ *  The `Meta` class is used to return information
+ *  about objects by way of reflection.
+ *
+ *  @package lib
+ */
 class Meta {
 
    /** 

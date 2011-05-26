@@ -1,7 +1,21 @@
 <?php
 
+/**
+ * NX
+ *
+ * @author    Nick Sinopoli <NSinopoli@gmail.com>
+ * @copyright Copyright (c) 2011, Nick Sinopoli
+ * @license   http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace nx\plugin\db;
 
+/*
+ *  The `PDO_MySQL` class is used to connect to a MySQL database
+ *  via the PDO interface.
+ *
+ *  @package plugin
+ */
 class PDO_MySQL extends \nx\core\Object {
 
    /**
@@ -33,9 +47,9 @@ class PDO_MySQL extends \nx\core\Object {
     *
     *  @param array $config                     The configuration settings, which can take four options:
     *                                           `database` - The name of the database.
-    *                                           `host` - The database host.
-    *                                           `username` -  The database username.
-    *                                           `password` -  The database password.
+    *                                           `host`     - The database host.
+    *                                           `username` - The database username.
+    *                                           `password` - The database password.
     *                                           (By default, instances are destroyed at the end of the request.)
     *  @access public
     *  @return void
@@ -57,23 +71,25 @@ class PDO_MySQL extends \nx\core\Object {
     *  @return void
     */
     protected function _init() {
-        $this->connect($this->_config['database'], $this->_config['host'], $this->_config['username'], $this->_config['password']);
+        $this->connect($this->_config);
     }
 
    /**
     *  Connects and selects database.
     *
-    *  @param string $database     The name of the database.
-    *  @param string $host         The database host.
-    *  @param string $username     The database username.
-    *  @param string $password     The database password.
+    *  @param array $options       Contains the connection information.  
+    *                              Takes the following options:
+    *  `database` - The name of the database.
+    *  `host`     - The database host.
+    *  `username` - The database username.
+    *  `password` - The database password.
     *  @access public
     *  @return bool
     */
-    public function connect($database, $host, $username, $password) {
-        $dsn = 'mysql:host=' . $host . ';dbname=' . $database; 
+    public function connect($options) {
+        $dsn = 'mysql:host=' . $options['host'] . ';dbname=' . $options['database']; 
         try {
-            $this->_dbh = new \PDO($dsn, $username, $password);
+            $this->_dbh = new \PDO($dsn, $options['username'], $options['password']);
             $this->_dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             return true;
         } catch ( PDOException $e ) {
@@ -106,7 +122,7 @@ class PDO_MySQL extends \nx\core\Object {
    /**
     *  Deletes an object from the database.
     *
-    *  @see PDO_MySQL->_format_where()
+    *  @see /nx/plugin/db/PDO_MySQL->_format_where()
     *  @param obj $obj                   The object to be deleted.
     *  @param string|array $where        The WHERE clause to be included in the DELETE query.
     *  @access public
@@ -174,9 +190,9 @@ class PDO_MySQL extends \nx\core\Object {
    /**
     *  Performs a `SELECT FROM` query.
     *
-    *  @see PDO_MySQL->query()
-    *  @see PDO_MySQL->fetch() 
-    *  @see PDO_MySQL->_format_where()
+    *  @see /nx/plugin/db/PDO_MySQL->query()
+    *  @see /nx/plugin/db/PDO_MySQL->fetch() 
+    *  @see /nx/plugin/db/PDO_MySQL->_format_where()
     *  @param string|array $fields       The fields to be retrieved.
     *  @param string|obj $table          The table to SELECT from.
     *  @param string|array $where        The WHERE clause of the SQL query.
@@ -208,8 +224,8 @@ class PDO_MySQL extends \nx\core\Object {
     *  Retrieves the primary key of all objects that match the criteria
     *  supplied in `$where`.
     *
-    *  @see PDO_MySQL->find() 
-    *  @see PDO_MySQL->_format_where()
+    *  @see /nx/plugin/db/PDO_MySQL->find() 
+    *  @see /nx/plugin/db/PDO_MySQL->_format_where()
     *  @param string|array $obj         The objects to find.
     *  @param string|array $where       The WHERE clause of the SQL query.
     *  @access public
@@ -231,8 +247,8 @@ class PDO_MySQL extends \nx\core\Object {
     *  Retrieves the primary key of the object matched by the criteria
     *  supplied in `$where`.
     *
-    *  @see PDO_MySQL->find() 
-    *  @see PDO_MySQL->_format_where()
+    *  @see /nx/plugin/db/PDO_MySQL->find() 
+    *  @see /nx/plugin/db/PDO_MySQL->_format_where()
     *  @param string|array $obj         The object to find.
     *  @param string|array $where       The WHERE clause of the SQL query.
     *  @access public

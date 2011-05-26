@@ -1,9 +1,24 @@
 <?php
 
+/**
+ * NX
+ *
+ * @author    Nick Sinopoli <NSinopoli@gmail.com>
+ * @copyright Copyright (c) 2011, Nick Sinopoli
+ * @license   http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace nx\lib;
 
 use nx\lib\File;
 
+/*
+ *  The `Dispatcher` class is used to handle url routing and
+ *  page rendering.
+ *
+ *
+ *  @package lib
+ */
 class Dispatcher {
 
    /**
