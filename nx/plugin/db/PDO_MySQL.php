@@ -419,6 +419,7 @@ class PDO_MySQL extends \nx\core\Object {
             $statement->execute();
     	} catch ( \PDOException $e ) {
             // TODO: How to handle error reporting?
+            die($e->getMessage() . $sql . var_dump($properties) . var_dump($e->getTrace()));
             $this->_affected_rows = 0;
             return false;
         }
