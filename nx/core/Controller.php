@@ -127,7 +127,8 @@ class Controller extends Object {
             return true;
         }
 
-        $view_file = ROOT_DIR . '/app/view/' . $this->_template . '/' . lcfirst($this->classname()) . '/' . $method . VIEW_EXTENSION;
+        // TODO: This whole controller/view handoff sucks.
+        $view_file = NX_ROOT . '/app/view/' . $this->_template . '/' . lcfirst($this->classname()) . '/' . $method . '.html';
         if ( !file_exists($view_file) ) {
             return false;
         }

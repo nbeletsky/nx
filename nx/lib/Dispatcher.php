@@ -29,7 +29,8 @@ class Dispatcher {
     *  @return bool
     */
     public static function is_whitelisted($controller) {
-        $whitelist = File::get_filenames_within(ROOT_DIR . '/app/controller');
+        // TODO: Fix this, get rid of the NX_ROOT constant
+        $whitelist = File::get_filenames_within(NX_ROOT . '/app/controller');
         $strip_ext = create_function('$val', 'return basename($val, ".php");');
         $whitelist = array_map($strip_ext, $whitelist);
         return in_array($controller, $whitelist);
@@ -110,7 +111,7 @@ class Dispatcher {
     *  @return void
     */
     public static function throw_404($template) {
-        $view_file = '../view/' . $template . '/404' . VIEW_EXTENSION;
+        $view_file = '../view/' . $template . '/404.html';
         if ( file_exists($view_file) ) {
             include $view_file;
         }

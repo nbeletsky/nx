@@ -2,14 +2,14 @@
 
 namespace nx\test\plugin;
 
-use nx\plugin\cache\MemcachedCache;
+use nx\plugin\cache\Memcached;
 
-class MemcachedCacheTest extends \PHPUnit_Framework_TestCase {    
+class MemcachedTest extends \PHPUnit_Framework_TestCase {    
 
     protected $_cache;
 
     public function setUp() {
-        $this->_cache = new MemcachedCache();
+        $this->_cache = new Memcached();
         $this->_cache->add_server(MEMCACHED_HOST);
         $this->_cache->flush();
     }

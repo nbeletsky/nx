@@ -11,12 +11,12 @@
 namespace nx\plugin\cache;
 
 /*
- *  The `MemcachedCache` class is used to facilitate storage
+ *  The `Memcached` class is used to facilitate storage
  *  and retrieval of data from a Memcached server.
  *
  *  @package plugin
  */
-class MemcachedCache extends \nx\core\Object {
+class Memcached extends \nx\core\Object {
 
    /**
     *  The Memcached object. 
@@ -38,7 +38,7 @@ class MemcachedCache extends \nx\core\Object {
     */
     public function __construct(array $config = array()) {
         $defaults = array(
-            'host'          => MEMCACHED_HOST,
+            'host'          => 'localhost',
             'persistent_id' => ''
         );
         parent::__construct($config + $defaults);
@@ -157,7 +157,7 @@ class MemcachedCache extends \nx\core\Object {
     *  @access public
     *  @return bool 
     *
-    *  @see /nx/plugin/cache/MemcachedCache->retrieve() for how to obtain the CAS token.
+    *  @see /nx/plugin/cache/Memcached->retrieve() for how to obtain the CAS token.
     */
     public function cas($token, $key, $value, $server_key = '', $expiration = 0) {
         return $this->_cache->casByKey($token, $server_key, $key, $value, $expiration);
@@ -252,7 +252,7 @@ class MemcachedCache extends \nx\core\Object {
     *  @access public
     *  @return mixed 
     *
-    *  @see /nx/plugin/cache/MemcachedCache->cas() for how to use CAS tokens.
+    *  @see /nx/plugin/cache/Memcached->cas() for how to use CAS tokens.
     */
     public function retrieve($key, $server_key = '', $cache_callback = null, &$cas_token = null) {
         return $this->_cache->getByKey($server_key, $key, $cache_callback, $cas_token);

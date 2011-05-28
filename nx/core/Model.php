@@ -2,16 +2,12 @@
 
 namespace nx\core;
 
+use nx\lib\Connections;
 use nx\lib\Data;
 use nx\lib\Meta;
 use nx\lib\Validator;
 
 class Model extends Object {
-
-    protected $_classes = array(
-        'db'    => 'nx\plugin\db\PDO_MySQL',
-        'cache' => 'nx\plugin\cache\MemcachedCache'
-    );
 
     protected $_db;
     protected $_cache;
@@ -27,8 +23,14 @@ class Model extends Object {
 
     protected $_no_cache = false;
 
+    protected $_meta = array(
+        'key'             => 'id',
+        'pk_separator'    => '_',
+        'habtm_separator' => '__'
+    );
+
    /**
-    *  Initializes an object.  Takes three configuration options:
+    *  Initializes an object.  Takes the following configuration options:
     *  `id`      - The primary key of an existing object, used if you 
     *              want to load an instance of an object with its 
     *              properties from the cache/database.
@@ -36,8 +38,8 @@ class Model extends Object {
     *              object desired is unknown.  Also used if you
     *              want to load an instance of an object with its 
     *              properties from the cache/database.
-    *  `classes` - Used to set custom cache or database classes. 
-    *              Defaults are defined in /nx/core/Model::$_classes.
+    *  `db`      - The name of the db connection to use as defined in app/config/bootstrap/db.php.
+    *  `cache`   - The name of the cache connection to use as defined in app/config/bootstrap/cache.php.
     *
     *  @see /nx/core/Model->_init()
     *  @see /nx/plugin/db/PDO_MySQL->_format_where()
@@ -49,7 +51,8 @@ class Model extends Object {
         $defaults = array(
             'id'      => null,
             'where'   => null,
-            'classes' => $this->_classes
+            'db'      => 'default',
+            'cache'   => 'default'
         );
         parent::__construct($config + $defaults);
     }
@@ -63,13 +66,10 @@ class Model extends Object {
     *  @access protected
     *  @return void
     */
-    // TODO: Get the db/cache construction out of here!  Put it in a bootstrap!
     protected function _init() {
         parent::_init();
-        $db = $this->_config['classes']['db'];
-        $this->_db = new $db(); 
-        $cache = $this->_config['classes']['cache'];
-        $this->_cache = new $cache(); 
+        $this->_db = Connections::get_db($this->_config['db']);
+        $this->_cache = Connections::get_cache($this->_config['cache']);
         
         if ( isset($this->_config['where']) ) {
             $result = $this->_db->find_object($this, $this->_config['where']); 

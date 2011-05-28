@@ -1,11 +1,10 @@
 <?php
 
-// Default root directory is two directories above where this config file is stored
-define('ROOT_DIR', realpath(__DIR__ . '/../..')); 
+define('NX_ROOT', dirname(dirname(dirname(__DIR__)))); 
 
 set_include_path(
     get_include_path() . PATH_SEPARATOR .
-    ROOT_DIR . PATH_SEPARATOR 
+    NX_ROOT . PATH_SEPARATOR 
 );
 
 function file_exists_in_include_path($file) {
@@ -36,11 +35,5 @@ function autoload($class) {
 }
 
 spl_autoload_register('autoload');
-
-define('PRIMARY_KEY', 'id');
-define('PK_SEPARATOR', '_');
-define('HABTM_SEPARATOR', '__');
-
-require 'config.application.php';
 
 ?>

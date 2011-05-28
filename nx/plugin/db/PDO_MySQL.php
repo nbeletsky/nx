@@ -56,10 +56,10 @@ class PDO_MySQL extends \nx\core\Object {
     */
     public function __construct(array $config = array()) {
         $defaults = array(
-            'database' => DATABASE_NAME,
-            'host'     => DATABASE_HOST, 
-            'username' => DATABASE_USER,
-            'password' => DATABASE_PASS
+            'database' => 'journal',
+            'host'     => 'localhost', 
+            'username' => 'root',
+            'password' => 'admin'
         );
         parent::__construct($config + $defaults);
     }
