@@ -72,7 +72,8 @@ class Model extends Object {
         $this->_cache = Connections::get_cache($this->_config['cache']);
         
         if ( isset($this->_config['where']) ) {
-            $result = $this->_db->find_object($this, $this->_config['where']); 
+            $this->_db->find('`' . PRIMARY_KEY . '`', $this, $this->_config['where'], 'LIMIT 1');
+            $result = $this->_db->fetch('assoc');
             if ( $result ) {
                 $this->_config['id'] = $result[PRIMARY_KEY];
             }
@@ -80,7 +81,10 @@ class Model extends Object {
 
         if ( is_numeric($this->_config['id']) ) {
             if ( !$this->pull_from_cache($this, $this->_config['id']) ) {
-                $this->_db->load_object($this, $this->_config['id']);
+                $where = array(PRIMARY_KEY => $this->_config['id']);
+                $this->_db->find('*', $this, $where);
+                $this->_db->fetch('into', $this);
+
                 $this->cache();
             }
         }
@@ -171,6 +175,12 @@ class Model extends Object {
         if ( !$this->_cache->delete($key) ) {
             // TODO: Throw exception!
         }
+
+        if ( is_null($where) ) {
+            // TODO: Throw exception if id is null?
+            $where = array(PRIMARY_KEY => $obj->get_pk());
+        }
+
         if ( !$this->_db->delete($this, $where) ) {
             // TODO: Throw exception!
         }
@@ -190,12 +200,14 @@ class Model extends Object {
             $obj = $this;
         }
 
-        $all_obj_ids = $obj->_db->find_all_objects($obj, $where);
+        $this->_db->find('`' . PRIMARY_KEY . '`', $obj, $where);
+        $rows = $this->_db->fetch_all('assoc');
 
         $collection = array();
         $obj_name = get_class($obj);
-        foreach ( $all_obj_ids as $obj_id ) {
-            $collection[$obj_id] = new $obj_name(array('id' => $obj_id));
+        foreach ( $rows as $row ) {
+            $new_id = $row[PRIMARY_KEY];
+            $collection[$new_id] = new $obj_name(array('id' => $new_id));
         }
         return $collection;
     }
@@ -281,7 +293,9 @@ class Model extends Object {
         $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
         $where = array($lookup_id => $this->get_pk());
 
-        $result = $this->_db->find_object($field, $where);
+
+        $this->_db->find('`' . PRIMARY_KEY . '`', $field, $where, 'LIMIT 1');
+        $result = $this->_db->fetch('assoc');
         $obj_id = $result[PRIMARY_KEY];
 
         return new $field(array('id' => $obj_id)); 

@@ -128,12 +128,13 @@ class PDO_MySQL extends \nx\core\Object {
     *  @access public
     *  @return bool       
     */
-    public function delete($obj, $where = null) {
-        $sql = 'DELETE FROM `' . $obj->classname() . '`';
+    public function delete($obj, $where) {
         if ( is_null($where) ) {
-            // TODO: Throw exception if id is null?
-            $where = array(PRIMARY_KEY => $obj->get_pk());
+            // TODO: Throw exception!
+            return false;
         }
+
+        $sql = 'DELETE FROM `' . $obj->classname() . '`';
 
         $sql .= $this->_format_where($where);
 
@@ -218,45 +219,6 @@ class PDO_MySQL extends \nx\core\Object {
             $sql .= ' ' . $additional;
         }
         $this->query($sql, $where); 
-    }
-
-   /**
-    *  Retrieves the primary key of all objects that match the criteria
-    *  supplied in `$where`.
-    *
-    *  @see /nx/plugin/db/PDO_MySQL->find() 
-    *  @see /nx/plugin/db/PDO_MySQL->_format_where()
-    *  @param string|array $obj         The objects to find.
-    *  @param string|array $where       The WHERE clause of the SQL query.
-    *  @access public
-    *  @return array
-    */
-    public function find_all_objects($obj, $where = null) {
-        $results = array();
-
-        $this->find('`' . PRIMARY_KEY . '`', $obj, $where);
-        $this->_set_fetch_mode('assoc');
-        while ( $row = $this->_statement->fetch() ) {
-            $results[] = $row[PRIMARY_KEY];
-        }
-        $this->_statement->closeCursor();
-        return $results;
-    }
-
-   /**
-    *  Retrieves the primary key of the object matched by the criteria
-    *  supplied in `$where`.
-    *
-    *  @see /nx/plugin/db/PDO_MySQL->find() 
-    *  @see /nx/plugin/db/PDO_MySQL->_format_where()
-    *  @param string|array $obj         The object to find.
-    *  @param string|array $where       The WHERE clause of the SQL query.
-    *  @access public
-    *  @return array
-    */
-    public function find_object($obj, $where = null) {
-        $this->find('`' . PRIMARY_KEY . '`', $obj, $where, 'LIMIT 1');
-        return $this->fetch('assoc');
     }
 
    /**
@@ -371,20 +333,6 @@ class PDO_MySQL extends \nx\core\Object {
     */
     public function insert_id() {
         return $this->_dbh->lastInsertId();
-    }
-
-   /**
-    *  Loads the supplied object with its values in the database.
-    *
-    *  @param obj $obj           The object to be loaded.
-    *  @param int $id            The primary key of the object.
-    *  @access public
-    *  @return obj       
-    */
-    public function load_object($obj, $id) {
-        $where = array(PRIMARY_KEY => $id);
-        $this->find('*', $obj, $where);
-        return $this->fetch('into', $obj);
     }
 
    /**
