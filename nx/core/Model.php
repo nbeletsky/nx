@@ -72,16 +72,16 @@ class Model extends Object {
         $this->_cache = Connections::get_cache($this->_config['cache']);
         
         if ( isset($this->_config['where']) ) {
-            $this->_db->find('`' . PRIMARY_KEY . '`', $this->classname(), $this->_config['where'], 'LIMIT 1');
+            $this->_db->find('`' . $this->_meta['key'] . '`', $this->classname(), $this->_config['where'], 'LIMIT 1');
             $result = $this->_db->fetch('assoc');
             if ( $result ) {
-                $this->_config['id'] = $result[PRIMARY_KEY];
+                $this->_config['id'] = $result[$this->_meta['key']];
             }
         }
 
         if ( is_numeric($this->_config['id']) ) {
             if ( !$this->pull_from_cache($this, $this->_config['id']) ) {
-                $where = array(PRIMARY_KEY => $this->_config['id']);
+                $where = array($this->_meta['key'] => $this->_config['id']);
                 $this->_db->find('*', $this->classname(), $where);
                 $this->_db->fetch('into', $this);
 
@@ -178,7 +178,7 @@ class Model extends Object {
 
         if ( is_null($where) ) {
             // TODO: Throw exception if id is null?
-            $where = array(PRIMARY_KEY => $obj->get_pk());
+            $where = array($this->_meta['key'] => $obj->get_pk());
         }
 
         if ( !$this->_db->delete($this->classname(), $where) ) {
@@ -196,13 +196,13 @@ class Model extends Object {
     *  @return array
     */
     public function find_all($where = null) {
-        $this->_db->find('`' . PRIMARY_KEY . '`', $this->classname(), $where);
+        $this->_db->find('`' . $this->_meta['key'] . '`', $this->classname(), $where);
         $rows = $this->_db->fetch_all('assoc');
 
         $collection = array();
         $obj_name = get_class($this);
         foreach ( $rows as $row ) {
-            $new_id = $row[PRIMARY_KEY];
+            $new_id = $row[$this->_meta['key']];
             $collection[$new_id] = new $obj_name(array('id' => $new_id));
         }
         return $collection;
@@ -217,7 +217,7 @@ class Model extends Object {
     *  @return object
     */
     protected function _get_belongs_to($field) {
-        $lookup_id = $field . PK_SEPARATOR . PRIMARY_KEY;
+        $lookup_id = $field . $this->_meta['pk_separator'] . $this->_meta['key'];
         $obj_id = $this->$lookup_id;
 
         return new $field(array('id' => $obj_id)); 
@@ -245,12 +245,16 @@ class Model extends Object {
     */
     protected function _get_habtm($field) {
         $class_name = get_class($this);
-        $table_name = ( $class_name < $field ) ? $class_name . HABTM_SEPARATOR . $field : $field . HABTM_SEPARATOR . $class_name;
+        if ( $class_name < $field ) { 
+            $table_name = $class_name . $this->_meta['habtm_separator'] . $field; 
+        } else {
+            $table_name = $field . $this->_meta['habtm_separator'] . $class_name;
+        }
 
-        $lookup_id = $class_name . PK_SEPARATOR . PRIMARY_KEY;
+        $lookup_id = $class_name . $this->_meta['pk_separator'] . $this->_meta['key'];
         $where = array($lookup_id => $this->get_pk());
 
-        $target_id = $field . PK_SEPARATOR . PRIMARY_KEY;
+        $target_id = $field . $this->_meta['pk_separator'] . $this->_meta['key'];
         $this->_db->find('`' . $target_id . '`', $table_name, $where);
 
         $rows = $this->_db->fetch_all('assoc');
@@ -271,7 +275,7 @@ class Model extends Object {
     *  @return array
     */
     protected function _get_has_many($field) {
-        $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
+        $lookup_id = get_class($this) . $this->_meta['pk_separator'] . $this->_meta['key'];
         $where = array($lookup_id => $this->get_pk());
 
         return $this->find_all($where, $field);
@@ -286,13 +290,13 @@ class Model extends Object {
     *  @return object
     */
     protected function _get_has_one($field) {
-        $lookup_id = get_class($this) . PK_SEPARATOR . PRIMARY_KEY;
+        $lookup_id = get_class($this) . $this->_meta['pk_separator'] . $this->_meta['key'];
         $where = array($lookup_id => $this->get_pk());
 
 
-        $this->_db->find('`' . PRIMARY_KEY . '`', $field, $where, 'LIMIT 1');
+        $this->_db->find('`' . $this->_meta['key'] . '`', $field, $where, 'LIMIT 1');
         $result = $this->_db->fetch('assoc');
-        $obj_id = $result[PRIMARY_KEY];
+        $obj_id = $result[$this->_meta['key']];
 
         return new $field(array('id' => $obj_id)); 
     }
@@ -304,7 +308,7 @@ class Model extends Object {
     *  @return int
     */
     public function get_pk() {
-        $id = PRIMARY_KEY;
+        $id = $this->_meta['key'];
         return $this->$id;
     }
 
@@ -434,7 +438,7 @@ class Model extends Object {
         }
         $this->_db->upsert($this->classname(), $this->get_columns());
         // TODO: Check that caching works with UPDATEd objects!
-        $id = PRIMARY_KEY;
+        $id = $this->_meta['key'];
         if ( !$this->$id ) {
             $this->$id = $this->_db->insert_id();
         }

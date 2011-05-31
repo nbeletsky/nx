@@ -98,7 +98,7 @@ class Session extends ApplicationModel {
     *  @return bool
     */
     public function destroy($session_id) {
-        $where = array(PRIMARY_KEY => $session_id);
+        $where = array($this->_meta['key'] => $session_id);
         $this->delete($where);
         return true;
     } 
@@ -220,8 +220,8 @@ class Session extends ApplicationModel {
     *  @return string
     */
     public function read($session_id) {
-        $where = array(PRIMARY_KEY => $session_id);
-        $this->_db->find('`data`', $this, $where);
+        $where = array($this->_meta['key'] => $session_id);
+        $this->_db->find('`data`', $this->classname(), $where);
 
         $data = $this->_db->fetch_column();
         return $data;
@@ -249,7 +249,7 @@ class Session extends ApplicationModel {
     *  @return bool
     */
     public function write($session_id, $data) {
-        $id = PRIMARY_KEY;
+        $id = $this->_meta['key'];
         $this->$id = $session_id;
         $this->data = $data;
 

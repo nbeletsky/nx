@@ -1,10 +1,5 @@
 <?php
 
-// TODO: Remove these!
-define('PRIMARY_KEY', 'id');
-define('PK_SEPARATOR', '_');
-define('HABTM_SEPARATOR', '__');
-
 // TODO: Move to a libraries class!
 define('CONTROLLER_LOCATION', 'app\controller\\');
 
