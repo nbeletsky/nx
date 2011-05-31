@@ -72,7 +72,7 @@ class Model extends Object {
         $this->_cache = Connections::get_cache($this->_config['cache']);
         
         if ( isset($this->_config['where']) ) {
-            $this->_db->find('`' . PRIMARY_KEY . '`', $this, $this->_config['where'], 'LIMIT 1');
+            $this->_db->find('`' . PRIMARY_KEY . '`', $this->classname(), $this->_config['where'], 'LIMIT 1');
             $result = $this->_db->fetch('assoc');
             if ( $result ) {
                 $this->_config['id'] = $result[PRIMARY_KEY];
@@ -82,7 +82,7 @@ class Model extends Object {
         if ( is_numeric($this->_config['id']) ) {
             if ( !$this->pull_from_cache($this, $this->_config['id']) ) {
                 $where = array(PRIMARY_KEY => $this->_config['id']);
-                $this->_db->find('*', $this, $where);
+                $this->_db->find('*', $this->classname(), $where);
                 $this->_db->fetch('into', $this);
 
                 $this->cache();
@@ -181,7 +181,7 @@ class Model extends Object {
             $where = array(PRIMARY_KEY => $obj->get_pk());
         }
 
-        if ( !$this->_db->delete($this, $where) ) {
+        if ( !$this->_db->delete($this->classname(), $where) ) {
             // TODO: Throw exception!
         }
         return true;
@@ -195,16 +195,12 @@ class Model extends Object {
     *  @access public
     *  @return array
     */
-    public function find_all($where = null, $obj = null) {
-        if ( is_null($obj) ) {
-            $obj = $this;
-        }
-
-        $this->_db->find('`' . PRIMARY_KEY . '`', $obj, $where);
+    public function find_all($where = null) {
+        $this->_db->find('`' . PRIMARY_KEY . '`', $this->classname(), $where);
         $rows = $this->_db->fetch_all('assoc');
 
         $collection = array();
-        $obj_name = get_class($obj);
+        $obj_name = get_class($this);
         foreach ( $rows as $row ) {
             $new_id = $row[PRIMARY_KEY];
             $collection[$new_id] = new $obj_name(array('id' => $new_id));
@@ -436,7 +432,7 @@ class Model extends Object {
         if ( !$this->is_valid() ) {
             return false;
         }
-        $this->_db->upsert($this);
+        $this->_db->upsert($this->classname(), $this->get_columns());
         // TODO: Check that caching works with UPDATEd objects!
         $id = PRIMARY_KEY;
         if ( !$this->$id ) {

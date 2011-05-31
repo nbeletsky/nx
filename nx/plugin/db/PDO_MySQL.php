@@ -79,10 +79,10 @@ class PDO_MySQL extends \nx\core\Object {
     *
     *  @param array $options       Contains the connection information.  
     *                              Takes the following options:
-    *  `database` - The name of the database.
-    *  `host`     - The database host.
-    *  `username` - The database username.
-    *  `password` - The database password.
+    *                              `database` - The name of the database.
+    *                              `host`     - The database host.
+    *                              `username` - The database username.
+    *                              `password` - The database password.
     *  @access public
     *  @return bool
     */
@@ -120,21 +120,21 @@ class PDO_MySQL extends \nx\core\Object {
     }
     
    /**
-    *  Deletes an object from the database.
+    *  Deletes a record from the database.
     *
     *  @see /nx/plugin/db/PDO_MySQL->_format_where()
-    *  @param obj $obj                   The object to be deleted.
+    *  @param string $table              The table containing the record to be deleted.
     *  @param string|array $where        The WHERE clause to be included in the DELETE query.
     *  @access public
     *  @return bool       
     */
-    public function delete($obj, $where) {
+    public function delete($table, $where) {
         if ( is_null($where) ) {
             // TODO: Throw exception!
             return false;
         }
 
-        $sql = 'DELETE FROM `' . $obj->classname() . '`';
+        $sql = 'DELETE FROM `' . $table . '`';
 
         $sql .= $this->_format_where($where);
 
@@ -195,7 +195,7 @@ class PDO_MySQL extends \nx\core\Object {
     *  @see /nx/plugin/db/PDO_MySQL->fetch() 
     *  @see /nx/plugin/db/PDO_MySQL->_format_where()
     *  @param string|array $fields       The fields to be retrieved.
-    *  @param string|obj $table          The table to SELECT from.
+    *  @param string $table              The table to SELECT from.
     *  @param string|array $where        The WHERE clause of the SQL query.
     *  @param string $additional         Any additional SQL to be added at the end of the query.
     *  @access public
@@ -207,10 +207,6 @@ class PDO_MySQL extends \nx\core\Object {
             $sql .= '`' . implode('`, `', $fields) . '`';
         } else {
             $sql .= $fields;
-        }
-
-        if ( is_object($table) ) {
-            $table = $table->classname();
         }
 
         $sql .= ' FROM `' . $table . '`';
@@ -243,6 +239,7 @@ class PDO_MySQL extends \nx\core\Object {
     *  @access protected
     *  @return string
     */
+    // TODO: Please fix this
     protected function _format_where($where = null) {
         $sql = '';
 
@@ -294,30 +291,31 @@ class PDO_MySQL extends \nx\core\Object {
     }
 
    /**
-    *  Inserts an object into the database. 
+    *  Inserts a record into the database. 
     *
-    *  @param obj $obj        The object to be inserted. 
+    *  @param string $table   The table containing the record to be inserted.
+    *  @param array $data     An array containing the data to be inserted. Format
+    *                         should be as follows:
+    *                         array('column_name' => 'column_value');
     *  @access public
     *  @return bool
     */
-    public function insert($obj) {
-        $properties = $obj->get_columns();
-
-        $sql = 'INSERT INTO `' . $obj->classname() . '` ';
+    public function insert($table, $data) {
+        $sql = 'INSERT INTO `' . $table . '` ';
         
-        $property_names = array_keys($properties);
-    	$fields = '`' . implode('`, `', $property_names) . '`';
-        $values = ':' . implode(', :', $property_names);
+        $key_names = array_keys($data);
+    	$fields = '`' . implode('`, `', $key_names) . '`';
+        $values = ':' . implode(', :', $key_names);
     
     	$sql .= '(' . $fields . ') VALUES (' . $values . ')';
 
     	$statement = $this->_dbh->prepare($sql);
 
         try {
-            $statement->execute($properties);
+            $statement->execute($data);
     	} catch ( \PDOException $e ) {
             // TODO: How to handle error reporting?
-            die($e->getMessage() . $sql . var_dump($properties) . var_dump($e->getTrace()));
+            die($e->getMessage() . $sql . var_dump($data) . var_dump($e->getTrace()));
             return false;
         }
 
@@ -367,7 +365,7 @@ class PDO_MySQL extends \nx\core\Object {
             $statement->execute();
     	} catch ( \PDOException $e ) {
             // TODO: How to handle error reporting?
-            die($e->getMessage() . $sql . var_dump($properties) . var_dump($e->getTrace()));
+            die($e->getMessage() . $sql . var_dump($parameters) . var_dump($e->getTrace()));
             $this->_affected_rows = 0;
             return false;
         }
@@ -424,20 +422,22 @@ class PDO_MySQL extends \nx\core\Object {
     }
 
    /**
-    *  Updates an object in the database.
+    *  Updates a record in the database.
     *
-    *  @param obj $obj              The object to be updated.
+    *  @see /nx/plugin/db/PDO_MySQL->_format_where()
+    *  @param string $table         The table containing the record to be inserted.
+    *  @param array $data           An array containing the data to be inserted. Format
+    *                               should be as follows:
+    *                               array('column_name' => 'column_value');
     *  @param array $where          The WHERE clause of the SQL query.
     *  @access public
     *  @return bool 
     */
-    public function update($obj, $where = null) {
-        $properties = $obj->get_columns();
+    public function update($table, $data, $where = null) {
+        $sql = 'UPDATE `' . $table . '` SET ';
 
-        $sql = 'UPDATE `' . $obj->classname() . '` SET ';
-
-        $property_names = array_keys($properties);
-    	foreach ( $property_names as $name ) {
+        $key_names = array_keys($data);
+    	foreach ( $key_names as $name ) {
             $sql .= '`' . $name . '`=:' . $name . ', ';
     	}
 
@@ -447,16 +447,16 @@ class PDO_MySQL extends \nx\core\Object {
     	    $sql .= ' WHERE ';
             foreach ( $where as $name => $val ) {
                 $sql .= '`' . $name . '`=:' . $name . '_where, ';
-                $properties[$name . '_where'] = $val;
+                $data[$name . '_where'] = $val;
             }
         }
     	$statement = $this->_dbh->prepare($sql);
 
         try {
-            $statement->execute($properties);
+            $statement->execute($data);
     	} catch ( \PDOException $e ) {
             // TODO: How to handle error reporting?
-            die($e->getMessage() . $sql . var_dump($properties) . var_dump($e->getTrace()));
+            die($e->getMessage() . $sql . var_dump($data) . var_dump($e->getTrace()));
             return false;
         }
     
@@ -465,25 +465,26 @@ class PDO_MySQL extends \nx\core\Object {
     }
 
    /**
-    *  Inserts or updates (if exists) an object in the database.
+    *  Inserts or updates (if exists) a record in the database.
     *
-    *  @param obj $obj                The object to be upserted.
+    *  @param string $table           The table containing the record to be inserted.
+    *  @param array $data             An array containing the data to be inserted. Format
+    *                                 should be as follows:
+    *                                 array('column_name' => 'column_value');
     *  @access public
     *  @return bool 
     */
-    public function upsert($obj) {
-        $properties = $obj->get_columns();
+    public function upsert($table, $data) {
+        $sql = 'INSERT INTO `' . $table . '` ';
 
-        $sql = 'INSERT INTO `' . $obj->classname() . '` ';
-
-        $property_names = array_keys($properties);
-    	$fields = '`' . implode('`, `', $property_names) . '`';
-        $values = ':' . implode(', :', $property_names);
+        $key_names = array_keys($data);
+    	$fields = '`' . implode('`, `', $key_names) . '`';
+        $values = ':' . implode(', :', $key_names);
 
     
         $sql .= '(' . $fields . ') VALUES (' . $values . ') ON DUPLICATE KEY UPDATE ';
 
-    	foreach ( $property_names as $name ) {
+    	foreach ( $key_names as $name ) {
             $sql .= '`' . $name . '`=:' . $name . ', ';
     	}
 
@@ -491,10 +492,10 @@ class PDO_MySQL extends \nx\core\Object {
     	$statement = $this->_dbh->prepare($sql);
 
         try {
-            $statement->execute($properties);
+            $statement->execute($data);
     	} catch ( \PDOException $e ) {
             // TODO: How to handle error reporting?
-            die($e->getMessage() . $sql . var_dump($properties) . var_dump($e->getTrace()));
+            die($e->getMessage() . $sql . var_dump($data) . var_dump($e->getTrace()));
             return false;
         }
 
