@@ -239,8 +239,7 @@ class PDO_MySQL extends \nx\core\Object {
     *  @access protected
     *  @return string
     */
-    // TODO: Please fix this
-    protected function _format_where($where = null) {
+    protected function _format_where(&$where = null) {
         $sql = '';
 
         if ( is_null($where) ) {
@@ -252,14 +251,15 @@ class PDO_MySQL extends \nx\core\Object {
             $sql .= $where;
         } elseif ( is_array($where) ) {
             foreach ( $where as $name => $val ) {
-                // $EXAMPLE = array( "i" => array( "gt" => 20, "lte" => 30 ) );
                 if ( is_string($val) ) {
                     $sql .= '`' . $name . '`=:' . $name . ' and ';
                 }
                 elseif ( is_array($val) ) {
                     foreach ( $val as $sign => $constraint ) {
-                        $new_name = $name .  '__' . $constraint;
-                        $sql .=  '`' . $new_name . '` ';
+                        do {
+                            $new_name = $name .  '__' . rand();
+                        } while ( isset($where[$new_name]) )
+                        $sql .=  '`' . $name . '` ';
                         switch ( $sign ) {
                             case 'gt':
                                 $sql .= '>';
@@ -424,7 +424,6 @@ class PDO_MySQL extends \nx\core\Object {
    /**
     *  Updates a record in the database.
     *
-    *  @see /nx/plugin/db/PDO_MySQL->_format_where()
     *  @param string $table         The table containing the record to be inserted.
     *  @param array $data           An array containing the data to be inserted. Format
     *                               should be as follows:
