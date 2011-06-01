@@ -88,8 +88,7 @@ class Dispatcher {
             return false;
         } 
 
-        $controller_name = CONTROLLER_LOCATION . $args['controller']; 
-        $controller = new $controller_name(array(
+        $controller = new $args['controller'](array(
             'http_get'  => $args['get'],
             'http_post' => $args['post']
         ));

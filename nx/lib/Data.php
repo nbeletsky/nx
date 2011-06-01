@@ -45,8 +45,7 @@ class Data {
                     $collection[$class][] = $obj; 
                 } else { // name = 'User[][username]'
                     foreach ( $child as $grandchild_array ) {
-                        $obj_name = MODEL_LOCATION . $child_key;
-                        $obj = new $obj_name();
+                        $obj = new $child_key();
                         foreach ( $grandchild_array as $key => $value ) {
                             $obj->$key = $value;
                         }
