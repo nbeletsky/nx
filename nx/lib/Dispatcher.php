@@ -22,21 +22,6 @@ use nx\lib\File;
 class Dispatcher {
 
    /**
-    *  Checks to see if a controller is whitelisted for use.
-    *
-    *  @param string $controller          The controller name.
-    *  @access public
-    *  @return bool
-    */
-    public static function is_whitelisted($controller) {
-        // TODO: Fix this, get rid of the NX_ROOT constant
-        $whitelist = File::get_filenames_within(NX_ROOT . '/app/controller');
-        $strip_ext = create_function('$val', 'return basename($val, ".php");');
-        $whitelist = array_map($strip_ext, $whitelist);
-        return in_array($controller, $whitelist);
-    }
-
-   /**
     *  Parses a query string and returns the controller, action, 
     *  id, and any additional arguments passed via $_GET. 
     *
@@ -83,12 +68,15 @@ class Dispatcher {
         rewrite ^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/([\d]+)/?$ index.php?controller=$1&action=$2&id=$3&args=$args? break;
         */
 
-        if ( !self::is_whitelisted($args['controller']) ) {
+        // TODO: Fix this!
+        $controller_name = CONTROLLER_LOCATION . $args['controller']; 
+
+        if ( !class_exists($controller_name) ) {
             self::throw_404(DEFAULT_TEMPLATE);
             return false;
         } 
 
-        $controller = new $args['controller'](array(
+        $controller = new $controller_name(array(
             'http_get'  => $args['get'],
             'http_post' => $args['post']
         ));

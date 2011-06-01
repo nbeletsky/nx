@@ -2,7 +2,7 @@
 
 namespace app\model;
 
-class User extends ApplicationModel {
+class User extends \nx\core\Model {
     protected $id;
 
     protected $username;

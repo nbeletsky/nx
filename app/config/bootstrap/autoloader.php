@@ -1,14 +1,10 @@
 <?php
 
 define('NX_ROOT', dirname(dirname(dirname(__DIR__)))); 
-define('CONTROLLER_LOCATION', NX_ROOT . '/app/controller'); 
-define('MODEL_LOCATION', NX_ROOT . '/app/model'); 
 
 set_include_path(
     get_include_path()  . PATH_SEPARATOR .
-    NX_ROOT             . PATH_SEPARATOR .
-    CONTROLLER_LOCATION . PATH_SEPARATOR .
-    MODEL_LOCATION      . PATH_SEPARATOR 
+    NX_ROOT             . PATH_SEPARATOR
 );
 
 function file_exists_in_include_path($file) {

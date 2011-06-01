@@ -4,7 +4,7 @@ namespace app\model;
 
 use nx\lib\String;
 
-class Session extends ApplicationModel {
+class Session extends \nx\core\Model {
     protected $id;
 
     protected $data = '';
