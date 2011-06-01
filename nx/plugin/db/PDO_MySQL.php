@@ -258,7 +258,7 @@ class PDO_MySQL extends \nx\core\Object {
                     foreach ( $val as $sign => $constraint ) {
                         do {
                             $new_name = $name .  '__' . rand();
-                        } while ( isset($where[$new_name]) )
+                        } while ( isset($where[$new_name]) );
                         $sql .=  '`' . $name . '` ';
                         switch ( $sign ) {
                             case 'gt':
