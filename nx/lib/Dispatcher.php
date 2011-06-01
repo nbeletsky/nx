@@ -33,8 +33,8 @@ class Dispatcher {
 
         parse_str($query_string, $query);
 
-        $controller = ( isset($query['controller']) ) ? ucfirst($query['controller']) : DEFAULT_CONTROLLER;
-        $action =     ( isset($query['action']) )     ? $query['action']              : DEFAULT_ACTION;
+        $controller = ( isset($query['controller']) ) ? ucfirst($query['controller']) : 'Dashboard';
+        $action =     ( isset($query['action']) )     ? $query['action']              : 'index';
         $id =         ( isset($query['id']) )         ? $query['id']                  : null;
 
         $get = array();
@@ -68,8 +68,7 @@ class Dispatcher {
         rewrite ^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/([\d]+)/?$ index.php?controller=$1&action=$2&id=$3&args=$args? break;
         */
 
-        // TODO: Fix this!
-        $controller_name = CONTROLLER_LOCATION . $args['controller']; 
+        $controller_name = 'app\controller\\' . $args['controller']; 
 
         if ( !class_exists($controller_name) ) {
             self::throw_404(DEFAULT_TEMPLATE);

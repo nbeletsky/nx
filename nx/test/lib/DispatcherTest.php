@@ -10,8 +10,8 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase {
         $query_string = '';
         $args = Dispatcher::parse_query_string($query_string);
         $check = array(
-            'controller' => DEFAULT_CONTROLLER,
-            'action'     => DEFAULT_ACTION,
+            'controller' => 'Dashboard',
+            'action'     => 'index',
             'id'         => null, 
             'get'        => array()
         );
@@ -21,7 +21,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase {
         $args = Dispatcher::parse_query_string($query_string);
         $check = array(
             'controller' => 'Register',
-            'action'     => DEFAULT_ACTION,
+            'action'     => 'index',
             'id'         => null, 
             'get'        => array()
         );
@@ -31,7 +31,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase {
         $args = Dispatcher::parse_query_string($query_string);
         $check = array(
             'controller' => 'Register',
-            'action'     => DEFAULT_ACTION,
+            'action'     => 'index',
             'id'         => '42', 
             'get'        => array()
         );
@@ -41,7 +41,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase {
         $args = Dispatcher::parse_query_string($query_string);
         $check = array(
             'controller' => 'Register',
-            'action'     => DEFAULT_ACTION,
+            'action'     => 'index',
             'id'         => null, 
             'get'        => array('username' => 'test')
         );
@@ -51,7 +51,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase {
         $args = Dispatcher::parse_query_string($query_string);
         $check = array(
             'controller' => 'Register',
-            'action'     => DEFAULT_ACTION,
+            'action'     => 'index',
             'id'         => null, 
             'get'        => array(
                 'username' => 'test',
@@ -74,7 +74,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase {
         $args = Dispatcher::parse_query_string($query_string);
         $check = array(
             'controller' => 'Register',
-            'action'     => DEFAULT_ACTION,
+            'action'     => 'index',
             'id'         => '42', 
             'get'        => array(
                 'username' => 'test',

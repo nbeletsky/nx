@@ -45,7 +45,8 @@ class Data {
                     $collection[$class][] = $obj; 
                 } else { // name = 'User[][username]'
                     foreach ( $child as $grandchild_array ) {
-                        $obj = new $child_key();
+                        $obj_name = 'app\model\\' . $child_key;
+                        $obj = new $obj_name();
                         foreach ( $grandchild_array as $key => $value ) {
                             $obj->$key = $value;
                         }
