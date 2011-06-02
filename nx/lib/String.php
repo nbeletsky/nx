@@ -5,6 +5,22 @@ namespace nx\lib;
 class String {
 
    /**
+    *  Returns the string between two delimiters in a body of text.
+    *       
+    *  @param string $start         The beginning delimiter.
+    *  @param string $end           The ending delimiter.
+    *  @param string $body          The text containing the delimiters.
+    *  @access public
+    *  @return string
+    */
+    public static function between($start, $end, $body) {
+        $start_pos = strpos($body, $start) + strlen($start);
+        $end_pos = strpos($body, $end);
+        $between = substr($body, $start_pos, $end_pos - $start_pos);
+        return ( $between ) ? trim($between) : '';
+    }
+
+   /**
     *  Decrypts cookie user ID.
     *       
     *  @param string $hex_hash      The hash to be decrypted.
@@ -48,6 +64,7 @@ class String {
         }
         return $hex_hash;
     }
+
 }
 
 ?>

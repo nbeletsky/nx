@@ -63,6 +63,14 @@ class Controller extends Object {
     */
     protected $_sanitizers = array();
 
+    protected $_session;
+    protected $_user;
+
+    protected $_classes = array(
+        'session' => 'app\model\Session', 
+        'user'    => 'app\model\User'
+    );
+
    /**
     *  Loads the configuration settings for the controller.
     *  
@@ -72,7 +80,8 @@ class Controller extends Object {
     public function __construct(array $config = array()) {
         $defaults = array(
             'http_get'  => $this->_http_get,
-            'http_post' => $this->_http_post
+            'http_post' => $this->_http_post,
+            'classes'   => $this->_classes
         );
         parent::__construct($config + $defaults);
     }
@@ -98,44 +107,44 @@ class Controller extends Object {
         }
 
         $this->_token = Auth::create_token($this->classname());
+
+        $session = $this->_config['classes']['session'];
+        $this->_session = new $session(); 
+
+        if ( $this->_session->is_logged_in() ) {
+            $user = $this->_config['classes']['user'];
+            $this->_user = new $user(array('id' => $this->_session->get_user_id()));
+            $this->_template = $this->_user->get_template();
+        } 
     }
 
    /**
-    *  Calls the controller method and passes its variables to the 
-    *  corresponding view, which is then displayed.
+    *  Calls the controller method, whose return values can then
+    *  be passed to and parsed by a view.
     *       
     *  @param string $method       The method.
     *  @param int $id              The id (passed from the URL, useful with query strings like 
     *                              `http://foobar.com/entry/23` or `http://foobar.com/entry/view/23`).
     *  @access public
-    *  @return bool
+    *  @return mixed
     */
     public function call($method, $id = null) {
         if ( !method_exists($this, $method) || $this->is_protected($method) ) {
             return false;
         }   
 
-        $to_view = $this->$method($id);
+        $results = $this->$method($id);
 
-        if ( is_null($to_view) || $to_view === false ) {
+        if ( is_null($results) || $results === false ) {
             return false;
         }
 
-        // AJAX
-        if ( is_string($to_view) ) {
-            echo htmlspecialchars($to_view, ENT_QUOTES, 'UTF-8');
-            return true;
-        }
+        $to_view = array(
+            'file' => $this->_template . '/' . lcfirst($this->classname()) . '/' . $method . '.html',
+            'vars' => $results
+        );
 
-        // TODO: This whole controller/view handoff sucks.
-        $view_file = NX_ROOT . '/app/view/' . $this->_template . '/' . lcfirst($this->classname()) . '/' . $method . '.html';
-        if ( !file_exists($view_file) ) {
-            return false;
-        }
-
-        extract($to_view);
-        include $view_file;
-        return true;
+        return $to_view;
     }
 
    /**

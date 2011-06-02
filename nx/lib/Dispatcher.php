@@ -11,6 +11,7 @@
 namespace nx\lib;
 
 use nx\lib\File;
+use nx\core\View;
 
 /*
  *  The `Dispatcher` class is used to handle url routing and
@@ -81,10 +82,13 @@ class Dispatcher {
         ));
 
         $results = $controller->call($args['action'], $args['id']);
-        if ( !$results ) {
+        if ( !is_array($results) ) {
             self::throw_404($controller->get_template());
             return false;
         }
+
+        $view = new View();
+        $display = $view->render($results['file'], $results['vars']);
 
         return true;
     }
