@@ -17,7 +17,6 @@ use nx\core\View;
  *  The `Dispatcher` class is used to handle url routing and
  *  page rendering.
  *
- *
  *  @package lib
  */
 class Dispatcher {
@@ -71,6 +70,12 @@ class Dispatcher {
         if ( !is_array($results) ) {
             self::throw_404($controller->get_template());
             return false;
+        }
+
+        // AJAX
+        if ( is_string($results['vars']) ) {
+            echo htmlspecialchars($results['vars'], ENT_QUOTES, 'UTF-8');
+            return true;
         }
 
         $view = new View();

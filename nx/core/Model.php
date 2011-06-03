@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * NX
+ *
+ * @author    Nick Sinopoli <NSinopoli@gmail.com>
+ * @copyright Copyright (c) 2011, Nick Sinopoli
+ * @license   http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace nx\core;
 
 use nx\lib\Connections;
@@ -7,22 +15,73 @@ use nx\lib\Data;
 use nx\lib\Meta;
 use nx\lib\Validator;
 
+/*
+ *  The `Model` class is the parent class of all 
+ *  application models.  Responsible for handling
+ *  object relationships, it provides automatic
+ *  interfacing with both databases and caches to 
+ *  allow for convenient object storage and retrieval.
+ *  It also provides sanitization and validation mechanisms.
+ *
+ *  @package core
+ */
 class Model extends Object {
 
-    protected $_db;
+   /**
+    *  The cache handler.
+    *
+    *  @var object
+    *  @access protected
+    */
     protected $_cache;
 
-    protected $_has_one = array();
-    protected $_has_many = array();
+   /**
+    *  The database handler.
+    *
+    *  @var object
+    *  @access protected
+    */
+    protected $_db;
+
+   /**
+    *  The `belongs to` relationships pertaining to `$this`.
+    *
+    *  @var array
+    *  @access protected
+    */
     protected $_belongs_to = array();
+
+   /**
+    *  The `has one` relationships pertaining to `$this`.
+    *
+    *  @var array
+    *  @access protected
+    */
+    protected $_has_one = array();
+
+   /**
+    *  The `has many` relationships pertaining to `$this`.
+    *
+    *  @var array
+    *  @access protected
+    */
+    protected $_has_many = array();
+
+   /**
+    *  The `has and belongs to many` relationships pertaining to `$this`.
+    *
+    *  @var array
+    *  @access protected
+    */
     protected $_has_and_belongs_to_many = array(); 
-    
-    protected $_sanitizers = array();
-    protected $_validators = array();
-    protected $_validation_errors = array();
 
-    protected $_no_cache = false;
-
+   /**
+    *  The meta information pertinent to objects
+    *  and their relationships with other objects.
+    *
+    *  @var array
+    *  @access protected
+    */
     protected $_meta = array(
         'key'             => 'id',
         'pk_separator'    => '_',
@@ -30,29 +89,65 @@ class Model extends Object {
     );
 
    /**
+    *  The sanitizers to be used when parsing
+    *  data.  Acceptable sanitizers are:
+    *  `key` => `b` for booleans 
+    *  `key` => `f` for float/decimals
+    *  `key` => `i` for integers
+    *  `key` => `s` for strings
+    *
+    *  @see /nx/lib/Data::sanitize()
+    *  @see /nx/core/Model->sanitize()
+    *  @var array
+    *  @access protected
+    */
+    protected $_sanitizers = array();
+
+   /**
+    *  The validators to be used when validating
+    *  data.
+    *
+    *  @see /nx/lib/Validator
+    *  @see /nx/core/Model->is_valid()
+    *  @var array
+    *  @access protected
+    */
+    protected $_validators = array();
+
+   /**
+    *  The validation error messages.
+    *
+    *  @see /nx/core/Model->is_valid()
+    *  @var array
+    *  @access protected
+    */
+    protected $_validation_errors = array();
+
+   /**
     *  Initializes an object.  Takes the following configuration options:
-    *  `id`      - The primary key of an existing object, used if you 
-    *              want to load an instance of an object with its 
-    *              properties from the cache/database.
-    *  `where`   - A WHERE clause to be used if the primary key of the
-    *              object desired is unknown.  Also used if you
-    *              want to load an instance of an object with its 
-    *              properties from the cache/database.
-    *  `db`      - The name of the db connection to use as defined in app/config/bootstrap/db.php.
-    *  `cache`   - The name of the cache connection to use as defined in app/config/bootstrap/cache.php.
+    *  `id`       - The primary key of an existing object, used if you 
+    *               want to load an instance of an object with its 
+    *               properties from the cache/database.
+    *  `where`    - A WHERE clause to be used if the primary key of the
+    *               object desired is unknown.  Also used if you
+    *               want to load an instance of an object with its 
+    *               properties from the cache/database.
+    *  `no_cache` - Whether or not to use the cache to store/retrieve the object. 
+    *  `db`       - The name of the db connection to use as defined in app/config/bootstrap/db.php.
+    *  `cache`    - The name of the cache connection to use as defined in app/config/bootstrap/cache.php.
     *
     *  @see /nx/core/Model->_init()
-    *  @see /nx/plugin/db/PDO_MySQL->_format_where()
     *  @param array $config        The configuration options.
     *  @access public
     *  @return void
     */
     public function __construct(array $config = array()) {
         $defaults = array(
-            'id'      => null,
-            'where'   => null,
-            'db'      => 'default',
-            'cache'   => 'default'
+            'id'       => null,
+            'where'    => null,
+            'no_cache' => false,
+            'db'       => 'default',
+            'cache'    => 'default'
         );
         parent::__construct($config + $defaults);
     }
@@ -152,7 +247,7 @@ class Model extends Object {
     *  @return bool
     */
     public function cache() {
-        if ( $this->_no_cache ) {
+        if ( $this->_config['no_cache'] ) {
             return false;
         }
 
@@ -395,7 +490,7 @@ class Model extends Object {
     *  @return object
     */
     public function pull_from_cache($obj, $id) {
-        if ( $this->_no_cache ) {
+        if ( $this->_config['no_cache'] ) {
             return false;
         }
 

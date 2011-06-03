@@ -10,13 +10,23 @@
 
 namespace nx\core;
 
+/*
+ *  The `View` class is the parent class of all 
+ *  application views.  It provides access to a 
+ *  form helper for assistance with creating common
+ *  page elements.
+ *
+ *  @package core
+ */
 class View extends Object {
 
+   /**
+    *  The form helper object.
+    *
+    *  @var object
+    *  @access protected
+    */
     protected $_form;
-
-    protected $_classes = array(
-        'form'    => 'nx\lib\Form' 
-    );
 
    /**
     *  Loads the configuration settings for the view.
@@ -26,7 +36,9 @@ class View extends Object {
     */
     public function __construct(array $config = array()) {
         $defaults = array(
-            'classes'   => $this->_classes
+            'classes'   => array(
+                'form' => 'nx\lib\Form'
+            )
         );
         parent::__construct($config + $defaults);
     }
@@ -44,16 +56,20 @@ class View extends Object {
         $this->_form = new $form();
     }
 
+   /**
+    *  Renders a given file with the supplied variables.
+    *       
+    *  @param string $file         The file to be rendered.
+    *  @param mixed $vars          Variables to be substituted in the view.
+    *  @access public
+    *  @return bool
+    */
     public function render($file, $vars) {
-        // AJAX
-        if ( is_string($vars) ) {
-            echo htmlspecialchars($vars, ENT_QUOTES, 'UTF-8');
-            return true;
+        if ( is_array($vars) ) {
+            extract($vars);
         }
 
-        extract($vars);
         require 'app/view/' . $file;
-
         return true;
     }
 

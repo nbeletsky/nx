@@ -30,8 +30,8 @@ class Memcached extends \nx\core\Object {
     *  Loads the configuration settings for Memcached.
     *
     *  @param array $config                     The configuration settings, which can take two options:
-    *                                           `host` - The hostname of the memcached server.
-    *                                           `persistent_id` -  A unique ID used to allow persistence between requests.
+    *                                           `host`          - The hostname of the memcached server.
+    *                                           `persistent_id` - A unique ID used to allow persistence between requests.
     *                                           (By default, instances are destroyed at the end of the request.)
     *  @access public
     *  @return void

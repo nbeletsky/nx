@@ -52,4 +52,4 @@ lighttpd
 apache
 ``````
 
-please don't use apache.  you'll thank me later.
+Please don't use Apache.  You'll thank me later.

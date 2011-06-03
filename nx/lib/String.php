@@ -1,7 +1,21 @@
 <?php
 
+/**
+ * NX
+ *
+ * @author    Nick Sinopoli <NSinopoli@gmail.com>
+ * @copyright Copyright (c) 2011, Nick Sinopoli
+ * @license   http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace nx\lib;
 
+/*
+ *  The `String` class contains methods that help with
+ *  string manipulation.
+ *
+ *  @package lib
+ */
 class String {
 
    /**

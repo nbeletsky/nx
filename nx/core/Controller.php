@@ -14,6 +14,14 @@ use nx\lib\Auth;
 use nx\lib\Data; 
 use nx\lib\Meta; 
 
+/*
+ *  The `Controller` class is the parent class of all 
+ *  application controllers.  It provides access to sanitized
+ *  $_POST and $_GET data and ensures protection against CSRF
+ *  attacks. 
+ *
+ *  @package core
+ */
 class Controller extends Object {
 
    /**
@@ -33,6 +41,29 @@ class Controller extends Object {
     protected $_http_post = array();
 
    /**
+    *  The sanitizers to be used when parsing
+    *  request data.  Acceptable sanitizers are:
+    *  `key` => `b` for booleans 
+    *  `key` => `f` for float/decimals
+    *  `key` => `i` for integers
+    *  `key` => `s` for strings
+    *
+    *  @see /nx/lib/Data::sanitize()
+    *  @see /nx/core/Controller->sanitize()
+    *  @var array
+    *  @access protected
+    */
+    protected $_sanitizers = array();
+
+   /**
+    *  The session object.
+    *
+    *  @var object
+    *  @access protected
+    */
+    protected $_session;
+
+   /**
     *  The controller template.
     *
     *  @var string
@@ -49,27 +80,12 @@ class Controller extends Object {
     protected $_token = null;
 
    /**
-    *  The sanitizers to be used when parsing
-    *  request data.  Acceptable sanitizers are:
-    *  `key` => `b` for booleans 
-    *  `key` => `f` for float/decimals
-    *  `key` => `i` for integers
-    *  `key` => `s` for strings
+    *  The user object.
     *
-    *  @see /nx/lib/Data::sanitize()
-    *  @see /nx/core/Controller->sanitize()
-    *  @var array
+    *  @var object
     *  @access protected
     */
-    protected $_sanitizers = array();
-
-    protected $_session;
     protected $_user;
-
-    protected $_classes = array(
-        'session' => 'app\model\Session', 
-        'user'    => 'app\model\User'
-    );
 
    /**
     *  Loads the configuration settings for the controller.
@@ -79,16 +95,20 @@ class Controller extends Object {
     */
     public function __construct(array $config = array()) {
         $defaults = array(
+            'classes'   => array(
+                'session' => 'app\model\Session', 
+                'user'    => 'app\model\User'
+            ),
             'http_get'  => $this->_http_get,
-            'http_post' => $this->_http_post,
-            'classes'   => $this->_classes
+            'http_post' => $this->_http_post
         );
         parent::__construct($config + $defaults);
     }
 
    /**
-    *  Initializes the controller with sanitized http request data and
-    *  generates a token to be used to ensure that the next request is valid.
+    *  Initializes the controller with sanitized http request data, 
+    *  generates a token to be used to ensure that the next request is valid,
+    *  and loads a user object if a valid session is found.
     *
     *  @access protected
     *  @return void

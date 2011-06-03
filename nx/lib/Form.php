@@ -23,7 +23,7 @@ class Form {
 
    /**
     *  Maintains the array index of bindings.
-    *  (This is used when a Form method [e.g., Form::text()] is called 
+    *  (This is used when a Form method [e.g., Form->text()] is called 
     *  multiple times with the same parameters.  An index is needed 
     *  to ensure that both inputs are passed to the server
     *  under unique names.)
