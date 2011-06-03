@@ -55,24 +55,10 @@ class Dispatcher {
     *  @return bool
     */
     public static function render($args) {
-        // URL layout
-        // foobar.com/
-        // foobar.com/controller[?args]
-        // foobar.com/controller/id[?args]
-        // foobar.com/controller/action[?args]
-        // foobar.com/controller/action/id[?args]
-        /* 
-        rewrite ^/$ index.php;
-        rewrite ^/([A-Za-z0-9\-]+)/?$ index.php?controller=$1&args=$args? break;
-        rewrite ^/([A-Za-z0-9\-]+)/([\d]+)/?$ index.php?controller=$1&id=$2&args=$args? break;
-        rewrite ^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/?$ index.php?controller=$1&action=$2&args=$args? break;
-        rewrite ^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/([\d]+)/?$ index.php?controller=$1&action=$2&id=$3&args=$args? break;
-        */
-
         $controller_name = 'app\controller\\' . $args['controller']; 
 
         if ( !class_exists($controller_name) ) {
-            self::throw_404(DEFAULT_TEMPLATE);
+            self::throw_404('default');
             return false;
         } 
 
@@ -88,9 +74,7 @@ class Dispatcher {
         }
 
         $view = new View();
-        $display = $view->render($results['file'], $results['vars']);
-
-        return true;
+        return $view->render($results['file'], $results['vars']);
     }
 
    /**
@@ -101,10 +85,7 @@ class Dispatcher {
     *  @return void
     */
     public static function throw_404($template) {
-        $view_file = '../view/' . $template . '/404.html';
-        if ( file_exists($view_file) ) {
-            include $view_file;
-        }
+        require 'app/view/' . $template . '/404.html';
     }
 
 }

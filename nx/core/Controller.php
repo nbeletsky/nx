@@ -38,7 +38,7 @@ class Controller extends Object {
     *  @var string
     *  @access protected
     */
-    protected $_template = DEFAULT_TEMPLATE; 
+    protected $_template = 'default'; 
 
    /**
     *  The request token.

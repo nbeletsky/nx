@@ -41,10 +41,6 @@ class User extends \nx\core\Model {
         'password_special_chars' => '#@!$%._'
     );
 
-    public function get_template() {
-        return ( $this->template ) ?: DEFAULT_TEMPLATE;
-    }
-
 }
 
 ?>

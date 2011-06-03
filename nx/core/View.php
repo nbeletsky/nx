@@ -51,14 +51,8 @@ class View extends Object {
             return true;
         }
 
-        // TODO: Axe this constant, and throw a 404!
-        $file = NX_ROOT . '/app/view/' . $file;
-        if ( !file_exists($file) ) {
-            return false;
-        }
-
         extract($vars);
-        include $file;
+        require 'app/view/' . $file;
 
         return true;
     }
