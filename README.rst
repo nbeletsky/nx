@@ -12,6 +12,7 @@ The following configurations will help you rewrite requests in accordance with t
 
 URL layout
 ``````````
+::
 
 foobar.com/
 foobar.com/controller[?args]
@@ -22,6 +23,7 @@ foobar.com/controller/action/id[?args]
 
 nginx
 `````
+::
 
 rewrite ^/$ index.php;
 rewrite ^/([A-Za-z0-9\-]+)/?$ index.php?controller=$1&args=$args? break;
@@ -32,6 +34,7 @@ rewrite ^/([A-Za-z0-9\-]+)/([A-Za-z0-9\-_]+)/([\d]+)/?$ index.php?controller=$1&
 
 lighttpd
 ````````
+::
 
 url.rewrite-once = (
         "^/$"=>"/index.php",
