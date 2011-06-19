@@ -33,7 +33,9 @@ class Validator {
     *  Checks a decimal number.
     *
     *  @param mixed $value          The value to be checked.
-    *  @param array $options        Accepts `precision` as a key.  If supplied, a check that the decimal has the same level of precision will be made.
+    *  @param array $options        Accepts `precision` as a key.
+    *                               If supplied, a check that the decimal has
+    *                               the same level of precision will be made.
     *  @access public
     *  @return bool
     */
@@ -63,7 +65,8 @@ class Validator {
     *  Checks an ip address.
     *
     *  @param string $value          The ip address to be checked.
-    *  @param array $options         The options to be used by the filter. See http://us3.php.net/manual/en/filter.filters.validate.php
+    *  @param array $options         The options to be used by the filter. See
+    *                                http://us3.php.net/manual/en/filter.filters.validate.php
     *  @access public
     *  @return bool
     */
@@ -76,7 +79,8 @@ class Validator {
     *  Checks that a string is between a certain length.
     *
     *  @param string $value          The string to be checked.
-    *  @param array $options         The options by which to constrain the check.  Takes `min` and/or `max` as keys.
+    *  @param array $options         The options by which to constrain the check.
+    *                                Takes `min` and/or `max` as keys.
     *  @access public
     *  @return bool
     */
@@ -112,21 +116,26 @@ class Validator {
    /**
     *  Checks that a password is constructed properly
     *  and has an acceptable length.
-    * 
+    *
     *  @param string $value          The password to be checked.
-    *  @param array $options         The options by which to constrain the check.  Takes `special_chars`, `min_length`, 
-    *                                and/or `max_length` as keys.
+    *  @param array $options         The options by which to constrain the check.
+    *                                Takes `special_chars`, `min_length`, and/or
+    *                                `max_length` as keys.
     *  @access public
     *  @return bool
     */
     public static function password($value, $options = array()) {
         $options += array('special_chars' => '#@!$%._', 'min_length' => 5, 'max_length' => 16);
 
-        $preg_pass = '/^(((?=.*[A-Za-z])(?=.*[\d])(?!.*[^A-Za-z\d]))|' . 
-                     '((?=.*[A-Za-z])(?=.*[' . $options['special_chars'] . '])(?!.*[^A-Za-z' . $options['special_chars'] . ']))|' .
-                     '((?=.*[\d])(?=.*[' . $options['special_chars'] . '])(?!.*[^\d' . $options['special_chars'] . ']))|' .
-                     '((?=.*[A-Za-z])(?=.*[\d])(?=.*[' . $options['special_chars'] . '])(?!.*[^A-Za-z\d' . 
-                     $options['special_chars'] . ']))).{' . $options['min_length'] . ',' . $options['max_length'] . '}$/';
+        $preg_pass = '/^(((?=.*[A-Za-z])(?=.*[\d])(?!.*[^A-Za-z\d]))|'
+            . '((?=.*[A-Za-z])(?=.*[' . $options['special_chars'] . '])(?!.*[^A-Za-z'
+            . $options['special_chars'] . ']))|' . '((?=.*[\d])(?=.*['
+            . $options['special_chars'] . '])(?!.*[^\d'
+            . $options['special_chars'] . ']))|'
+            .  '((?=.*[A-Za-z])(?=.*[\d])(?=.*['
+            . $options['special_chars'] . '])(?!.*[^A-Za-z\d'
+            . $options['special_chars'] . ']))).{' . $options['min_length']
+            . ',' . $options['max_length'] . '}$/';
         return preg_match($preg_pass, $value);
     }
 
@@ -134,7 +143,8 @@ class Validator {
     *  Checks that a number is within certain bounds.
     *
     *  @param mixed $value           The value to be checked.
-    *  @param array $options         The options by which to constrain the check.  Takes `upper` and/or `lower` as keys.
+    *  @param array $options         The options by which to constrain the check.
+    *                                Takes `upper` and/or `lower` as keys.
     *  @access public
     *  @return bool
     */
@@ -158,13 +168,13 @@ class Validator {
 
    /**
     *  Checks a zip code.
-    * 
+    *
     *  @param string $value            The zip code to be checked.
     *  @access public
     *  @return bool
     */
     public static function zip($value) {
-        return preg_match('/^\d{5}([\-]\d{4})?$/', $value); 
+        return preg_match('/^\d{5}([\-]\d{4})?$/', $value);
     }
 
 }

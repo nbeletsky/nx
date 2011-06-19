@@ -4,7 +4,7 @@ namespace nx\test\lib;
 
 use nx\lib\Data;
 
-class DataTest extends \PHPUnit_Framework_TestCase {    
+class DataTest extends \PHPUnit_Framework_TestCase {
 
     public function test_SanitizeXSS_ReturnsCleanData() {
         // Tests taken from http://ha.ckers.org/xss.html
@@ -242,9 +242,10 @@ EOD
         $keys = array_keys($replacements);
         $values = array_values($replacements);
         foreach ( $tests as $test ) {
-            $check = str_replace($keys, $values, $test); 
+            $check = str_replace($keys, $values, $test);
             $clean = Data::sanitize($test, $type);
-            $this->assertEquals($clean, $check, 'HTML `' . $test . '` was not properly stripped.');
+            $this->assertEquals($clean, $check, 'HTML `' . $test
+                . '` was not properly stripped.');
         }
 
     }
@@ -255,140 +256,160 @@ EOD
         $type = 'b';
         $check = true;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Boolean `true` was not sanitized to boolean `true`.');
+        $this->assertEquals($clean, $check, 'Boolean `true` was not sanitized to
+            boolean `true`.');
 
         // Bool to float
         $dirty = true;
         $type = 'f';
         $check = 1;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Boolean `true` was not sanitized to float `1`.');
+        $this->assertEquals($clean, $check, 'Boolean `true` was not sanitized to
+            float `1`.');
 
         // Bool to int
         $dirty = false;
         $type = 'i';
         $check = 0;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Boolean `false` was not sanitized to integer `0`.');
+        $this->assertEquals($clean, $check, 'Boolean `false` was not sanitized
+            to integer `0`.');
 
         // Bool to string
         $dirty = true;
         $type = 's';
         $check = '1';
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Boolean `true` was not sanitized to string `1`.');
+        $this->assertEquals($clean, $check, 'Boolean `true` was not sanitized to
+            string `1`.');
 
         // Bool to string
         $dirty = false;
         $type = 's';
         $check = '';
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Boolean `false` was not sanitized to empty string ``.');
+        $this->assertEquals($clean, $check, 'Boolean `false` was not sanitized
+            to empty string ``.');
 
         // Float to bool
         $dirty = 1.234;
         $type = 'b';
         $check = true;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Float `1.234` was not sanitized to boolean `true`.');
+        $this->assertEquals($clean, $check, 'Float `1.234` was not sanitized to
+            boolean `true`.');
 
         // Float to float
         $dirty = 1.234;
         $type = 'f';
         $check = 1.234;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Float `1.234` was not sanitized to float `1.234`.');
+        $this->assertEquals($clean, $check, 'Float `1.234` was not sanitized to
+            float `1.234`.');
 
         // Float to int
         $dirty = 1.928;
         $type = 'i';
         $check = 1928;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Float `1.928` was not sanitized to integer `1928`.');
+        $this->assertEquals($clean, $check, 'Float `1.928` was not sanitized to
+            integer `1928`.');
 
         // Float to string
         $dirty = 1.928;
         $type = 's';
         $check = '1.928';
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Float `1.928` was not sanitized to string `1.928`.');
+        $this->assertEquals($clean, $check, 'Float `1.928` was not sanitized to
+            string `1.928`.');
 
         // Int to bool
         $dirty = 0;
         $type = 'b';
         $check = false;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Integer `0` was not sanitized to boolean `false`.');
+        $this->assertEquals($clean, $check, 'Integer `0` was not sanitized to
+            boolean `false`.');
 
         // Int to bool
         $dirty = 1;
         $type = 'b';
         $check = true;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Integer `1` was not sanitized to boolean `true`.');
+        $this->assertEquals($clean, $check, 'Integer `1` was not sanitized to
+            boolean `true`.');
 
         // Int to float
         $dirty = 2;
         $type = 'f';
         $check = 2;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Integer `2` was not sanitized to float `2`.');
+        $this->assertEquals($clean, $check, 'Integer `2` was not sanitized to
+            float `2`.');
 
         // Int to int
         $dirty = 3;
         $type = 'i';
         $check = 3;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Integer `3` was not sanitized to integer `3`.');
+        $this->assertEquals($clean, $check, 'Integer `3` was not sanitized to
+            integer `3`.');
 
         // Int to string
         $dirty = 3;
         $type = 's';
         $check = '3';
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'Integer `3` was not sanitized to string `3`.');
+        $this->assertEquals($clean, $check, 'Integer `3` was not sanitized to
+            string `3`.');
 
         // String to bool
         $dirty = 'true';
         $type = 'b';
         $check = false;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'String `true` was not sanitized to boolean `false`.');
+        $this->assertEquals($clean, $check, 'String `true` was not sanitized to
+            boolean `false`.');
 
         // String to bool
         $dirty = '1';
         $type = 'b';
         $check = true;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'String `1` was not sanitized to boolean `true`.');
+        $this->assertEquals($clean, $check, 'String `1` was not sanitized to
+            boolean `true`.');
 
         // String to float
         $dirty = "1.928";
         $type = 'f';
         $check = 1.928;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'String `1.928` was not sanitized to float `1.928`.');
+        $this->assertEquals($clean, $check, 'String `1.928` was not sanitized to
+            float `1.928`.');
 
         // String to int
         $dirty = "1";
         $type = 'i';
         $check = 1;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'String `1` was not sanitized to integer `1`.');
+        $this->assertEquals($clean, $check, 'String `1` was not sanitized to
+            integer `1`.');
 
         // String to int
         $dirty = "1.928";
         $type = 'i';
         $check = 1.928;
         $clean = Data::sanitize($dirty, $type);
-        $this->assertNotEquals($clean, $check, 'String `1.928` sanitized as an integer should not return `1.928`.');
+        $this->assertNotEquals($clean, $check, 'String `1.928` sanitized as an
+            integer should not return `1.928`.');
 
         // String to string
         $dirty = 'test';
         $type = 's';
         $check = 'test';
         $clean = Data::sanitize($dirty, $type);
-        $this->assertEquals($clean, $check, 'String `test` was not sanitized to string `test`.');
+        $this->assertEquals($clean, $check, 'String `test` was not sanitized to
+            string `test`.');
     }
 }
 ?>

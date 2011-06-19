@@ -10,15 +10,15 @@
 
 namespace nx\core;
 
-use nx\lib\Auth; 
-use nx\lib\Data; 
-use nx\lib\Meta; 
+use nx\lib\Auth;
+use nx\lib\Data;
+use nx\lib\Meta;
 
 /*
- *  The `Controller` class is the parent class of all 
+ *  The `Controller` class is the parent class of all
  *  application controllers.  It provides access to sanitized
  *  $_POST and $_GET data and ensures protection against CSRF
- *  attacks. 
+ *  attacks.
  *
  *  @package core
  */
@@ -43,7 +43,7 @@ class Controller extends Object {
    /**
     *  The sanitizers to be used when parsing
     *  request data.  Acceptable sanitizers are:
-    *  `key` => `b` for booleans 
+    *  `key` => `b` for booleans
     *  `key` => `f` for float/decimals
     *  `key` => `i` for integers
     *  `key` => `s` for strings
@@ -69,7 +69,7 @@ class Controller extends Object {
     *  @var string
     *  @access protected
     */
-    protected $_template = 'default'; 
+    protected $_template = 'default';
 
    /**
     *  The request token.
@@ -89,14 +89,14 @@ class Controller extends Object {
 
    /**
     *  Loads the configuration settings for the controller.
-    *  
+    *
     *  @access public
     *  @return void
     */
     public function __construct(array $config = array()) {
         $defaults = array(
             'classes'   => array(
-                'session' => 'app\model\Session', 
+                'session' => 'app\model\Session',
                 'user'    => 'app\model\User'
             ),
             'http_get'  => $this->_http_get,
@@ -106,7 +106,7 @@ class Controller extends Object {
     }
 
    /**
-    *  Initializes the controller with sanitized http request data, 
+    *  Initializes the controller with sanitized http request data,
     *  generates a token to be used to ensure that the next request is valid,
     *  and loads a user object if a valid session is found.
     *
@@ -129,29 +129,30 @@ class Controller extends Object {
         $this->_token = Auth::create_token($this->classname());
 
         $session = $this->_config['classes']['session'];
-        $this->_session = new $session(); 
+        $this->_session = new $session();
 
         if ( $this->_session->is_logged_in() ) {
             $user = $this->_config['classes']['user'];
             $this->_user = new $user(array('id' => $this->_session->get_user_id()));
             $this->_template = $this->_user->get_template();
-        } 
+        }
     }
 
    /**
     *  Calls the controller method, whose return values can then
     *  be passed to and parsed by a view.
-    *       
+    *
     *  @param string $method       The method.
-    *  @param int $id              The id (passed from the URL, useful with query strings like 
-    *                              `http://foobar.com/entry/23` or `http://foobar.com/entry/view/23`).
+    *  @param int $id              The id (passed from the URL, useful with
+    *                              query strings like `http://foobar.com/entry/23`
+    *                              or `http://foobar.com/entry/view/23`).
     *  @access public
     *  @return mixed
     */
     public function call($method, $id = null) {
         if ( !method_exists($this, $method) || $this->is_protected($method) ) {
             return false;
-        }   
+        }
 
         $results = $this->$method($id);
 
@@ -160,7 +161,8 @@ class Controller extends Object {
         }
 
         $to_view = array(
-            'file' => $this->_template . '/' . lcfirst($this->classname()) . '/' . $method . '.html',
+            'file' => $this->_template . '/'
+                . lcfirst($this->classname()) . '/' . $method . '.html',
             'vars' => $results
         );
 
@@ -169,7 +171,7 @@ class Controller extends Object {
 
    /**
     *  Returns the current template.
-    *       
+    *
     *  @access public
     *  @return string
     */
@@ -179,7 +181,7 @@ class Controller extends Object {
 
    /**
     *  Handles CSRF attacks.
-    *       
+    *
     *  @access public
     *  @return void
     */
@@ -189,8 +191,8 @@ class Controller extends Object {
     }
 
    /**
-    *  Checks if a method is protected. 
-    *       
+    *  Checks if a method is protected.
+    *
     *  @param string $method       The method.
     *  @access public
     *  @return bool
@@ -200,9 +202,9 @@ class Controller extends Object {
     }
 
    /**
-    *  Checks that the token submitted with the 
+    *  Checks that the token submitted with the
     *  request data is valid.
-    *       
+    *
     *  @param array $request       The request data.
     *  @access protected
     *  @return bool
@@ -216,7 +218,7 @@ class Controller extends Object {
 
    /**
     *  Redirects the page.
-    *       
+    *
     *  @param string $page         The page to be redirected to.
     *  @access public
     *  @return bool
@@ -231,9 +233,9 @@ class Controller extends Object {
     }
 
    /**
-    *  Sanitizes data according to the sanitizers defined in $this->_sanitizers. 
+    *  Sanitizes data according to the sanitizers defined in $this->_sanitizers.
     *  If data is an object, the object's sanitize() method will be called.
-    *       
+    *
     *  @param array $data          The data to be sanitized.
     *  @access public
     *  @return array

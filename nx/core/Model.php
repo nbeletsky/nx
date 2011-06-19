@@ -16,10 +16,10 @@ use nx\lib\Meta;
 use nx\lib\Validator;
 
 /*
- *  The `Model` class is the parent class of all 
+ *  The `Model` class is the parent class of all
  *  application models.  Responsible for handling
  *  object relationships, it provides automatic
- *  interfacing with both databases and caches to 
+ *  interfacing with both databases and caches to
  *  allow for convenient object storage and retrieval.
  *  It also provides sanitization and validation mechanisms.
  *
@@ -73,7 +73,7 @@ class Model extends Object {
     *  @var array
     *  @access protected
     */
-    protected $_has_and_belongs_to_many = array(); 
+    protected $_has_and_belongs_to_many = array();
 
    /**
     *  The meta information pertinent to objects
@@ -91,7 +91,7 @@ class Model extends Object {
    /**
     *  The sanitizers to be used when parsing
     *  data.  Acceptable sanitizers are:
-    *  `key` => `b` for booleans 
+    *  `key` => `b` for booleans
     *  `key` => `f` for float/decimals
     *  `key` => `i` for integers
     *  `key` => `s` for strings
@@ -125,14 +125,14 @@ class Model extends Object {
 
    /**
     *  Initializes an object.  Takes the following configuration options:
-    *  `id`       - The primary key of an existing object, used if you 
-    *               want to load an instance of an object with its 
+    *  `id`       - The primary key of an existing object, used if you
+    *               want to load an instance of an object with its
     *               properties from the cache/database.
     *  `where`    - A WHERE clause to be used if the primary key of the
     *               object desired is unknown.  Also used if you
-    *               want to load an instance of an object with its 
+    *               want to load an instance of an object with its
     *               properties from the cache/database.
-    *  `no_cache` - Whether or not to use the cache to store/retrieve the object. 
+    *  `no_cache` - Whether or not to use the cache to store/retrieve the object.
     *  `db`       - The name of the db connection to use as defined in app/config/bootstrap/db.php.
     *  `cache`    - The name of the cache connection to use as defined in app/config/bootstrap/cache.php.
     *
@@ -153,7 +153,7 @@ class Model extends Object {
     }
 
    /**
-    *  Initializes an object.  Object properties are populated 
+    *  Initializes an object.  Object properties are populated
     *  automatically - first by checking the cache, and then, if that
     *  fails, by retrieving the values from the database.
     *
@@ -165,7 +165,7 @@ class Model extends Object {
         parent::_init();
         $this->_db = Connections::get_db($this->_config['db']);
         $this->_cache = Connections::get_cache($this->_config['cache']);
-        
+
         if ( isset($this->_config['where']) ) {
             $this->_db->find('`' . $this->_meta['key'] . '`', $this->classname(), $this->_config['where'], 'LIMIT 1');
             $result = $this->_db->fetch('assoc');
@@ -212,7 +212,7 @@ class Model extends Object {
 
         return $this->$field;
     }
-    
+
    /**
     *  Sets an object's property.
     *
@@ -229,7 +229,7 @@ class Model extends Object {
     *  Checks if `$this` has a "belongs to" relationship with the
     *  object defined in `$field`.
     *
-    *  @param string $field        The class name of the foreign object. 
+    *  @param string $field        The class name of the foreign object.
     *  @access public
     *  @return bool
     */
@@ -239,7 +239,7 @@ class Model extends Object {
 
    /**
     *  Stores an object in the cache.  Only the object's
-    *  "columns" (i.e., protected properties that are not prefixed 
+    *  "columns" (i.e., protected properties that are not prefixed
     *  with an underscore) are serialized and stored.
     *
     *  @see /nx/lib/Meta::get_columns()
@@ -260,7 +260,7 @@ class Model extends Object {
 
    /**
     *  Deletes an object from both the cache and the database.
-    *       
+    *
     *  @param string|array $where        The WHERE clause to be included in the DELETE query.
     *  @access public
     *  @return bool
@@ -283,9 +283,9 @@ class Model extends Object {
     }
 
    /**
-    *  Finds and returns an array of all the objects in the 
-    *  database that match the conditions provided in `$where`. 
-    *       
+    *  Finds and returns an array of all the objects in the
+    *  database that match the conditions provided in `$where`.
+    *
     *  @param string|array $where        The WHERE clause of the SQL query.
     *  @access public
     *  @return array
@@ -306,7 +306,7 @@ class Model extends Object {
    /**
     *  Returns the object associated with `$this` via a
     *  "belongs to" relationship.
-    *       
+    *
     *  @param string $field        The object name.
     *  @access protected
     *  @return object
@@ -315,11 +315,11 @@ class Model extends Object {
         $lookup_id = $field . $this->_meta['pk_separator'] . $this->_meta['key'];
         $obj_id = $this->$lookup_id;
 
-        return new $field(array('id' => $obj_id)); 
+        return new $field(array('id' => $obj_id));
     }
 
    /**
-    *  Retrieves the "columns" (i.e., protected properties 
+    *  Retrieves the "columns" (i.e., protected properties
     *  that are not prefixed with an underscore) belonging
     *  to `$this`.
     *
@@ -333,15 +333,15 @@ class Model extends Object {
    /**
     *  Returns an array of objects associated with `$this` via a
     *  "has and belongs to many" relationship.
-    *       
+    *
     *  @param string $field        The object name.
     *  @access protected
     *  @return array
     */
     protected function _get_habtm($field) {
         $class_name = get_class($this);
-        if ( $class_name < $field ) { 
-            $table_name = $class_name . $this->_meta['habtm_separator'] . $field; 
+        if ( $class_name < $field ) {
+            $table_name = $class_name . $this->_meta['habtm_separator'] . $field;
         } else {
             $table_name = $field . $this->_meta['habtm_separator'] . $class_name;
         }
@@ -356,7 +356,7 @@ class Model extends Object {
         $collection = array();
         foreach ( $rows as $row ) {
             $new_id = $row[$target_id];
-            $collection[$new_id] = new $field(array('id' => $new_id)); 
+            $collection[$new_id] = new $field(array('id' => $new_id));
         }
         return $collection;
     }
@@ -364,7 +364,7 @@ class Model extends Object {
    /**
     *  Returns an array of objects associated with `$this` via a
     *  "has many" relationship.
-    *       
+    *
     *  @param string $field        The object name.
     *  @access protected
     *  @return array
@@ -379,7 +379,7 @@ class Model extends Object {
    /**
     *  Returns the object associated with `$this` via a
     *  "has one" relationship.
-    *       
+    *
     *  @param string $field        The object name.
     *  @access protected
     *  @return object
@@ -393,12 +393,12 @@ class Model extends Object {
         $result = $this->_db->fetch('assoc');
         $obj_id = $result[$this->_meta['key']];
 
-        return new $field(array('id' => $obj_id)); 
+        return new $field(array('id' => $obj_id));
     }
 
    /**
     *  Returns the primary key associated with `$this`.
-    *       
+    *
     *  @access public
     *  @return int
     */
@@ -419,22 +419,22 @@ class Model extends Object {
     }
 
    /**
-    *  Checks if `$this` has a "has and belongs to many" 
+    *  Checks if `$this` has a "has and belongs to many"
     *  relationship with the object defined in `$field`.
     *
-    *  @param string $field        The class name of the foreign object. 
+    *  @param string $field        The class name of the foreign object.
     *  @access public
     *  @return bool
     */
     public function habtm($field) {
         return ( in_array($field, $this->_has_and_belongs_to_many) );
     }
-    
+
    /**
     *  Checks if `$this` has a "has many" relationship with the
     *  object defined in `$field`.
     *
-    *  @param string $field        The class name of the foreign object. 
+    *  @param string $field        The class name of the foreign object.
     *  @access public
     *  @return bool
     */
@@ -446,7 +446,7 @@ class Model extends Object {
     *  Checks if `$this` has a "has one" relationship with the
     *  object defined in `$field`.
     *
-    *  @param string $field        The class name of the foreign object. 
+    *  @param string $field        The class name of the foreign object.
     *  @access public
     *  @return bool
     */
@@ -456,10 +456,10 @@ class Model extends Object {
 
    /**
     *  Checks that a specific object property is valid.  If no property
-    *  is supplied, then all of the object's "columns" (i.e., protected 
-    *  properties that are not prefixed with an underscore) will be validated.  
+    *  is supplied, then all of the object's "columns" (i.e., protected
+    *  properties that are not prefixed with an underscore) will be validated.
     *  Corresponding errors are stored in $this->_validation_errors.
-    *       
+    *
     *  @see /nx/lib/Validator
     *  @param string|null $field        The object property to be validated.
     *  @access public
@@ -469,13 +469,13 @@ class Model extends Object {
         if ( empty($this->_validators) ) {
             return true;
         }
-        
+
         if ( !is_null($field) ) {
             $this->_validation_errors = $this->_validate($field);
         } else {
             $this->_validation_errors = array();
             foreach ( array_key_values($this->get_columns()) as $field ) {
-                $this->_validation_errors += $this->_validate($field); 
+                $this->_validation_errors += $this->_validate($field);
             }
         }
         return ( empty($this->_validation_errors) );
@@ -510,7 +510,7 @@ class Model extends Object {
    /**
     *  Sanitizes an object's properties in accordance with the sanitizers
     *  defined in $this->_sanitzers.
-    *       
+    *
     *  @access public
     *  @return object
     */
@@ -523,7 +523,7 @@ class Model extends Object {
 
    /**
     *  Stores an object in both the database and the cache.
-    *       
+    *
     *  @access public
     *  @return bool
     */
@@ -545,7 +545,7 @@ class Model extends Object {
     *  Validates a property of an object in accordance with the
     *  validators defined in $this->_validators.  Returns an array
     *  of error messages.
-    *       
+    *
     *  @param string $field        The object property to be validated.
     *  @access protected
     *  @return array

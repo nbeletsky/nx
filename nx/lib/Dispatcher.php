@@ -22,8 +22,8 @@ use nx\core\View;
 class Dispatcher {
 
    /**
-    *  Parses a query string and returns the controller, action, 
-    *  id, and any additional arguments passed via $_GET. 
+    *  Parses a query string and returns the controller, action,
+    *  id, and any additional arguments passed via $_GET.
     *
     *  @param string $query_string        The controller name.
     *  @access public
@@ -33,9 +33,15 @@ class Dispatcher {
 
         parse_str($query_string, $query);
 
-        $controller = ( isset($query['controller']) ) ? ucfirst($query['controller']) : 'Dashboard';
-        $action =     ( isset($query['action']) )     ? $query['action']              : 'index';
-        $id =         ( isset($query['id']) )         ? $query['id']                  : null;
+        $controller = ( isset($query['controller']) )
+            ? ucfirst($query['controller'])
+            : 'Dashboard';
+        $action = ( isset($query['action']) )
+            ? $query['action']
+            : 'index';
+        $id = ( isset($query['id']) )
+            ? $query['id']
+            : null;
 
         $get = array();
         if ( isset($query['args']) && $query['args'] != '' ) {
@@ -54,12 +60,12 @@ class Dispatcher {
     *  @return bool
     */
     public static function render($args) {
-        $controller_name = 'app\controller\\' . $args['controller']; 
+        $controller_name = 'app\controller\\' . $args['controller'];
 
         if ( !class_exists($controller_name) ) {
             self::throw_404('default');
             return false;
-        } 
+        }
 
         $controller = new $controller_name(array(
             'http_get'  => $args['get'],

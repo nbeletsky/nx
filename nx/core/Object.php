@@ -15,10 +15,10 @@ use nx\lib\Meta;
 /*
  *  The `Object` class is the class from which the other
  *  core classes inherit.  Rather than rely on complex
- *  method signatures for class instantiation, it provides 
- *  a simple mechanism by which configuration settings 
- *  can be passed to class constructors by means of an 
- *  array, and optionally 'initializes' an object following 
+ *  method signatures for class instantiation, it provides
+ *  a simple mechanism by which configuration settings
+ *  can be passed to class constructors by means of an
+ *  array, and optionally 'initializes' an object following
  *  construction.
  *
  *  @package core
@@ -43,7 +43,7 @@ class Object {
 
    /**
     *  Loads the configuration settings for the class.
-    *  
+    *
     *  @access public
     *  @return void
     */
@@ -58,7 +58,7 @@ class Object {
 
    /**
     *  Initializes the class.
-    *  
+    *
     *  @access public
     *  @return void
     */
@@ -68,7 +68,7 @@ class Object {
 
    /**
     *  Returns the object's classname without the namespace.
-    *       
+    *
     *  @access public
     *  @return string
     */

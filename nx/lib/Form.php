@@ -13,8 +13,8 @@ namespace nx\lib;
 /*
  *  The `Form` class is used to generate common HTML elements.
  *  All helper creation methods accept an optional `$binding` parameter,
- *  which can be used to autopopulate an instance of that object 
- *  with the element's values upon form submission. 
+ *  which can be used to autopopulate an instance of that object
+ *  with the element's values upon form submission.
  *
  *  @see /nx/lib/Data::extract_post()
  *  @package lib
@@ -23,8 +23,8 @@ class Form {
 
    /**
     *  Maintains the array index of bindings.
-    *  (This is used when a Form method [e.g., Form->text()] is called 
-    *  multiple times with the same parameters.  An index is needed 
+    *  (This is used when a Form method [e.g., Form->text()] is called
+    *  multiple times with the same parameters.  An index is needed
     *  to ensure that both inputs are passed to the server
     *  under unique names.)
     *
@@ -34,10 +34,11 @@ class Form {
     protected $_binding_counter = array();
 
    /**
-    * Creates a checkbox. 
-    * 
-    * @param array $attributes          The HTML attributes. 
-    * @param obj $binding               The object to which the value of the checkbox should be mapped.
+    * Creates a checkbox.
+    *
+    * @param array $attributes          The HTML attributes.
+    * @param obj $binding               The object to which the value of
+    *                                   the checkbox should be mapped.
     * @access public
     * @return string
     */
@@ -45,19 +46,24 @@ class Form {
         $html = "<input type='checkbox' ";
         $html .= $this->_parse_attributes($attributes, $binding);
 
-        if ( !is_null($binding) && isset($binding->$attributes['name']) && $binding->$attributes['name'] == $attributes['value'] ) {
+        if (
+            !is_null($binding)
+            && isset($binding->$attributes['name'])
+            && $binding->$attributes['name'] == $attributes['value']
+        ) {
             $html .= "checked='checked' ";
         }
         $html .= "/>";
-        
+
         return $html;
     }
 
    /**
-    * Creates an email textbox. 
-    * 
-    * @param array $attributes          The HTML attributes. 
-    * @param obj $binding               The object to which the value of the textbox should be mapped.
+    * Creates an email textbox.
+    *
+    * @param array $attributes          The HTML attributes.
+    * @param obj $binding               The object to which the value of the
+    *                                   textbox should be mapped.
     * @access public
     * @return string
     */
@@ -80,10 +86,11 @@ class Form {
     }
 
    /**
-    * Creates a hidden input. 
-    * 
-    * @param array $attributes          The HTML attributes. 
-    * @param obj $binding               The object to which the value of the hidden input should be mapped.
+    * Creates a hidden input.
+    *
+    * @param array $attributes          The HTML attributes.
+    * @param obj $binding               The object to which the value of the
+    *                                   hidden input should be mapped.
     * @access public
     * @return string
     */
@@ -95,7 +102,8 @@ class Form {
     * Creates an input field.
     *
     * @param array $attributes          The HTML attributes.
-    * @param obj $binding               The object to which the value of the input should be mapped.
+    * @param obj $binding               The object to which the value of the
+    *                                   input should be mapped.
     * @access protected
     * @return string
     */
@@ -108,10 +116,11 @@ class Form {
     }
 
    /**
-    * Creates a number textbox. 
-    * 
-    * @param array $attributes          The HTML attributes. 
-    * @param obj $binding               The object to which the value of the textbox should be mapped.
+    * Creates a number textbox.
+    *
+    * @param array $attributes          The HTML attributes.
+    * @param obj $binding               The object to which the value of the textbox
+    *                                   should be mapped.
     * @access public
     * @return string
     */
@@ -120,10 +129,11 @@ class Form {
     }
 
    /**
-    * Parses HTML attributes and binds an object's value to an element. 
-    * 
-    * @param array $attributes          The HTML attributes. 
-    * @param obj $binding               The object to which the value of the hidden input should be mapped.
+    * Parses HTML attributes and binds an object's value to an element.
+    *
+    * @param array $attributes          The HTML attributes.
+    * @param obj $binding               The object to which the value of the
+    *                                   hidden input should be mapped.
     * @access protected
     * @return string
     */
@@ -134,46 +144,59 @@ class Form {
             // An attribute passed alone without a key (e.g., array('autofocus'))
             // will be assigned a numeric key by PHP
             if ( is_numeric($key) ) {
-                $html .= $setting . " "; 
-            } else {
-                switch ( $key ) {
-                    case 'name':
-                        if ( !is_null($binding) ) {
-                            if ( !is_null($binding->get_pk()) ) {
-                                $setting = $binding->classname() . '|' . $binding->get_pk() . '[' . $setting . "]";
-                            } else {
-                                if ( !array_key_exists($binding->classname(), $this->_binding_counter) ) {
-                                    $this->_binding_counter[$binding->classname()] = array($setting);
-                                } else {
-                                    $this->_binding_counter[$binding->classname()][] = $setting;
-                                }
-                                $count = array_count_values($this->_binding_counter[$binding->classname()]);
-                                $index = $count[$setting] - 1;
-                                $setting = $binding->classname() . '[' . $index . '][' . $setting . "]";
-                            }
-                        }
+                $html .= $setting . " ";
+                continue;
+            }
+
+            switch ( $key ) {
+                case 'name':
+                    if ( is_null($binding) ) {
                         break;
-                    case 'value':
-                        $value_present = true;
+                    }
+
+                    $b_class = $binding->classname();
+
+                    if ( !is_null($binding->get_pk()) ) {
+                        $setting = $b_class
+                            . '|' . $binding->get_pk()
+                            . '[' . $setting . "]";
                         break;
-                }
-                $html .= $key . "='" . $this->escape($setting) . "' "; 
-            } 
+                    }
+
+                    if ( !array_key_exists($b_class, $this->_binding_counter) ) {
+                        $this->_binding_counter[$b_class] = array($setting);
+                    } else {
+                        $this->_binding_counter[$b_class][] = $setting;
+                    }
+                    $count = array_count_values($this->_binding_counter[$b_class]);
+                    $index = $count[$setting] - 1;
+                    $setting = $b_class . '[' . $index . '][' . $setting . "]";
+                    break;
+                case 'value':
+                    $value_present = true;
+                    break;
+            }
+            $html .= $key . "='" . $this->escape($setting) . "' ";
         }
 
-        if ( !$value_present && !is_null($binding) && !is_null($binding->$attributes['name']) ) {
+        if (
+            !$value_present
+            && !is_null($binding)
+            && !is_null($binding->$attributes['name'])
+        ) {
             $html .= "value='" . $this->escape($binding->$attributes['name']) . "'";
-        } 
+        }
 
         return $html;
     }
 
    /**
     * Creates a set of radio buttons.
-    * 
-    * @param array $attributes          The HTML attributes. 
+    *
+    * @param array $attributes          The HTML attributes.
     * @param array $options             The values to use for the radio buttons.
-    * @param obj $binding               The object to which the value of the radio buttons should be mapped.
+    * @param obj $binding               The object to which the value of the
+    *                                   radio buttons should be mapped.
     * @access public
     * @return string
     */
@@ -182,7 +205,11 @@ class Form {
         foreach ( $values as $value => $display ) {
             $html .= "<input type='radio' ";
             $html .= $this->_parse_attributes($attributes, $binding);
-            if ( !is_null($binding) && isset($binding->$attributes['name']) && $binding->$attributes['name'] == $value ) {
+            if (
+                !is_null($binding)
+                && isset($binding->$attributes['name'])
+                && $binding->$attributes['name'] == $value
+            ) {
                 $html .= "checked='checked' ";
             }
             $html.= "/>";
@@ -192,10 +219,11 @@ class Form {
     }
 
    /**
-    * Creates a search textbox. 
-    * 
-    * @param array $attributes          The HTML attributes. 
-    * @param obj $binding               The object to which the value of the textbox should be mapped.
+    * Creates a search textbox.
+    *
+    * @param array $attributes          The HTML attributes.
+    * @param obj $binding               The object to which the value of the
+    *                                   textbox should be mapped.
     * @access public
     * @return string
     */
@@ -205,10 +233,11 @@ class Form {
 
    /**
     * Creates a dropdown list.
-    * 
-    * @param array $attributes          The HTML attributes. 
+    *
+    * @param array $attributes          The HTML attributes.
     * @param array $options             The options with which to populate the dropdown list.
-    * @param obj $binding               The object to which the value of the dropdown list should be mapped.
+    * @param obj $binding               The object to which the value of the
+    *                                   dropdown list should be mapped.
     * @access public
     * @return string
     */
@@ -218,8 +247,12 @@ class Form {
         $html .= ">";
         foreach( $options as $value => $display ) {
             $html.= "<option value='" . $this->escape($value) . "' ";
-                
-            if ( !is_null($binding) && isset($binding->$attributes['name']) && $binding->$attributes['name'] == $value ) {
+
+            if (
+                !is_null($binding)
+                && isset($binding->$attributes['name'])
+                && $binding->$attributes['name'] == $value
+            ) {
                 $html.= "selected='selected' ";
             }
             $html.= ">" . $this->escape($display) . "</option>";
@@ -230,10 +263,11 @@ class Form {
     }
 
    /**
-    * Creates a textbox. 
-    * 
-    * @param array $attributes          The HTML attributes. 
-    * @param obj $binding               The object to which the value of the textbox should be mapped.
+    * Creates a textbox.
+    *
+    * @param array $attributes          The HTML attributes.
+    * @param obj $binding               The object to which the value of the
+    *                                   textbox should be mapped.
     * @access public
     * @return string
     */
@@ -242,10 +276,11 @@ class Form {
     }
 
    /**
-    * Creates a textarea. 
-    * 
-    * @param array $attributes          The HTML attributes. 
-    * @param obj $binding               The object to which the value of the textarea should be mapped.
+    * Creates a textarea.
+    *
+    * @param array $attributes          The HTML attributes.
+    * @param obj $binding               The object to which the value of the
+    *                                   textarea should be mapped.
     * @access public
     * @return string
     */
@@ -254,11 +289,11 @@ class Form {
         $html .= $this->_parse_attributes($attributes, $binding);
         $html .= '>';
         if ( isset($attributes['value']) ) {
-            $html .= $this->escape($attributes['value']); 
+            $html .= $this->escape($attributes['value']);
         } elseif ( !is_null($binding) && isset($binding->$attributes['name']) ) {
-            $html .= $this->escape($binding->$attributes['name']); 
+            $html .= $this->escape($binding->$attributes['name']);
         }
-        $html .= "</textarea>"; 
+        $html .= "</textarea>";
 
         return $html;
     }

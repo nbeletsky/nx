@@ -25,8 +25,18 @@ class User extends \nx\core\Model {
         ),
         'username' => array(
             array('not_empty', 'message' => 'Username cannot be blank.'),
-            array('alphanumeric', 'message' => 'Username must contain only alphanumeric characters.'),
-            array('length_between', 'options' => array('min' => '5', 'max' => 16), 'message' => 'Username must be between 5 and 16 characters.'),
+            array(
+                'alphanumeric',
+                'message' => 'Username must contain only alphanumeric characters.'
+            ),
+            array(
+                'length_between',
+                'options' => array(
+                    'min' => '5',
+                    'max' => 16
+                ),
+                'message' => 'Username must be between 5 and 16 characters.'
+            ),
         ),
         'ip' => array(
             array('ip', 'message' => 'ip is invalid.')

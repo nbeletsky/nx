@@ -19,7 +19,7 @@ namespace nx\lib;
 class File {
 
    /**
-    *  Erases the contents of a file. 
+    *  Erases the contents of a file.
     *
     *  @param string $filename        The file to be emptied.
     *  @access public
@@ -60,7 +60,8 @@ class File {
         $handle = @fopen($filename, $mode);
         if ( !$handle ) {
             // TODO: Set exception handler!
-            throw new \Exception('Could not open ' . $filename . ' for writing.  Check the location and permissions of the file and try again.');
+            throw new \Exception('Could not open ' . $filename . ' for writing.'
+                . '  Check the location and permissions of the file and try again.');
         }
 
         fwrite($handle, $data);

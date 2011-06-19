@@ -20,7 +20,7 @@ class String {
 
    /**
     *  Returns the string between two delimiters in a body of text.
-    *       
+    *
     *  @param string $start         The beginning delimiter.
     *  @param string $end           The ending delimiter.
     *  @param string $body          The text containing the delimiters.
@@ -36,7 +36,7 @@ class String {
 
    /**
     *  Decrypts cookie user ID.
-    *       
+    *
     *  @param string $hex_hash      The hash to be decrypted.
     *  @access public
     *  @return int
@@ -50,7 +50,7 @@ class String {
         $cur_pos = 0;
         $hex_id = '';
         for ( $i = 0; $i <= 7; $i++ ) {
-            $cur_pos += $i + 1; 
+            $cur_pos += $i + 1;
             $hex_id .= substr($hex_hash, $cur_pos, 1);
         }
         // Convert hex to user id
@@ -59,7 +59,7 @@ class String {
 
    /**
     *  Encrypts user ID for cookie use.
-    *       
+    *
     *  @param int $user_id      The user's ID.
     *  @access public
     *  @return string
@@ -73,8 +73,13 @@ class String {
         // Interpolate hex into hash
         $cur_pos = 0;
         for ( $i = 0; $i <= 7; $i++ ) {
-            $cur_pos += $i + 1; 
-            $hex_hash = substr_replace($hex_hash, substr($user_hex, $i, 1), $cur_pos, 1);
+            $cur_pos += $i + 1;
+            $hex_hash = substr_replace(
+                $hex_hash,
+                substr($user_hex, $i, 1),
+                $cur_pos,
+                1
+            );
         }
         return $hex_hash;
     }

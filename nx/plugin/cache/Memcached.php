@@ -19,7 +19,7 @@ namespace nx\plugin\cache;
 class Memcached extends \nx\core\Object {
 
    /**
-    *  The Memcached object. 
+    *  The Memcached object.
     *
     *  @var object
     *  @access protected
@@ -29,10 +29,15 @@ class Memcached extends \nx\core\Object {
    /**
     *  Loads the configuration settings for Memcached.
     *
-    *  @param array $config                     The configuration settings, which can take two options:
-    *                                           `host`          - The hostname of the memcached server.
-    *                                           `persistent_id` - A unique ID used to allow persistence between requests.
-    *                                           (By default, instances are destroyed at the end of the request.)
+    *  @param array $config                     The configuration settings, which
+    *                                           can take two options:
+    *                                           `host`          - The hostname of
+    *                                                             the memcached server.
+    *                                           `persistent_id` - A unique ID used
+    *                                                             to allow persistence
+    *                                                             between requests.
+    *                                           (By default, instances are
+    *                                           destroyed at the end of the request.)
     *  @access public
     *  @return void
     */
@@ -45,8 +50,8 @@ class Memcached extends \nx\core\Object {
     }
 
    /**
-    *  Creates a new instance of Memcached and adds a server if one does not exist using
-    *  the provided host. 
+    *  Creates a new instance of Memcached and adds a server if one does
+    *  not exist using the provided host.
     *
     *  @access protected
     *  @return void
@@ -73,17 +78,21 @@ class Memcached extends \nx\core\Object {
     }
 
    /**
-    *  Adds an item under a new key.  Functionally equivalent to store(), though this operation will fail
-    *  if $key already exists on the server.
+    *  Adds an item under a new key.  Functionally equivalent to store(),
+    *  though this operation will fail if $key already exists on the server.
     *
     *  @param string $key                       The key under which to store the value.
-    *  @param mixed $value                      The value to be stored. 
-    *  @param string $server_key                The key identifying the server to store the value on.
-    *  @param int $expiration                   The expiration time.  Can be number of seconds from now.  
-    *                                           If this value exceeds 60*60*24*30 (number of seconds in 30 days), the value will be interpreted
-    *                                           as a UNIX timestamp.
+    *  @param mixed $value                      The value to be stored.
+    *  @param string $server_key                The key identifying the
+    *                                           server to store the value on.
+    *  @param int $expiration                   The expiration time.
+    *                                           Can be number of seconds from now.
+    *                                           If this value exceeds 60*60*24*30
+    *                                           (number of seconds in 30 days),
+    *                                           the value will be interpreted as
+    *                                           a UNIX timestamp.
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function add($key, $value, $server_key = '', $expiration = 0) {
         return $this->_cache->addByKey($server_key, $key, $value, $expiration);
@@ -93,12 +102,18 @@ class Memcached extends \nx\core\Object {
     *  Adds a server to the server pool.
     *
     *  @param string $host                      The hostname of the memcached server.
-    *  @param int $weight                       The weight of the server relative to the total weight of all the servers in the pool. 
-    *                                           This controls the probability of the server being selected for operations, and
-    *                                           usually corresponds to the amount of memory available to memcached on that server.
-    *  @param int $port                         The port on which memcache is running.  (Typically 11211.)
+    *  @param int $weight                       The weight of the server relative
+    *                                           to the total weight of all the
+    *                                           servers in the pool.
+    *                                           This controls the probability of
+    *                                           the server being selected for
+    *                                           operations, and usually corresponds
+    *                                           to the amount of memory available
+    *                                           to memcached on that server.
+    *  @param int $port                         The port on which memcache is running.
+    *                                           (Typically 11211.)
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function add_server($host, $weight = 0, $port = 11211) {
         return $this->_cache->addServer($host, $port, $weight);
@@ -107,23 +122,24 @@ class Memcached extends \nx\core\Object {
    /**
     *  Adds multiple servers to the server pool.
     *
-    *  @param array $servers                    Array of the servers to add to the pool. 
-    *                                           Expected format: array(
-    *                                                                array(
-    *                                                                    'host'   => $host, 
-    *                                                                    'weight' => $weight [ = 0], 
-    *                                                                    'port'   => $port [ = 11211]
-    *                                                                )
-    *                                                            )
+    *  @param array $servers                    Array of the servers to add to the pool.
+    *                                           Expected format:
+    *                                           array(
+    *                                               array(
+    *                                                   'host'   => $host,
+    *                                                   'weight' => $weight [ = 0],
+    *                                                   'port'   => $port [ = 11211]
+    *                                               )
+    *                                           )
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function add_servers($servers) {
         $reassembled = array();
         foreach ( $servers as $server ) {
             $reassembled[] = array(
-                $server['host'], 
-                (isset($server['port'])) ? $server['port'] : 11211, 
+                $server['host'],
+                (isset($server['port'])) ? $server['port'] : 11211,
                 (isset($server['weight'])) ? $server['weight'] : 0
             );
         }
@@ -136,26 +152,33 @@ class Memcached extends \nx\core\Object {
     *
     *  @param string $key                       The key under which to store the value.
     *  @param string $value                     The string to append.
-    *  @param mixed $server_key                 The key identifying the server to store the value on.
+    *  @param mixed $server_key                 The key identifying the server
+    *                                           to store the value on.
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function append($key, $value, $server_key = '') {
         return $this->_cache->appendByKey($server_key, $key, $value);
     }
 
    /**
-    *  Compares and swaps an item.  This means that the item will be stored only if no other client has updated it since it was last fetched by this client.
+    *  Compares and swaps an item.  This means that the item will be stored only
+    *  if no other client has updated it since it was last fetched by this client.
     *
-    *  @param float $token                      Unique value associated with the existing item. Generated by memcached.
+    *  @param float $token                      Unique value associated with the
+    *                                           existing item. Generated by memcached.
     *  @param string $key                       The key under which to store the value.
-    *  @param mixed $value                      The value to be stored. 
-    *  @param string $server_key                The key identifying the server to store the value on.
-    *  @param int $expiration                   The expiration time.  Can be number of seconds from now.  
-    *                                           If this value exceeds 60*60*24*30 (number of seconds in 30 days), the value will be interpreted
+    *  @param mixed $value                      The value to be stored.
+    *  @param string $server_key                The key identifying the server
+    *                                           to store the value on.
+    *  @param int $expiration                   The expiration time.  Can be
+    *                                           number of seconds from now.
+    *                                           If this value exceeds 60*60*24*30
+    *                                           (number of seconds in 30 days),
+    *                                           the value will be interpreted
     *                                           as a UNIX timestamp.
     *  @access public
-    *  @return bool 
+    *  @return bool
     *
     *  @see /nx/plugin/cache/Memcached->retrieve() for how to obtain the CAS token.
     */
@@ -167,10 +190,14 @@ class Memcached extends \nx\core\Object {
     *  Decrements a numeric item's value.
     *
     *  @param string $key                       The key of the item to decrement.
-    *  @param int $offset                       The amount by which to decrement the item's value. 
+    *  @param int $offset                       The amount by which to decrement
+    *                                           the item's value.
     *  @access public
-    *  @return int                              If the item's value is not numeric, it is treated as if the value were 0.
-    *                                           If the operation would decrease the value below 0, the new value will be 0.
+    *  @return int                              If the item's value is not
+    *                                           numeric, it is treated as if the
+    *                                           value were 0.  If the operation
+    *                                           would decrease the value below
+    *                                           0, the new value will be 0.
     */
     public function decrement($key, $offset = 1) {
         return $this->_cache->decrement($key, $offset);
@@ -180,10 +207,12 @@ class Memcached extends \nx\core\Object {
     *  Deletes an item.
     *
     *  @param string $key                       The key to be deleted.
-    *  @param string $server_key                The key identifying the server to delete the value from.
-    *  @param int $time                         The amount of time the server will wait to delete the item.
+    *  @param string $server_key                The key identifying the server
+    *                                           to delete the value from.
+    *  @param int $time                         The amount of time the server
+    *                                           will wait to delete the item.
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function delete($key, $server_key = '', $time = 0) {
         return $this->_cache->deleteByKey($server_key, $key, $time);
@@ -192,9 +221,10 @@ class Memcached extends \nx\core\Object {
    /**
     *  Invalidates all items in the cache.
     *
-    *  @param int $delay                        Number of seconds to wait before invalidating the items.
+    *  @param int $delay                        Number of seconds to wait before
+    *                                           invalidating the items.
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function flush($delay = 0) {
         return $this->_cache->flush($delay);
@@ -204,9 +234,12 @@ class Memcached extends \nx\core\Object {
     *  Increments a numeric item's value.
     *
     *  @param string $key                       The key of the item to increment.
-    *  @param int $offset                       The amount by which to increment the item's value. 
+    *  @param int $offset                       The amount by which to increment
+    *                                           the item's value.
     *  @access public
-    *  @return int                              If the item's value is not numeric, it is treated as if the value were 0.
+    *  @return int                              If the item's value is not
+    *                                           numeric, it is treated as if the
+    *                                           value were 0.
     */
     public function increment($key, $offset = 1) {
         return $this->_cache->increment($key, $offset);
@@ -217,26 +250,32 @@ class Memcached extends \nx\core\Object {
     *
     *  @param string $key                       The key of the item to prepend the data to.
     *  @param string $value                     The string to prepend.
-    *  @param mixed $server_key                 The key identifying the server to store the value on.
+    *  @param mixed $server_key                 The key identifying the server
+    *                                           to store the value on.
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function prepend($key, $value, $server_key = '') {
         return $this->_cache->prependByKey($server_key, $key, $value);
     }
 
    /**
-    *  Replaces the item under an existing key.  Functionally equivalent to store(), though this operation will fail
+    *  Replaces the item under an existing key.  Functionally
+    *  equivalent to store(), though this operation will fail
     *  if $key does not exist.
     *
     *  @param string $key                       The key under which to store the value.
-    *  @param mixed $value                      The value to be stored. 
-    *  @param string $server_key                The key identifying the server to store the value on.
-    *  @param int $expiration                   The expiration time.  Can be number of seconds from now.  
-    *                                           If this value exceeds 60*60*24*30 (number of seconds in 30 days), the value will be interpreted
-    *                                           as a UNIX timestamp.
+    *  @param mixed $value                      The value to be stored.
+    *  @param string $server_key                The key identifying the server
+    *                                           to store the value on.
+    *  @param int $expiration                   The expiration time.
+    *                                           Can be number of seconds from now.
+    *                                           If this value exceeds 60*60*24*30
+    *                                           (number of seconds in 30 days),
+    *                                           the value will be interpreted as
+    *                                           a UNIX timestamp.
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function replace($key, $value, $server_key = '', $expiration = 0) {
         return $this->_cache->replaceByKey($server_key, $key, $value, $expiration);
@@ -246,15 +285,16 @@ class Memcached extends \nx\core\Object {
     *  Retrieves an item.  Returns false if the key is not found.
     *
     *  @param string $key                       The key of the item to retrieve.
-    *  @param string $server_key                The key identifying the server to retrieve the value from.
-    *  @param callback $cache_callback          Read-through caching callback. 
-    *  @param float &$cas_token                 The variable to store the CAS token in. 
+    *  @param string $server_key                The key identifying the server
+    *                                           to retrieve the value from.
+    *  @param callback $cache_cb                Read-through caching callback.
+    *  @param float &$cas_token                 The variable to store the CAS token in.
     *  @access public
-    *  @return mixed 
+    *  @return mixed
     *
     *  @see /nx/plugin/cache/Memcached->cas() for how to use CAS tokens.
     */
-    public function retrieve($key, $server_key = '', $cache_callback = null, &$cas_token = null) {
+    public function retrieve($key, $server_key = '', $cache_cb = null, &$cas_token = null) {
         return $this->_cache->getByKey($server_key, $key, $cache_callback, $cas_token);
     }
 
@@ -282,13 +322,17 @@ class Memcached extends \nx\core\Object {
     *  Stores an item.
     *
     *  @param string $key                       The key under which to store the value.
-    *  @param mixed $value                      The value to be stored. 
-    *  @param string $server_key                The key identifying the server to store the value on.
-    *  @param int $expiration                   The expiration time.  Can be number of seconds from now.  
-    *                                           If this value exceeds 60*60*24*30 (number of seconds in 30 days), the value will be interpreted
+    *  @param mixed $value                      The value to be stored.
+    *  @param string $server_key                The key identifying the server
+    *                                           to store the value on.
+    *  @param int $expiration                   The expiration time.
+    *                                           Can be number of seconds from now.
+    *                                           If this value exceeds 60*60*24*30
+    *                                           (number of seconds in 30 days),
+    *                                           the value will be interpreted
     *                                           as a UNIX timestamp.
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function store($key, $value, $server_key = '', $expiration = 0) {
         $result = $this->_cache->setByKey($server_key, $key, $value, $expiration);

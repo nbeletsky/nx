@@ -11,7 +11,7 @@
 namespace nx\lib;
 
 /*
- *  Adopted from PHPass, the `Password` class is 
+ *  Adopted from PHPass, the `Password` class is
  *  used to create and check password hashes.
  *
  *  @package lib

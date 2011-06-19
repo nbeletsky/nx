@@ -39,11 +39,13 @@ class Connections {
     *
     *  @see app\config\bootstrap\cache.php
     *  @param string $name          The name of the cache handler.
-    *  @param array $options        The cache options.  Takes the 
+    *  @param array $options        The cache options.  Takes the
     *                               following parameters:
     *                               `plugin`        - The name of the cache plugin.
-    *                               `host`          - The hostname of the server where the cache resides.
-    *                               `persistent_id` - A unique ID used to allow persistence between requests.
+    *                               `host`          - The hostname of the server
+    *                                                 where the cache resides.
+    *                               `persistent_id` - A unique ID used to allow
+    *                                                 persistence between requests.
     *  @access public
     *  @return void
     */
@@ -58,7 +60,7 @@ class Connections {
     *
     *  @see app\config\bootstrap\db.php
     *  @param string $name          The name of the database handler.
-    *  @param array $options        The database options.  Takes the 
+    *  @param array $options        The database options.  Takes the
     *                               following parameters:
     *                               `plugin`   - The name of the database plugin.
     *                               `database` - The name of the database.

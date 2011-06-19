@@ -11,8 +11,8 @@
 namespace nx\core;
 
 /*
- *  The `View` class is the parent class of all 
- *  application views.  It provides access to a 
+ *  The `View` class is the parent class of all
+ *  application views.  It provides access to a
  *  form helper for assistance with creating common
  *  page elements.
  *
@@ -30,7 +30,7 @@ class View extends Object {
 
    /**
     *  Loads the configuration settings for the view.
-    *  
+    *
     *  @access public
     *  @return void
     */
@@ -58,7 +58,7 @@ class View extends Object {
 
    /**
     *  Renders a given file with the supplied variables.
-    *       
+    *
     *  @param string $file         The file to be rendered.
     *  @param mixed $vars          Variables to be substituted in the view.
     *  @access public

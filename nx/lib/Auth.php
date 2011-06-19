@@ -12,8 +12,8 @@ namespace nx\lib;
 
 /*
  *  The `Auth` class is used to create and validate
- *  form tokens.  These tokens help to ensure that 
- *  any remote data sent to the server comes from the 
+ *  form tokens.  These tokens help to ensure that
+ *  any remote data sent to the server comes from the
  *  actual sender, and not via a CSRF.
  *
  *  @package lib
@@ -23,8 +23,8 @@ class Auth {
    /**
     *  Creates a unique token for a given controller.
     *
-    *  @param string $controller     The controller name. 
-    *  @param string $salt           The token salt. 
+    *  @param string $controller     The controller name.
+    *  @param string $salt           The token salt.
     *  @access public
     *  @return string
     */
@@ -39,7 +39,7 @@ class Auth {
     *  Checks that a controller's token is valid for a given request.
     *
     *  @param array $request         The data provided with the http request.
-    *  @param string $controller     The controller name. 
+    *  @param string $controller     The controller name.
     *  @access public
     *  @return bool
     */

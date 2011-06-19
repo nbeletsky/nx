@@ -18,10 +18,11 @@ namespace nx\lib;
  */
 class Meta {
 
-   /** 
-    *  Returns the classname without the namespace. 
+   /**
+    *  Returns the classname without the namespace.
     *
-    *  @param object|string $obj          The object or class name from which to retrieve the classname.
+    *  @param object|string $obj          The object or class name from which
+    *                                     to retrieve the classname.
     *  @access public
     *  @return string
     */
@@ -29,13 +30,13 @@ class Meta {
         if ( !is_object($obj) && !is_string($obj) ) {
             return false;
         }
-        
+
         $class = explode('\\', (is_string($obj) ? $obj : get_class($obj)));
         return array_pop($class);
     }
 
-   /** 
-    *  Returns all of the columns (protected properties that are 
+   /**
+    *  Returns all of the columns (protected properties that are
     *  not prefixed with an underscore) of a given object.
     *
     *  @param object $obj                 The object from which to retrieve the properties.
@@ -55,7 +56,7 @@ class Meta {
         return $collection;
     }
 
-   /** 
+   /**
     *  Returns all of the protected methods in a given class.
     *
     *  @param object $obj                 The object from which to retrieve the methods.

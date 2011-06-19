@@ -1,6 +1,6 @@
 <?php
 
-define('NX_ROOT', dirname(dirname(dirname(__DIR__)))); 
+define('NX_ROOT', dirname(dirname(dirname(__DIR__))));
 
 set_include_path(
     get_include_path()  . PATH_SEPARATOR .

@@ -12,7 +12,7 @@ namespace nx\lib;
 
 /*
  *  The `Data` class is a collection of data-oriented methods, which
- *  help sanitize and organize remote data. 
+ *  help sanitize and organize remote data.
  *
  *  @package lib
  */
@@ -20,9 +20,9 @@ class Data {
 
    /**
     *  Extracts $_POST data and returns it as a collection of objects (if an
-    *  object was bound to it via the form) and `key` => `value` pairs (if no 
+    *  object was bound to it via the form) and `key` => `value` pairs (if no
     *  object is bound).
-    * 
+    *
     *  @param array $data      The $_POST data.
     *  @access public
     *  @return mixed
@@ -31,7 +31,7 @@ class Data {
         $collection = array();
         foreach ( $data as $child_key => $child ) {
             if ( !is_array($child) ) { // name = 'username'
-                $collection[$child_key] = $child; 
+                $collection[$child_key] = $child;
             } else {
                 $loc = strrpos($child_key, '|');
                 if ( $loc !== false ) { // name = 'User|id[username]'
@@ -42,7 +42,7 @@ class Data {
                     {
                         $obj->$key = $value;
                     }
-                    $collection[$class][] = $obj; 
+                    $collection[$class][] = $obj;
                 } else { // name = 'User[][username]'
                     foreach ( $child as $grandchild_array ) {
                         $obj_name = 'app\model\\' . $child_key;
@@ -51,17 +51,17 @@ class Data {
                             $obj->$key = $value;
                         }
                     }
-                    $collection[$child_key][] = $obj; 
+                    $collection[$child_key][] = $obj;
                 }
             }
         }
 
-        return $collection; 
+        return $collection;
     }
 
    /**
     *  Sanitizes input according to type.
-    * 
+    *
     *  @param mixed $data      The data to be sanitized.
     *  @param string $type     The type of validation.
     *  @access public
@@ -73,13 +73,21 @@ class Data {
                 $data = (boolean) filter_var($data, FILTER_SANITIZE_NUMBER_INT);
                 break;
             case 'f':
-                $data = floatval(filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION));
+                $data = floatval(filter_var(
+                    $data,
+                    FILTER_SANITIZE_NUMBER_FLOAT,
+                    FILTER_FLAG_ALLOW_FRACTION
+                ));
                 break;
             case 'i':
                 $data = intval(filter_var($data, FILTER_SANITIZE_NUMBER_INT));
                 break;
             case 's':
-                $data = trim(strval(filter_var($data, FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_ENCODE_HIGH | FILTER_FLAG_ENCODE_AMP)));
+                $data = trim(strval(filter_var(
+                    $data,
+                    FILTER_SANITIZE_SPECIAL_CHARS,
+                    FILTER_FLAG_STRIP_LOW | FILTER_FLAG_ENCODE_HIGH | FILTER_FLAG_ENCODE_AMP
+                )));
                 break;
         }
         return $data;

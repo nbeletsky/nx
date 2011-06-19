@@ -34,7 +34,7 @@ class Session extends \nx\core\Model {
 
    /**
     *  Constructor.
-    * 
+    *
     *  @access public
     *  @return void
     */
@@ -62,7 +62,7 @@ class Session extends \nx\core\Model {
 
    /**
     *  Executes when the session operation is done.
-    * 
+    *
     *  @access public
     *  @return bool
     */
@@ -72,7 +72,7 @@ class Session extends \nx\core\Model {
 
    /**
     *  Creates a new login session.
-    *       
+    *
     *  @param int $user_id     The user's ID.
     *  @access private
     *  @return bool
@@ -83,16 +83,20 @@ class Session extends \nx\core\Model {
         session_regenerate_id(true);
         $_SESSION = array();
         $_SESSION['uid'] = $user_id;
-        $_SESSION['fingerprint'] = $this->_get_fingerprint($user_id); 
+        $_SESSION['fingerprint'] = $this->_get_fingerprint($user_id);
         $_SESSION['last_active'] = $this->last_active;
-        setcookie(self::COOKIE_ID_NAME, String::encrypt_cookie($user_id), time() + self::LOGIN_COOKIE_EXPIRE);
+        setcookie(
+            self::COOKIE_ID_NAME,
+            String::encrypt_cookie($user_id),
+            time() + self::LOGIN_COOKIE_EXPIRE
+        );
 
         return true;
     }
 
    /**
     *  Executes when a session is destroyed.
-    * 
+    *
     *  @param string $session_id        The session id.
     *  @access public
     *  @return bool
@@ -101,11 +105,11 @@ class Session extends \nx\core\Model {
         $where = array($this->_meta['key'] => $session_id);
         $this->delete($where);
         return true;
-    } 
+    }
 
    /**
     *  Executes when the garbage collector is executed.
-    * 
+    *
     *  @param int $max_lifetime        The max session lifetime.
     *  @access public
     *  @return bool
@@ -118,8 +122,8 @@ class Session extends \nx\core\Model {
 
    /**
     *  Returns the user's session fingerprint.
-    *       
-    *  @param int $user_id     The user's ID.     
+    *
+    *  @param int $user_id     The user's ID.
     *  @access private
     *  @return string
     */
@@ -132,11 +136,18 @@ class Session extends \nx\core\Model {
     }
 
     public function is_logged_in() {
-        if ( (!isset($_SESSION['uid'])) || (!isset($_SESSION['fingerprint'])) || (!isset($_SESSION['last_active'])) ) {
+        if (
+            (!isset($_SESSION['uid']))
+            || (!isset($_SESSION['fingerprint']))
+            || (!isset($_SESSION['last_active']))
+        ) {
             $this->User_id = 0;
             $is_logged_in = false;
-        } elseif ( (!isset($_COOKIE[self::COOKIE_ID_NAME])) || ($_SESSION['uid'] != String::decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME])) || 
-                 ($_SESSION['fingerprint'] != $this->_get_fingerprint($_SESSION['uid'])) ) {
+        } elseif (
+            (!isset($_COOKIE[self::COOKIE_ID_NAME]))
+            || ($_SESSION['uid'] != String::decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME]))
+            || ($_SESSION['fingerprint'] != $this->_get_fingerprint($_SESSION['uid']))
+        ) {
             $this->User_id = 0;
             $is_logged_in = false;
             $this->kill();
@@ -154,7 +165,7 @@ class Session extends \nx\core\Model {
 
    /**
     *  Ends the current session and deletes the login cookie.
-    *       
+    *
     *  @access public
     *  @return void
     */
@@ -163,7 +174,7 @@ class Session extends \nx\core\Model {
         setcookie(self::COOKIE_ID_NAME, '', time() - 3600);
         session_destroy();
     }
-   
+
    /**
     *  Logs a user in.
     *
@@ -175,7 +186,7 @@ class Session extends \nx\core\Model {
     */
     public function login($user, $hashed_password, $ip) {
         if ( !$user ) {
-            return false; 
+            return false;
         }
 
         if ( $user->password !== $hashed_password ) {
@@ -185,8 +196,8 @@ class Session extends \nx\core\Model {
         $user->ip = sprintf('%u', ip2long($ip));
         $user->last_login = date('Y-m-d H:i:s');
         $user->store();
-       
-        $this->_create($user->get_pk()); 
+
+        $this->_create($user->get_pk());
 
         return true;
     }
@@ -196,14 +207,14 @@ class Session extends \nx\core\Model {
     *
     *  @access public
     *  @return void
-    */ 
+    */
     public function logout() {
         $this->kill();
     }
 
    /**
     *  Executes when the session is being opened.
-    * 
+    *
     *  @access public
     *  @return bool
     */
@@ -214,7 +225,7 @@ class Session extends \nx\core\Model {
    /**
     *  Reads the session data.  MUST return a string for save handler
     *  to work as expected.
-    * 
+    *
     *  @param string $session_id      The session id.
     *  @access public
     *  @return string
@@ -229,7 +240,7 @@ class Session extends \nx\core\Model {
 
    /**
     *  Ends the current session and starts a new one.
-    *       
+    *
     *  @access public
     *  @return void
     */
@@ -242,7 +253,7 @@ class Session extends \nx\core\Model {
 
    /**
     *  Saves the session data.
-    * 
+    *
     *  @param string $session_id        The session id.
     *  @param string $data              The session data.
     *  @access public
@@ -253,7 +264,7 @@ class Session extends \nx\core\Model {
         $this->$id = $session_id;
         $this->data = $data;
 
-        return $this->store();       
+        return $this->store();
     }
 }
 

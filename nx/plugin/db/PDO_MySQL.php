@@ -19,7 +19,7 @@ namespace nx\plugin\db;
 class PDO_MySQL extends \nx\core\Object {
 
    /**
-    *  The db handle. 
+    *  The db handle.
     *
     *  @var object
     *  @access protected
@@ -45,19 +45,21 @@ class PDO_MySQL extends \nx\core\Object {
    /**
     *  Loads the configuration settings for a MySQL connection.
     *
-    *  @param array $config                     The configuration settings, which can take four options:
+    *  @param array $config                     The configuration settings,
+    *                                           which can take four options:
     *                                           `database` - The name of the database.
     *                                           `host`     - The database host.
     *                                           `username` - The database username.
     *                                           `password` - The database password.
-    *                                           (By default, instances are destroyed at the end of the request.)
+    *                                           (By default, instances are
+    *                                           destroyed at the end of the request.)
     *  @access public
     *  @return void
     */
     public function __construct(array $config = array()) {
         $defaults = array(
             'database' => 'journal',
-            'host'     => 'localhost', 
+            'host'     => 'localhost',
             'username' => 'root',
             'password' => 'admin'
         );
@@ -77,7 +79,7 @@ class PDO_MySQL extends \nx\core\Object {
    /**
     *  Connects and selects database.
     *
-    *  @param array $options       Contains the connection information.  
+    *  @param array $options       Contains the connection information.
     *                              Takes the following options:
     *                              `database` - The name of the database.
     *                              `host`     - The database host.
@@ -87,7 +89,7 @@ class PDO_MySQL extends \nx\core\Object {
     *  @return bool
     */
     public function connect($options) {
-        $dsn = 'mysql:host=' . $options['host'] . ';dbname=' . $options['database']; 
+        $dsn = 'mysql:host=' . $options['host'] . ';dbname=' . $options['database'];
         try {
             $this->_dbh = new \PDO($dsn, $options['username'], $options['password']);
             $this->_dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -99,7 +101,8 @@ class PDO_MySQL extends \nx\core\Object {
     }
 
    /**
-    *  Returns the number of rows affected by the last DELETE, INSERT, or UPDATE query.
+    *  Returns the number of rows affected by the last DELETE,
+    *  INSERT, or UPDATE query.
     *
     *  @access public
     *  @return int
@@ -118,7 +121,7 @@ class PDO_MySQL extends \nx\core\Object {
         $this->_dbh = null;
         return true;
     }
-    
+
    /**
     *  Deletes a record from the database.
     *
@@ -126,7 +129,7 @@ class PDO_MySQL extends \nx\core\Object {
     *  @param string $table              The table containing the record to be deleted.
     *  @param string|array $where        The WHERE clause to be included in the DELETE query.
     *  @access public
-    *  @return bool       
+    *  @return bool
     */
     public function delete($table, $where) {
         if ( is_null($where) ) {
@@ -144,7 +147,7 @@ class PDO_MySQL extends \nx\core\Object {
             return $this->query($sql, $where);
         }
     }
-    
+
    /**
     *  Fetches the next row from the result set in memory (i.e., the one
     *  that was created after running query()).
@@ -158,7 +161,7 @@ class PDO_MySQL extends \nx\core\Object {
         $this->_set_fetch_mode($fetch_style, $obj);
         $row = $this->_statement->fetch();
         $this->_statement->closeCursor();
-        return $row; 
+        return $row;
     }
 
    /**
@@ -172,32 +175,35 @@ class PDO_MySQL extends \nx\core\Object {
         $this->_set_fetch_mode($fetch_style);
         $rows = $this->_statement->fetchAll();
         $this->_statement->closeCursor();
-        return $rows; 
+        return $rows;
     }
 
    /**
-    *  Returns a single column from the next row of a result set or false if there are no more rows.
+    *  Returns a single column from the next row of a result set or false
+    *  if there are no more rows.
     *
-    *  @param int $column_number         Zero-index number of the column to retrieve from the row.
+    *  @param int $column_number         Zero-index number of the column to
+    *                                    retrieve from the row.
     *  @access public
     *  @return mixed
     */
     public function fetch_column($column_number = 0) {
         $column = $this->_statement->fetchColumn($column_number);
         $this->_statement->closeCursor();
-        return $column; 
+        return $column;
     }
 
    /**
     *  Performs a `SELECT FROM` query.
     *
     *  @see /nx/plugin/db/PDO_MySQL->query()
-    *  @see /nx/plugin/db/PDO_MySQL->fetch() 
+    *  @see /nx/plugin/db/PDO_MySQL->fetch()
     *  @see /nx/plugin/db/PDO_MySQL->_format_where()
     *  @param string|array $fields       The fields to be retrieved.
     *  @param string $table              The table to SELECT from.
     *  @param string|array $where        The WHERE clause of the SQL query.
-    *  @param string $additional         Any additional SQL to be added at the end of the query.
+    *  @param string $additional         Any additional SQL to be added at the end
+    *                                    of the query.
     *  @access public
     *  @return void
     */
@@ -214,7 +220,7 @@ class PDO_MySQL extends \nx\core\Object {
         if ( !is_null($additional) ) {
             $sql .= ' ' . $additional;
         }
-        $this->query($sql, $where); 
+        $this->query($sql, $where);
     }
 
    /**
@@ -291,7 +297,7 @@ class PDO_MySQL extends \nx\core\Object {
     }
 
    /**
-    *  Inserts a record into the database. 
+    *  Inserts a record into the database.
     *
     *  @param string $table   The table containing the record to be inserted.
     *  @param array $data     An array containing the data to be inserted. Format
@@ -302,11 +308,11 @@ class PDO_MySQL extends \nx\core\Object {
     */
     public function insert($table, $data) {
         $sql = 'INSERT INTO `' . $table . '` ';
-        
+
         $key_names = array_keys($data);
     	$fields = '`' . implode('`, `', $key_names) . '`';
         $values = ':' . implode(', :', $key_names);
-    
+
     	$sql .= '(' . $fields . ') VALUES (' . $values . ')';
 
     	$statement = $this->_dbh->prepare($sql);
@@ -337,7 +343,7 @@ class PDO_MySQL extends \nx\core\Object {
     *  Returns the number of rows affected by the last SELECT query.
     *
     *  @access public
-    *  @return int       
+    *  @return int
     */
     public function num_rows() {
         $this->query('SELECT FOUND_ROWS()');
@@ -351,7 +357,7 @@ class PDO_MySQL extends \nx\core\Object {
     *  @param string $sql           The SQL query to be executed.
     *  @param array $parameters     An array containing the parameters to be bound.
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function query($sql, $parameters = null) {
         $statement = $this->_dbh->prepare($sql);
@@ -369,7 +375,7 @@ class PDO_MySQL extends \nx\core\Object {
             $this->_affected_rows = 0;
             return false;
         }
-    
+
     	$this->_affected_rows = $statement->rowCount();
         $this->_statement = $statement;
     	return true;
@@ -381,7 +387,7 @@ class PDO_MySQL extends \nx\core\Object {
     *  @param string $sql                The SQL query to be executed.
     *  @param array $parameters          An array containing the parameters to be bound.
     *  @access public
-    *  @return mixed       
+    *  @return mixed
     */
     public function query_first($sql, $parameters = null) {
         $this->query($sql . ' LIMIT 1', $parameters);
@@ -393,7 +399,7 @@ class PDO_MySQL extends \nx\core\Object {
     *  @param string $fetch_style        Controls how the rows will be returned.
     *  @param obj $obj                   The object to be fetched into for use with FETCH_INTO.
     *  @access protected
-    *  @return int 
+    *  @return int
     */
     protected function _set_fetch_mode($fetch_style, $obj = null) {
         switch ( $fetch_style ) {
@@ -430,7 +436,7 @@ class PDO_MySQL extends \nx\core\Object {
     *                               array('column_name' => 'column_value');
     *  @param array $where          The WHERE clause of the SQL query.
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function update($table, $data, $where = null) {
         $sql = 'UPDATE `' . $table . '` SET ';
@@ -458,7 +464,7 @@ class PDO_MySQL extends \nx\core\Object {
             die($e->getMessage() . $sql . var_dump($data) . var_dump($e->getTrace()));
             return false;
         }
-    
+
     	$this->_affected_rows = $statement->rowCount();
     	return true;
     }
@@ -471,7 +477,7 @@ class PDO_MySQL extends \nx\core\Object {
     *                                 should be as follows:
     *                                 array('column_name' => 'column_value');
     *  @access public
-    *  @return bool 
+    *  @return bool
     */
     public function upsert($table, $data) {
         $sql = 'INSERT INTO `' . $table . '` ';
@@ -480,7 +486,7 @@ class PDO_MySQL extends \nx\core\Object {
     	$fields = '`' . implode('`, `', $key_names) . '`';
         $values = ':' . implode(', :', $key_names);
 
-    
+
         $sql .= '(' . $fields . ') VALUES (' . $values . ') ON DUPLICATE KEY UPDATE ';
 
     	foreach ( $key_names as $name ) {
@@ -499,7 +505,7 @@ class PDO_MySQL extends \nx\core\Object {
         }
 
     	$this->_affected_rows = $statement->rowCount();
-        return true; 
+        return true;
     }
 }
 
