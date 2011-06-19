@@ -142,25 +142,28 @@ class Session extends \nx\core\Model {
             || (!isset($_SESSION['last_active']))
         ) {
             $this->User_id = 0;
-            $is_logged_in = false;
-        } elseif (
+            return false;
+        }
+
+        if (
             (!isset($_COOKIE[self::COOKIE_ID_NAME]))
             || ($_SESSION['uid'] != String::decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME]))
             || ($_SESSION['fingerprint'] != $this->_get_fingerprint($_SESSION['uid']))
         ) {
             $this->User_id = 0;
-            $is_logged_in = false;
             $this->kill();
-        } elseif ( (strtotime($_SESSION['last_active']) + self::SESSION_LIFETIME < time()) ) {
-            $this->User_id = 0;
-            $is_logged_in = false;
-            $this->reset();
-        } else {
-            $this->User_id = $_SESSION['uid'];
-            $is_logged_in = true;
-            $_SESSION['last_active'] = $this->last_active;
+            return false;
         }
-        return $is_logged_in;
+
+        if ( (strtotime($_SESSION['last_active']) + self::SESSION_LIFETIME < time()) ) {
+            $this->User_id = 0;
+            $this->reset();
+            return false;
+        }
+
+        $this->User_id = $_SESSION['uid'];
+        $_SESSION['last_active'] = $this->last_active;
+        return true;
     }
 
    /**
