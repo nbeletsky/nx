@@ -408,6 +408,16 @@ class Model extends Object {
     }
 
    /**
+    *  Returns the validation errors.
+    *
+    *  @access public
+    *  @return array
+    */
+    public function get_validation_errors() {
+        return $this->_validation_errors;
+    }
+
+   /**
     *  Retrieves the validators associated with a given property.
     *
     *  @param string $field        The object property.
@@ -474,7 +484,7 @@ class Model extends Object {
             $this->_validation_errors = $this->_validate($field);
         } else {
             $this->_validation_errors = array();
-            foreach ( array_key_values($this->get_columns()) as $field ) {
+            foreach ( array_keys($this->get_columns()) as $field ) {
                 $this->_validation_errors += $this->_validate($field);
             }
         }
