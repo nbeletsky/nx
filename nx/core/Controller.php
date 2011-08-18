@@ -116,6 +116,9 @@ class Controller extends Object {
     protected function _init() {
         parent::_init();
 
+        $session = $this->_config['classes']['session'];
+        $this->_session = new $session();
+
         $this->_http_get = $this->sanitize($this->_config['http_get']);
         if ( !$this->_is_valid_request($this->_http_get) ) {
             $this->handle_CSRF();
@@ -127,9 +130,6 @@ class Controller extends Object {
         }
 
         $this->_token = Auth::create_token($this->classname());
-
-        $session = $this->_config['classes']['session'];
-        $this->_session = new $session();
 
         if ( $this->_session->is_logged_in() ) {
             $user = $this->_config['classes']['user'];
