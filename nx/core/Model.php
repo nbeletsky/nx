@@ -85,7 +85,8 @@ class Model extends Object {
     protected $_meta = array(
         'key'             => 'id',
         'pk_separator'    => '_',
-        'habtm_separator' => '__'
+        'habtm_separator' => '__',
+        'model_namespace' => 'app\model\\'
     );
 
    /**
@@ -254,7 +255,7 @@ class Model extends Object {
         $properties = $this->get_columns();
         $data = json_encode($properties);
 
-        $key = get_class($this) . '_' . $this->get_pk();
+        $key = $this->classname() . '_' . $this->get_pk();
         return $this->_cache->store($key, $data);
     }
 
@@ -266,7 +267,7 @@ class Model extends Object {
     *  @return bool
     */
     public function delete($where = null) {
-        $key = get_class($this) . '_' . $this->get_pk();
+        $key = $this->classname() . '_' . $this->get_pk();
         if ( !$this->_cache->delete($key) ) {
             // TODO: Throw exception!
         }
@@ -287,15 +288,17 @@ class Model extends Object {
     *  database that match the conditions provided in `$where`.
     *
     *  @param string|array $where        The WHERE clause of the SQL query.
+    *  @param string $obj                The name of the objects to retrieve.
     *  @access public
     *  @return array
     */
-    public function find_all($where = null) {
-        $this->_db->find('`' . $this->_meta['key'] . '`', $this->classname(), $where);
+    public function find_all($where = null, $obj = null) {
+        $obj_name = ( is_null($obj) ) ? $this->classname() : $obj;
+        $this->_db->find('`' . $this->_meta['key'] . '`', $obj_name, $where);
         $rows = $this->_db->fetch_all('assoc');
 
+        $obj_name = $this->_meta['model_namespace'] . $obj_name;
         $collection = array();
-        $obj_name = get_class($this);
         foreach ( $rows as $row ) {
             $new_id = $row[$this->_meta['key']];
             $collection[$new_id] = new $obj_name(array('id' => $new_id));
@@ -315,7 +318,8 @@ class Model extends Object {
         $lookup_id = $field . $this->_meta['pk_separator'] . $this->_meta['key'];
         $obj_id = $this->$lookup_id;
 
-        return new $field(array('id' => $obj_id));
+        $obj_name = $this->_meta['model_namespace'] . $field;
+        return new $obj_name(array('id' => $obj_id));
     }
 
    /**
@@ -339,7 +343,7 @@ class Model extends Object {
     *  @return array
     */
     protected function _get_habtm($field) {
-        $class_name = get_class($this);
+        $class_name = $this->classname();
         if ( $class_name < $field ) {
             $table_name = $class_name . $this->_meta['habtm_separator'] . $field;
         } else {
@@ -352,11 +356,12 @@ class Model extends Object {
         $target_id = $field . $this->_meta['pk_separator'] . $this->_meta['key'];
         $this->_db->find('`' . $target_id . '`', $table_name, $where);
 
+        $obj_name = $this->_meta['model_namespace'] . $field;
         $rows = $this->_db->fetch_all('assoc');
         $collection = array();
         foreach ( $rows as $row ) {
             $new_id = $row[$target_id];
-            $collection[$new_id] = new $field(array('id' => $new_id));
+            $collection[$new_id] = new $obj_name(array('id' => $new_id));
         }
         return $collection;
     }
@@ -370,7 +375,7 @@ class Model extends Object {
     *  @return array
     */
     protected function _get_has_many($field) {
-        $lookup_id = get_class($this) . $this->_meta['pk_separator'] . $this->_meta['key'];
+        $lookup_id = $this->classname() . $this->_meta['pk_separator'] . $this->_meta['key'];
         $where = array($lookup_id => $this->get_pk());
 
         return $this->find_all($where, $field);
@@ -385,15 +390,16 @@ class Model extends Object {
     *  @return object
     */
     protected function _get_has_one($field) {
-        $lookup_id = get_class($this) . $this->_meta['pk_separator'] . $this->_meta['key'];
+        $lookup_id = $this->classname() . $this->_meta['pk_separator'] . $this->_meta['key'];
         $where = array($lookup_id => $this->get_pk());
-
 
         $this->_db->find('`' . $this->_meta['key'] . '`', $field, $where, 'LIMIT 1');
         $result = $this->_db->fetch('assoc');
         $obj_id = $result[$this->_meta['key']];
 
-        return new $field(array('id' => $obj_id));
+        $obj_name = $this->_meta['model_namespace'] . $field;
+
+        return new $obj_name(array('id' => $obj_id));
     }
 
    /**
@@ -504,7 +510,7 @@ class Model extends Object {
             return false;
         }
 
-        $key = get_class($obj) . '_' . $id;
+        $key = $obj->classname() . '_' . $id;
         $cached_data = $obj->_cache->retrieve($key);
         if ( !$cached_data ) {
             return false;
