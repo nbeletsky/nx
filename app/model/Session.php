@@ -2,6 +2,7 @@
 
 namespace app\model;
 
+use nx\lib\Password;
 use nx\lib\String;
 
 class Session extends \nx\core\Model {
@@ -182,17 +183,17 @@ class Session extends \nx\core\Model {
     *  Logs a user in.
     *
     *  @param obj $user               The user object to check against.
-    *  @param obj $hashed_password    The encrypted password to check against.
+    *  @param string $password        The password to check against.
     *  @param string $ip              The user's IP address.
     *  @access public
     *  @return bool
     */
-    public function login($user, $hashed_password, $ip) {
+    public function login($user, $password, $ip) {
         if ( !$user ) {
             return false;
         }
 
-        if ( $user->password !== $hashed_password ) {
+        if ( !Password::check($password, $user->password) ) {
             return false;
         }
 
