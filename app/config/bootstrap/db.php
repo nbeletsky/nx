@@ -4,7 +4,7 @@
     'plugin'   => 'PDO_MySQL',
     'database' => 'journal',
     'host'     => 'localhost',
-    'user'     => 'root',
+    'username' => 'root',
     'password' => 'admin'
 ));
 
