@@ -295,7 +295,7 @@ class Memcached extends \nx\core\Object {
     *  @see /nx/plugin/cache/Memcached->cas() for how to use CAS tokens.
     */
     public function retrieve($key, $server_key = '', $cache_cb = null, &$cas_token = null) {
-        return $this->_cache->getByKey($server_key, $key, $cache_callback, $cas_token);
+        return $this->_cache->getByKey($server_key, $key, $cache_cb, $cas_token);
     }
 
    /**
