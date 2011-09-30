@@ -120,16 +120,17 @@ class Controller extends Object {
         $this->_session = new $session();
 
         $this->_http_get = $this->sanitize($this->_config['http_get']);
-        if ( !$this->_is_valid_request($this->_http_get) ) {
-            $this->handle_CSRF();
-        }
-
         $this->_http_post = $this->sanitize($this->_config['http_post']);
-        if ( !$this->_is_valid_request($this->_http_post) ) {
+
+        if ( !$this->_is_valid_request($this->_http_get)
+            || !$this->_is_valid_request($this->_http_post) ) {
             $this->handle_CSRF();
+            $this->_token = null;
         }
 
-        $this->_token = Auth::create_token($this->classname());
+        if ( is_null($this->_token) ) {
+            $this->_token = Auth::create_token();
+        }
 
         if ( $this->_session->is_logged_in() ) {
             $user = $this->_config['classes']['user'];
@@ -195,7 +196,7 @@ class Controller extends Object {
     *  @return void
     */
     public function handle_CSRF() {
-        // TODO: Handle CSRF more elegantly
+        // TODO: Log this as a potential CSRF attack
         die('CSRF attack!');
     }
 
