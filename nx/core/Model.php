@@ -548,7 +548,6 @@ class Model extends Object {
             return false;
         }
         $this->_db->upsert($this->classname(), $this->get_columns());
-        // TODO: Check that caching works with UPDATEd objects!
         $id = $this->_meta['key'];
         if ( !$this->$id ) {
             $this->$id = $this->_db->insert_id();
