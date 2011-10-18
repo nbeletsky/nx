@@ -50,6 +50,7 @@ class Time {
     *  a date in the future.
     *
     *  @param string $end_date       The date in the future.
+    *  @access public
     *  @return string
     */
     public static function remaining($end_date) {

@@ -30,7 +30,6 @@ class Dispatcher {
     *  @return array
     */
     public static function parse_query_string($query_string) {
-
         parse_str($query_string, $query);
 
         $controller = ( isset($query['controller']) )
