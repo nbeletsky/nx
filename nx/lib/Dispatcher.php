@@ -10,8 +10,6 @@
 
 namespace nx\lib;
 
-use nx\core\View;
-
 /*
  *  The `Dispatcher` class is used to handle url routing and
  *  page rendering.
@@ -23,7 +21,8 @@ class Dispatcher {
     protected static $_config = array(
         'classes'   => array(
             'request' => 'nx\lib\Request',
-            'router'  => 'nx\lib\Router'
+            'router'  => 'nx\lib\Router',
+            'view'  =>   'nx\core\View'
         )
     );
 
@@ -85,7 +84,8 @@ class Dispatcher {
             return true;
         }
 
-        $view = new View();
+        $view = static::$_config['classes']['view'];
+        $view = new $view();
         return $view->render($results['file'], $results['vars']);
     }
 
