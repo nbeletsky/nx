@@ -21,7 +21,12 @@ class SMTP extends \nx\core\Object {
             'username'       => '',
             'password'       => '',
             'port'           => 25,
-            'authentication' => ''
+            // TODO: Change this to be an empty string
+            // and allow ssl or tls
+            //'authentication' => ''
+
+            // TODO: Remove this
+            'auth'           => true
         );
         parent::__construct($config + $defaults);
     }
@@ -37,12 +42,31 @@ class SMTP extends \nx\core\Object {
             'to'           => array(),
             'cc'           => array(),
             'bcc'          => array(),
-            'content-type' => 'text/html'
+            'content-type' => 'text/html',
             'message'      => '',
             'attachments'  => array(),
             'read-receipt' => ''
         );
         $options += $defaults;
+
+        // TODO: The rest of this function is temporary
+        $headers = array(
+            'From'    => $options['from'],
+            'To'      => $options['to'],
+            'Subject' => $options['subject']
+        );
+
+        require('Mail.php');
+        $smtp = \Mail::factory('smtp', $this->_config);
+        $mail = $smtp->send($options['to'], $headers, $options['message']);
+
+        if ( \PEAR::isError($mail) ) {
+            throw new \Exception($mail->getMessage()
+                . ' Mail to ' . $options['to'] . ' could not be sent.');
+            return false;
+        }
+
+        return true;
 
     }
 
