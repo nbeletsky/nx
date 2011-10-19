@@ -32,7 +32,7 @@ class Dispatcher {
     *
     *  @param array $config        The configuration options.
     *  @access public
-    *  @return bool
+    *  @return void
     */
 	public static function config(array $config = array()) {
         static::$_config = $config + static::$_config;
