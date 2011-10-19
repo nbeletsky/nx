@@ -44,6 +44,7 @@ class Object {
    /**
     *  Loads the configuration settings for the class.
     *
+    *  @param array $config        The configuration options.
     *  @access public
     *  @return void
     */

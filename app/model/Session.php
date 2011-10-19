@@ -36,6 +36,7 @@ class Session extends \nx\core\Model {
    /**
     *  Constructor.
     *
+    *  @param array $config        The configuration options.
     *  @access public
     *  @return void
     */

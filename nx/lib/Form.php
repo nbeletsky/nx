@@ -16,7 +16,7 @@ namespace nx\lib;
  *  which can be used to autopopulate an instance of that object
  *  with the element's values upon form submission.
  *
- *  @see /nx/lib/Data::extract_post()
+ *  @see /nx/lib/Request::extract_post()
  *  @package lib
  */
 class Form {

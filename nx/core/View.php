@@ -31,6 +31,7 @@ class View extends Object {
    /**
     *  Loads the configuration settings for the view.
     *
+    *  @param array $config        The configuration options.
     *  @access public
     *  @return void
     */

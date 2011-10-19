@@ -25,6 +25,15 @@ use nx\lib\Meta;
 class Controller extends Object {
 
    /**
+    *  Whether or not the controller should be
+    *  publicly accessible.
+    *
+    *  @var bool
+    *  @access protected
+    */
+    protected $_accessible = true;
+
+   /**
     *  The sanitized data from $_GET.
     *
     *  @var array
@@ -69,7 +78,7 @@ class Controller extends Object {
     *  @var string
     *  @access protected
     */
-    protected $_template = 'default';
+    protected $_template = 'web';
 
    /**
     *  The request token.
@@ -90,6 +99,7 @@ class Controller extends Object {
    /**
     *  Loads the configuration settings for the controller.
     *
+    *  @param array $config        The configuration options.
     *  @access public
     *  @return void
     */
@@ -198,6 +208,17 @@ class Controller extends Object {
     public function handle_CSRF() {
         // TODO: Log this as a potential CSRF attack
         die('CSRF attack!');
+    }
+
+   /**
+    *  Returns whether or not the controller is
+    *  publicly accessible.
+    *
+    *  @access public
+    *  @return bool
+    */
+    public function is_accessible() {
+        return $this->_accessible;
     }
 
    /**

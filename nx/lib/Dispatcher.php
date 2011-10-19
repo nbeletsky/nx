@@ -10,7 +10,6 @@
 
 namespace nx\lib;
 
-use nx\lib\File;
 use nx\core\View;
 
 /*
@@ -21,55 +20,58 @@ use nx\core\View;
  */
 class Dispatcher {
 
+    protected static $_config = array(
+        'classes'   => array(
+            'request' => 'nx\lib\Request',
+            'router'  => 'nx\lib\Router'
+        )
+    );
+
    /**
-    *  Parses a query string and returns the controller, action,
-    *  id, and any additional arguments passed via $_GET.
+    *  Sets the configuration options for the dispatcher.
     *
-    *  @param string $query_string        The controller name.
+    *  @param array $config        The configuration options.
     *  @access public
-    *  @return array
+    *  @return bool
     */
-    public static function parse_query_string($query_string) {
-        parse_str($query_string, $query);
-
-        $controller = ( isset($query['controller']) )
-            ? ucfirst($query['controller'])
-            : 'Dashboard';
-        $action = ( isset($query['action']) )
-            ? $query['action']
-            : 'index';
-        $id = ( isset($query['id']) )
-            ? $query['id']
-            : null;
-
-        $get = array();
-        if ( isset($query['args']) && $query['args'] != '' ) {
-            $args = substr($query_string, strpos($query_string, $query['args']));
-            parse_str($args, $get);
-        }
-        return compact('controller', 'action', 'id', 'get');
-    }
+	public static function config(array $config = array()) {
+        static::$_config = $config + static::$_config;
+	}
 
    /**
     *  Renders a page.
     *
-    *  @see nx\lib\Dispatcher::parse_query_string()
-    *  @param array $args                 The data parsed from the query string.
+    *  @param string $url          The url representing the page to be rendered.
+    *  @param bool $is_include     Whether or not the page is an include.
     *  @access public
     *  @return bool
     */
-    public static function render($args) {
+    public static function render($url, $is_include = false) {
+        $router = static::$_config['classes']['router'];
+        if ( !$args = $router::parse_url($url) ) {
+            self::throw_404('web');
+            return false;
+        }
+
         $controller_name = 'app\controller\\' . $args['controller'];
 
         if ( !class_exists($controller_name) ) {
-            self::throw_404('default');
+            self::throw_404('web');
             return false;
         }
+
+        $request = static::$_config['classes']['request'];
+        $args['post'] = $request::extract_post($_POST);
 
         $controller = new $controller_name(array(
             'http_get'  => $args['get'],
             'http_post' => $args['post']
         ));
+
+        if ( !$controller->is_accessible() && !$is_include ) {
+            self::throw_404($controller->get_template());
+            return false;
+        }
 
         $results = $controller->call($args['action'], $args['id']);
         if ( !is_array($results) ) {
@@ -90,7 +92,7 @@ class Dispatcher {
    /**
     *  Renders a 404 page.
     *
-    *  @param string $template            The view template to use.
+    *  @param string $template     The view template to use.
     *  @access public
     *  @return void
     */
