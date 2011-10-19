@@ -11,8 +11,7 @@
 namespace nx\lib;
 
 /*
- *  The `Dispatcher` class is used to handle url routing and
- *  page rendering.
+ *  The `Dispatcher` class is used to page rendering.
  *
  *  @package lib
  */
@@ -22,7 +21,7 @@ class Dispatcher {
         'classes'   => array(
             'request' => 'nx\lib\Request',
             'router'  => 'nx\lib\Router',
-            'view'  =>   'nx\core\View'
+            'view'    => 'nx\core\View'
         )
     );
 
