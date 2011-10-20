@@ -60,10 +60,10 @@ class Session extends \nx\core\Model {
     public function __construct(array $config = array()) {
         $defaults = array(
             'no_cache'            => true,
-            'session_lifetime'    => 3600,  // 60 minutes
-            'login_cookie_expire' => 2592000,  // 30 days
+            'session_lifetime'    => 3600,           // 60 minutes
+            'login_cookie_expire' => 2592000,        // 30 days
             'session_salt'        => 'M^mc?(9%ZKx[',
-            'cookie_id_name'      => 'nara_id'
+            'cookie_id_name'      => 'nx_id'
         );
         parent::__construct($config + $defaults);
     }
