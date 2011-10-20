@@ -10,7 +10,7 @@ class MemcachedTest extends \PHPUnit_Framework_TestCase {
 
     public function setUp() {
         $this->_cache = new Memcached();
-        $this->_cache->add_server(MEMCACHED_HOST);
+        $this->_cache->add_server('localhost');
         $this->_cache->flush();
     }
 

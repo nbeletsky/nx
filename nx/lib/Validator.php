@@ -26,7 +26,8 @@ class Validator {
     *  @return bool
     */
     public static function alphanumeric($value) {
-        return preg_match('/^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]+$/mu', $value);
+        $pattern = '/^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]+$/mu';
+        return (boolean) preg_match($pattern, $value);
     }
 
    /**
@@ -41,8 +42,12 @@ class Validator {
     */
     public static function decimal($value, $options = array()) {
         if ( isset($options['precision']) ) {
-            $precision = strlen($value) - strrpos($value, '.') - 1;
+            $decimal_position = strrpos($value, '.');
+            if ( $decimal_position === false ) {
+                return false;
+            }
 
+            $precision = strlen($value) - $decimal_position - 1;
             if ( $precision !== (int) $options['precision'] ) {
                 return false;
             }
@@ -58,7 +63,7 @@ class Validator {
     *  @return bool
     */
     public static function email($value) {
-        return filter_var($value, FILTER_VALIDATE_EMAIL);
+        return (boolean) filter_var($value, FILTER_VALIDATE_EMAIL);
     }
 
    /**
@@ -99,7 +104,7 @@ class Validator {
     *  @return bool
     */
     public static function not_empty($value) {
-        return preg_match('/[^\s]+/m', $value);
+        return (boolean) preg_match('/[^\s]+/m', $value);
     }
 
    /**
@@ -111,32 +116,6 @@ class Validator {
     */
     public static function numeric($value) {
         return is_numeric($value);
-    }
-
-   /**
-    *  Checks that a password is constructed properly
-    *  and has an acceptable length.
-    *
-    *  @param string $value          The password to be checked.
-    *  @param array $options         The options by which to constrain the check.
-    *                                Takes `special_chars`, `min_length`, and/or
-    *                                `max_length` as keys.
-    *  @access public
-    *  @return bool
-    */
-    public static function password($value, $options = array()) {
-        $options += array('special_chars' => '#@!$%._', 'min_length' => 5, 'max_length' => 16);
-
-        $preg_pass = '/^(((?=.*[A-Za-z])(?=.*[\d])(?!.*[^A-Za-z\d]))|'
-            . '((?=.*[A-Za-z])(?=.*[' . $options['special_chars'] . '])(?!.*[^A-Za-z'
-            . $options['special_chars'] . ']))|' . '((?=.*[\d])(?=.*['
-            . $options['special_chars'] . '])(?!.*[^\d'
-            . $options['special_chars'] . ']))|'
-            .  '((?=.*[A-Za-z])(?=.*[\d])(?=.*['
-            . $options['special_chars'] . '])(?!.*[^A-Za-z\d'
-            . $options['special_chars'] . ']))).{' . $options['min_length']
-            . ',' . $options['max_length'] . '}$/';
-        return preg_match($preg_pass, $value);
     }
 
    /**
@@ -173,8 +152,8 @@ class Validator {
     *  @access public
     *  @return bool
     */
-    public static function zip($value) {
-        return preg_match('/^\d{5}([\-]\d{4})?$/', $value);
+    public static function zip_code($value) {
+        return (boolean) preg_match('/^\d{5}([\-]\d{4})?$/', $value);
     }
 
 }
