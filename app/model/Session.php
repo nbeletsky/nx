@@ -6,8 +6,21 @@ use nx\lib\Password;
 use nx\lib\String;
 
 class Session extends \nx\core\Model {
+
+   /**
+    *  The session id.
+    *
+    *  @var int $id
+    *  @access protected
+    */
     protected $id;
 
+   /**
+    *  The session data.
+    *
+    *  @var string $id
+    *  @access protected
+    */
     protected $data = '';
 
    /**
@@ -26,25 +39,41 @@ class Session extends \nx\core\Model {
     */
     protected $User_id = 0;
 
-    protected $_no_cache = true;
-
-    const SESSION_LIFETIME    = 3600;            // 60 minutes
-    const LOGIN_COOKIE_EXPIRE = 2592000;         // Cookie expiration date (30 days)
-    const SESSION_SALT        = 'M^mc?(9%ZKx[';  // Session salt
-    const COOKIE_ID_NAME      = 'nx_id';         // Name of the cookie for the user date
-
    /**
-    *  Constructor.
+    *  Loads the configuration settings for the session.
     *
-    *  @param array $config        The configuration options.
+    *  @param array $config         The configuration settings,
+    *                               which can take five options:
+    *                               `no_cache`            - Whether or not to
+    *                                                       cache the session.
+    *                               `session_lifetime`    - The length of a
+    *                                                       session.
+    *                               `login_cookie_expire` - The cookie expiration
+    *                                                       date.
+    *                               `session_salt`        - The salt for session
+    *                                                       encryption.
+    *                               `cookie_id_name`      - Name of the cookie for
+    *                                                       the user.
     *  @access public
     *  @return void
     */
     public function __construct(array $config = array()) {
-        $defaults = array();
+        $defaults = array(
+            'no_cache'            => true,
+            'session_lifetime'    => 3600,  // 60 minutes
+            'login_cookie_expire' => 2592000,  // 30 days
+            'session_salt'        => 'M^mc?(9%ZKx[',
+            'cookie_id_name'      => 'nara_id'
+        );
         parent::__construct($config + $defaults);
     }
 
+   /**
+    *  Initializes the session handler.
+    *
+    *  @access protected
+    *  @return void
+    */
     protected function _init() {
         parent::_init();
 
@@ -75,7 +104,7 @@ class Session extends \nx\core\Model {
    /**
     *  Creates a new login session.
     *
-    *  @param int $user_id     The user's ID.
+    *  @param int $user_id          The user's ID.
     *  @access private
     *  @return bool
     */
@@ -84,13 +113,13 @@ class Session extends \nx\core\Model {
 
         session_regenerate_id(true);
         $_SESSION = array();
-        $_SESSION['uid'] = $user_id;
+        $_SESSION['user_id'] = $user_id;
         $_SESSION['fingerprint'] = $this->_get_fingerprint($user_id);
         $_SESSION['last_active'] = $this->last_active;
         setcookie(
-            self::COOKIE_ID_NAME,
+            $this->_config['cookie_id_name'],
             String::encrypt_cookie($user_id),
-            time() + self::LOGIN_COOKIE_EXPIRE
+            time() + $this->_config['login_cookie_expire']
         );
 
         return true;
@@ -99,7 +128,7 @@ class Session extends \nx\core\Model {
    /**
     *  Executes when a session is destroyed.
     *
-    *  @param string $session_id        The session id.
+    *  @param string $session_id    The session id.
     *  @access public
     *  @return bool
     */
@@ -112,80 +141,88 @@ class Session extends \nx\core\Model {
    /**
     *  Executes when the garbage collector is executed.
     *
-    *  @param int $max_lifetime        The max session lifetime.
+    *  @param int $max_lifetime     The max session lifetime.
     *  @access public
     *  @return bool
     */
     public function gc($max_lifetime) {
         $expired = strtotime($this->last_active) - $max_lifetime;
-        $where = '`last_active`<' . $expired;
+        $where = array(
+            'last_active' => array(
+                'lt' => $expired
+            )
+        );
         return $this->delete($where);
     }
 
    /**
     *  Returns the user's session fingerprint.
     *
-    *  @param int $user_id     The user's ID.
+    *  @param int $user_id          The user's ID.
     *  @access private
     *  @return string
     */
     private function _get_fingerprint($user_id) {
-        return sha1(self::SESSION_SALT . $user_id . $_SERVER['HTTP_USER_AGENT']);
+        return sha1($this->_config['session_salt'] . $user_id . $_SERVER['HTTP_USER_AGENT']);
     }
 
+   /**
+    *  Returns the user's id.
+    *
+    *  @access public
+    *  @return int
+    */
     public function get_user_id() {
         return $this->User_id;
     }
 
+   /**
+    *  Checks the user's current session status.  If the session
+    *  has expired or is invalid, the user will automatically be
+    *  logged out.
+    *
+    *  @access public
+    *  @return bool
+    */
     public function is_logged_in() {
         if (
-            (!isset($_SESSION['uid']))
-            || (!isset($_SESSION['fingerprint']))
-            || (!isset($_SESSION['last_active']))
+            !isset($_SESSION['user_id'])
+            || !isset($_SESSION['fingerprint'])
+            || !isset($_SESSION['last_active'])
         ) {
             $this->User_id = 0;
             return false;
         }
 
+        $uid = String::decrypt_cookie($_COOKIE[$this->_config['cookie_id_name']]);
+        $fingerprint = $this->_get_fingerprint($_SESSION['user_id']);
         if (
-            (!isset($_COOKIE[self::COOKIE_ID_NAME]))
-            || ($_SESSION['uid'] != String::decrypt_cookie($_COOKIE[self::COOKIE_ID_NAME]))
-            || ($_SESSION['fingerprint'] != $this->_get_fingerprint($_SESSION['uid']))
+            !isset($_COOKIE[$this->_config['cookie_id_name']])
+            || $_SESSION['user_id'] != $uid
+            || $_SESSION['fingerprint'] != $fingerprint
         ) {
             $this->User_id = 0;
-            $this->kill();
+            $this->logout();
             return false;
         }
 
-        if ( (strtotime($_SESSION['last_active']) + self::SESSION_LIFETIME < time()) ) {
+        if ( strtotime($_SESSION['last_active']) + $this->_config['session_lifetime'] < time() ) {
             $this->User_id = 0;
             $this->reset();
             return false;
         }
 
-        $this->User_id = $_SESSION['uid'];
+        $this->User_id = $_SESSION['user_id'];
         $_SESSION['last_active'] = $this->last_active;
         return true;
     }
 
    /**
-    *  Ends the current session and deletes the login cookie.
-    *
-    *  @access public
-    *  @return void
-    */
-    public function kill() {
-        $_SESSION = array();
-        setcookie(self::COOKIE_ID_NAME, '', time() - 3600);
-        session_destroy();
-    }
-
-   /**
     *  Logs a user in.
     *
-    *  @param obj $user               The user object to check against.
-    *  @param string $password        The password to check against.
-    *  @param string $ip              The user's IP address.
+    *  @param obj $user             The user object to check against.
+    *  @param string $password      The password to check against.
+    *  @param string $ip            The user's IP address.
     *  @access public
     *  @return bool
     */
@@ -208,13 +245,15 @@ class Session extends \nx\core\Model {
     }
 
    /**
-    *  Logs a user out.
+    *  Ends the current session and deletes the login cookie.
     *
     *  @access public
     *  @return void
     */
     public function logout() {
-        $this->kill();
+        $_SESSION = array();
+        setcookie($this->_config['cookie_id_name'], '', time() - 3600);
+        session_destroy();
     }
 
    /**
@@ -228,10 +267,10 @@ class Session extends \nx\core\Model {
     }
 
    /**
-    *  Reads the session data.  MUST return a string for save handler
-    *  to work as expected.
+    *  Reads the session data.  Note that this MUST return a string
+    *  for save handler to work as expected.
     *
-    *  @param string $session_id      The session id.
+    *  @param string $session_id    The session id.
     *  @access public
     *  @return string
     */
@@ -239,8 +278,7 @@ class Session extends \nx\core\Model {
         $where = array($this->_meta['key'] => $session_id);
         $this->_db->find('`data`', $this->classname(), $where);
 
-        $data = $this->_db->fetch_column();
-        return $data;
+        return $this->_db->fetch_column();
     }
 
    /**
@@ -259,8 +297,8 @@ class Session extends \nx\core\Model {
    /**
     *  Saves the session data.
     *
-    *  @param string $session_id        The session id.
-    *  @param string $data              The session data.
+    *  @param string $session_id    The session id.
+    *  @param string $data          The session data.
     *  @access public
     *  @return bool
     */
