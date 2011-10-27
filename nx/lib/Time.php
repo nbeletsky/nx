@@ -18,16 +18,44 @@ namespace nx\lib;
  */
 class Time {
 
+    /**
+     *  Calculates the amount of time between two dates.
+     *
+     *
+     *  @param string $date_1       The first date.
+     *  @param string $date_2       The second date.  Defaults to now.
+     *  @access public
+     *  @return array
+     */
+    public static function between($date_1, $date_2 = null) {
+        if ( is_null($date_2) ) {
+            $date_2 = time();
+        } else {
+            $date_2 = strtotime($date_2);
+        }
+        $time = abs(strtotime($date_1) - $date_2);
+
+        $days = floor($time / 86400);
+        $remainder = $time % 86400;
+        $hours = floor($remainder / 3600);
+        $remainder = $remainder % 3600;
+        $minutes = floor($remainder / 60);
+        $seconds = $remainder % 60;
+        return compact('days', 'hours', 'minutes', 'seconds');
+    }
+
    /**
     *  Returns an array of times separated by a constant interval.
     *
-    *  @param int $interval          The interval between each time in the list.
-    *  @param bool $military         Whether or not to output time using 24-hour format.
+    *  @param int $interval          The interval (in minutes) between
+    *                                each time.
+    *  @param bool $military         Whether or not to output time using
+    *                                24-hour format.
     *  @access public
     *  @return array
     */
     public static function get_with_interval($interval = 15, $military = false) {
-        if ( 60 % interval !== 0 ) {
+        if ( $interval % 60 !== 0 ) {
             return false;
         }
 
@@ -43,51 +71,6 @@ class Time {
         }
         date_default_timezone_set($original_timezone);
         return $list;
-    }
-
-   /**
-    *  Calculates the amount of time remaining between now and
-    *  a date in the future.
-    *
-    *  @param string $end_date       The date in the future.
-    *  @access public
-    *  @return string
-    */
-    public static function remaining($end_date) {
-        $time = strtotime($end_date) - time();
-        if ( $time < 0 ) {
-            return false;
-        }
-
-        if ( ($time >= 0) && ($time <= 59) ) {
-            $time_left = $time . 's';
-        } elseif ( ($time >= 60) && ($time <= 3599) ) {
-            $total_min = $time / 60;
-            $min = floor($total_min);
-
-            $sec = floor(($total_min - $min) * 60);
-
-            $time_left = $min . 'm ' . $sec . 's';
-        } elseif ( ($time >= 3600) && ($time <= 86399) ) {
-            $total_hour = $time / 3600;
-            $hour = floor($total_hour);
-
-            $min = floor(($total_hour - $hour) * 60);
-
-            $time_left = $hour . 'h ' . $min . 'm';
-        } elseif ( $time >= 86400 ) {
-            $total_day = $time / 86400;
-            $day = floor($total_day);
-
-            $total_hour = $total_day - $day;
-            $hour = floor(($total_hour * 24));
-
-            $total_min = ($total_hour * 24) - $hour;
-            $min = floor(($total_min * 60));
-
-            $time_left = $day . 'd ' . $hour . 'h ' . $min . 'm';
-        }
-        return $time_left;
     }
 
 }
