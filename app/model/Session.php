@@ -18,7 +18,7 @@ class Session extends \nx\core\Model {
    /**
     *  The session data.
     *
-    *  @var string $id
+    *  @var string $data
     *  @access protected
     */
     protected $data = '';
@@ -277,8 +277,8 @@ class Session extends \nx\core\Model {
     public function read($session_id) {
         $where = array($this->_meta['key'] => $session_id);
         $this->_db->find('`data`', $this->classname(), $where);
-
-        return $this->_db->fetch_column();
+        $result = $this->_db->fetch('assoc');
+        return $result['data'];
     }
 
    /**
