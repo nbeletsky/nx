@@ -1,6 +1,6 @@
 <?php
 
-namespace nx\test\plugin;
+namespace nx\test\plugin\db;
 
 use nx\plugin\db\PDO_MySQL;
 

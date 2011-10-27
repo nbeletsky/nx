@@ -1,6 +1,6 @@
 <?php
 
-namespace nx\test\plugin;
+namespace nx\test\plugin\cache;
 
 use nx\plugin\cache\Memcached;
 
