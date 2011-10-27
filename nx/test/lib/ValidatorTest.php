@@ -20,6 +20,188 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse(Validator::alphanumeric($check));
     }
 
+    public function test_Date_ReturnsBool() {
+        $format = 'dmy';
+        $check = '20 10 2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20.10.2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20-10-2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20/10/2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '29/02/2011';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+        $check = '20 10 11';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20.10.11';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20-10-11';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20/10/11';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '29/02/11';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+
+        $format = 'mdy';
+        $check = '10 20 2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '10.20.2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '10-20-2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '10/20/2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '02/29/2011';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+        $check = '10 20 11';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '10.20.11';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '10-20-11';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '10/20/11';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '02/29/11';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+
+        $format = 'ymd';
+        $check = '2011 10 20';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '2011.10.20';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '2011-10-20';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '2011/10/20';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '2011/02/29';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+        $check = '11 10 20';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '11.10.20';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '11-10-20';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '11/10/20';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '11/02/29';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+
+        $format = 'dMy';
+        $check = '20 October 2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20 Oct 2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20 Octob 2011';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+
+        $format = 'Mdy';
+        $check = 'October 20, 2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = 'October 20 2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = 'Oct 20, 2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = 'Oct 20 2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = 'Octob 20 2011';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+
+        $format = 'My';
+        $check = 'October 2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = 'Oct 2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = 'Octob 2011';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+
+        $format = 'my';
+        $check = '10 2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '10.2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '10-2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '10/2011';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '13/2011';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+
+        $format = 'dmy hms';
+        $check = '20.10.2011 12:21:13';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20-10-2011 12:21:13';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20/10/2011 12:21:13';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20.10.2011 12:21';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20-10-2011 12:21';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20/10/2011 12:21';
+        $this->assertTrue(Validator::date($check, compact('format')));
+
+        $check = '20/10/2011 12';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+        $check = '20/10/2011 32:21';
+        $this->assertFalse(Validator::date($check, compact('format')));
+
+        $check = '29/02/2011 12:21:13';
+        $this->assertFalse(Validator::date($check, compact('format')));
+    }
+
     public function test_Decimal_ReturnsBool() {
         $check = '234';
         $this->assertTrue(Validator::decimal($check));
