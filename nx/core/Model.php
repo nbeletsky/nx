@@ -134,8 +134,10 @@ class Model extends Object {
     *               want to load an instance of an object with its
     *               properties from the cache/database.
     *  `no_cache` - Whether or not to use the cache to store/retrieve the object.
-    *  `db`       - The name of the db connection to use as defined in app/config/bootstrap/db.php.
-    *  `cache`    - The name of the cache connection to use as defined in app/config/bootstrap/cache.php.
+    *  `db`       - The name of the db connection to use as defined
+    *               in app/config/bootstrap/db.php.
+    *  `cache`    - The name of the cache connection to use as defined
+    *               in app/config/bootstrap/cache.php.
     *
     *  @see /nx/core/Model->_init()
     *  @param array $config        The configuration options.
@@ -168,7 +170,9 @@ class Model extends Object {
         $this->_cache = Connections::get_cache($this->_config['cache']);
 
         if ( isset($this->_config['where']) ) {
-            $this->_db->find('`' . $this->_meta['key'] . '`', $this->classname(), $this->_config['where'], 'LIMIT 1');
+            $field = '`' . $this->_meta['key'] . '`';
+            $table = $this->classname();
+            $this->_db->find($field, $table, $this->_config['where'], 'LIMIT 1');
             $result = $this->_db->fetch('assoc');
             if ( $result ) {
                 $this->_config['id'] = $result[$this->_meta['key']];
@@ -262,7 +266,8 @@ class Model extends Object {
    /**
     *  Deletes an object from both the cache and the database.
     *
-    *  @param string|array $where        The WHERE clause to be included in the DELETE query.
+    *  @param string|array $where  The WHERE clause to be included in the
+    *                              DELETE query.
     *  @access public
     *  @return bool
     */
@@ -287,8 +292,8 @@ class Model extends Object {
     *  Finds and returns an array of all the objects in the
     *  database that match the conditions provided in `$where`.
     *
-    *  @param string|array $where        The WHERE clause of the SQL query.
-    *  @param string $obj                The name of the objects to retrieve.
+    *  @param string|array $where  The WHERE clause of the SQL query.
+    *  @param string $obj          The name of the objects to retrieve.
     *  @access public
     *  @return array
     */
@@ -477,7 +482,7 @@ class Model extends Object {
     *  Corresponding errors are stored in $this->_validation_errors.
     *
     *  @see /nx/lib/Validator
-    *  @param string|null $field        The object property to be validated.
+    *  @param string|null $field   The object property to be validated.
     *  @access public
     *  @return bool
     */
@@ -500,8 +505,10 @@ class Model extends Object {
    /**
     *  Retrieves an object from the cache.
     *
-    *  @param object $obj        The object to be populated with the retrieved values.
-    *  @param int $id            The unique identifier of the object to be retrieved.
+    *  @param object $obj          The object to be populated with the
+    *                              retrieved values.
+    *  @param int $id              The unique identifier of the object
+    *                              to be retrieved.
     *  @access public
     *  @return object
     */
