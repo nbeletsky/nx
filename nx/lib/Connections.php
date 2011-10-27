@@ -35,12 +35,34 @@ class Connections {
     protected static $_db = array();
 
    /**
-    *  Creates a new cache connection using the defined options.
+    *  The initialization status of the handlers.
+    *
+    *  @var array
+    *  @access protected
+    */
+    protected static $_initialized = array(
+        'cache' => array(),
+        'db'    => array()
+    );
+
+   /**
+    *  The options for handlers.
+    *
+    *  @var array
+    *  @access protected
+    */
+    protected static $_options = array(
+        'cache' => array(),
+        'db'    => array()
+    );
+
+   /**
+    *  Stores the cache connection details using the defined options.
     *
     *  @see app\config\bootstrap\cache.php
     *  @param string $name          The name of the cache handler.
-    *  @param array $options        The cache options.  Takes the
-    *                               following parameters:
+    *  @param array $options        The cache options.  Takes the following
+    *                               parameters:
     *                               `plugin`        - The name of the cache plugin.
     *                               `host`          - The hostname of the server
     *                                                 where the cache resides.
@@ -50,13 +72,12 @@ class Connections {
     *  @return void
     */
     public static function add_cache($name, array $options = array()) {
-        $cache = 'nx\plugin\cache\\' . $options['plugin'];
-        unset($options['plugin']);
-        self::$_cache[$name] = new $cache($options);
+        self::$_options['cache'][$name] = $options;
+        self::$_initialized['cache'][$name] = false;
     }
 
    /**
-    *  Creates a new database connection using the defined options.
+    *  Stores the database connection details using the defined options.
     *
     *  @see app\config\bootstrap\db.php
     *  @param string $name          The name of the database handler.
@@ -71,9 +92,8 @@ class Connections {
     *  @return void
     */
     public static function add_db($name, array $options = array()) {
-        $db = 'nx\plugin\db\\' . $options['plugin'];
-        unset($options['plugin']);
-        self::$_db[$name] = new $db($options);
+        self::$_options['db'][$name] = $options;
+        self::$_initialized['db'][$name] = false;
     }
 
    /**
@@ -84,6 +104,14 @@ class Connections {
     *  @return object
     */
     public static function get_cache($name) {
+        if ( !self::$_initialized['cache'][$name] ) {
+            $plugin = self::$_options['cache'][$name]['plugin'];
+            $cache = 'nx\plugin\cache\\' . $plugin;
+            unset(self::$_options['cache'][$name]['plugin']);
+            self::$_cache[$name] = new $cache(self::$_options['cache'][$name]);
+            self::$_initialized['cache'][$name] = true;
+        }
+
         return self::$_cache[$name];
     }
 
@@ -95,6 +123,14 @@ class Connections {
     *  @return object
     */
     public static function get_db($name) {
+        if ( !self::$_initialized['db'][$name] ) {
+            $plugin = self::$_options['db'][$name]['plugin'];
+            $db = 'nx\plugin\db\\' . $plugin;
+            unset(self::$_options['db'][$name]['plugin']);
+            self::$_db[$name] = new $db(self::$_options['db'][$name]);
+            self::$_initialized['db'][$name] = true;
+        }
+
         return self::$_db[$name];
     }
 }
