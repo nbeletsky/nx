@@ -31,14 +31,15 @@ class View extends Object {
    /**
     *  Loads the configuration settings for the view.
     *
-    *  @param array $config        The configuration options.
+    *  @param array $config         The configuration options.
     *  @access public
     *  @return void
     */
     public function __construct(array $config = array()) {
         $defaults = array(
             'classes'   => array(
-                'form' => 'nx\lib\Form'
+                'compiler' => 'nx\lib\Compiler',
+                'form'     => 'nx\lib\Form'
             )
         );
         parent::__construct($config + $defaults);
@@ -60,18 +61,22 @@ class View extends Object {
    /**
     *  Renders a given file with the supplied variables.
     *
-    *  @param string $file         The file to be rendered.
-    *  @param mixed $vars          Variables to be substituted in the view.
+    *  @param string $file          The file to be rendered.
+    *  @param mixed $vars           Variables to be substituted in the view.
     *  @access public
-    *  @return bool
+    *  @return string
     */
     public function render($file, $vars) {
         if ( is_array($vars) ) {
             extract($vars);
         }
 
-        require 'app/view/' . $file;
-        return true;
+        $compiler = $this->_config['classes']['compiler'];
+        $template = $compiler::compile($file);
+
+        ob_start();
+        require $template;
+        return ob_get_clean();
     }
 
 }

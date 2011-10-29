@@ -11,128 +11,80 @@
 namespace nx\lib;
 
 /*
- *  The `Connections` class contains methods that assist
- *  in accessing database and cache connections.
+ *  The `Compiler` class is used to compile HTML pages with custom
+ *  syntax into templates.  It is also used to serve
+ *  cached templates.
  *
  *  @package lib
  */
-class Connections {
+class Compiler {
 
    /**
-    *  The collection of cache handlers.
+    *  Retrieves the compiled filename, and caches the file
+    *  if it is not already cached.
     *
-    *  @var array
-    *  @access protected
-    */
-    protected static $_cache = array();
-
-   /**
-    *  The collection of database handlers.
-    *
-    *  @var array
-    *  @access protected
-    */
-    protected static $_db = array();
-
-   /**
-    *  The initialization status of the handlers.
-    *
-    *  @var array
-    *  @access protected
-    */
-    protected static $_initialized = array(
-        'cache' => array(),
-        'db'    => array()
-    );
-
-   /**
-    *  The options for handlers.
-    *
-    *  @var array
-    *  @access protected
-    */
-    protected static $_options = array(
-        'cache' => array(),
-        'db'    => array()
-    );
-
-   /**
-    *  Stores the cache connection details using the defined options.
-    *
-    *  @see app\config\bootstrap\cache.php
-    *  @param string $name          The name of the cache handler.
-    *  @param array $options        The cache options.  Takes the following
-    *                               parameters:
-    *                               `plugin`        - The name of the cache plugin.
-    *                               `host`          - The hostname of the server
-    *                                                 where the cache resides.
-    *                               `persistent_id` - A unique ID used to allow
-    *                                                 persistence between requests.
+    *  @param string $file          The file location.
+    *  @param array $options        The compilation options, which take
+    *                               the following keys:
+    *                               'path' - The path relative to the file
+    *                                        where the cached file should be
+    *                                        stored.
     *  @access public
-    *  @return void
+    *  @return string
     */
-    public static function add_cache($name, array $options = array()) {
-        self::$_options['cache'][$name] = $options;
-        self::$_initialized['cache'][$name] = false;
-    }
+    public static function compile($file, $options = array()) {
+        $options += array(
+            'path' => 'compiled/'
+        );
 
-   /**
-    *  Stores the database connection details using the defined options.
-    *
-    *  @see app\config\bootstrap\db.php
-    *  @param string $name          The name of the database handler.
-    *  @param array $options        The database options.  Takes the
-    *                               following parameters:
-    *                               `plugin`   - The name of the database plugin.
-    *                               `database` - The name of the database.
-    *                               `host`     - The database host.
-    *                               `username` - The database username.
-    *                               `password` - The database password.
-    *  @access public
-    *  @return void
-    */
-    public static function add_db($name, array $options = array()) {
-        self::$_options['db'][$name] = $options;
-        self::$_initialized['db'][$name] = false;
-    }
+        $stats = stat($file);
+        $dir = dirname($file);
+        $location = basename(dirname($dir)) . '_' . basename($dir)
+            . '_' . basename($file, '.html');
+        $template = 'template_' . $location . '_' . $stats['mtime']
+            . '_' . $stats['ino'] . '_' . $stats['size'] . '.html';
+        $template = $dir . '/' . $options['path'] . $template;
 
-   /**
-    *  Returns the cache handler.
-    *
-    *  @param string $name          The name of the cache handler.
-    *  @access public
-    *  @return object
-    */
-    public static function get_cache($name) {
-        if ( !self::$_initialized['cache'][$name] ) {
-            $plugin = self::$_options['cache'][$name]['plugin'];
-            $cache = 'nx\plugin\cache\\' . $plugin;
-            unset(self::$_options['cache'][$name]['plugin']);
-            self::$_cache[$name] = new $cache(self::$_options['cache'][$name]);
-            self::$_initialized['cache'][$name] = true;
+        if ( file_exists($template) ) {
+            return $template;
         }
 
-        return self::$_cache[$name];
+        $compiled = self::_replace(file_get_contents($file));
+        $template_dir = dirname($template);
+        if ( !is_dir($template_dir) && !mkdir($template_dir, 0755, true) ) {
+            // TODO: Throw exception
+           return false;
+        }
+
+        if ( is_writable($template_dir)
+            && file_put_contents($template, $compiled) !== false ) {
+            $pattern = $template_dir . '/template_' . $location . '_*.html';
+            foreach ( glob($pattern) as $old ) {
+                if ( $old !== $template ) {
+                    unlink($old);
+                }
+            }
+            return $template;
+        }
+
+        // TODO: Throw exception if write fails!
+        return false;
     }
 
    /**
-    *  Returns the database handler.
+    *  Replaces a template with custom syntax.
     *
-    *  @param string $name          The name of the database handler.
+    *  @param string $template      The template.
     *  @access public
-    *  @return object
+    *  @return string
     */
-    public static function get_db($name) {
-        if ( !self::$_initialized['db'][$name] ) {
-            $plugin = self::$_options['db'][$name]['plugin'];
-            $db = 'nx\plugin\db\\' . $plugin;
-            unset(self::$_options['db'][$name]['plugin']);
-            self::$_db[$name] = new $db(self::$_options['db'][$name]);
-            self::$_initialized['db'][$name] = true;
-        }
+    protected static function _replace($template) {
+        $replace = array(
+            '/\<\?=\s*\$this->(.+?)\s*;?\s*\?>/msx' => '<?php echo $this->$1; ?>',
+            '/\<\?=\s*(.+?)\s*;?\s*\?>/msx'         => '<?php echo $this->_form->escape($1); ?>'
+        );
 
-        return self::$_db[$name];
+        return preg_replace(array_keys($replace), array_values($replace), $template);
     }
+
 }
-
-?>

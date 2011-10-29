@@ -1,12 +1,18 @@
 <?php
 
-define('NX_ROOT', dirname(dirname(dirname(__DIR__))));
+$nx_root = dirname(dirname(dirname(__DIR__)));
 
 set_include_path(
     get_include_path()  . PATH_SEPARATOR .
-    NX_ROOT             . PATH_SEPARATOR
+    $nx_root            . PATH_SEPARATOR
 );
 
+/**
+*  Checks to see if a file exists within the include path.
+*
+*  @param string $file              The file.
+*  @return bool
+*/
 function file_exists_in_include_path($file) {
     if ( file_exists($file) ) {
         return realpath($file);
@@ -25,6 +31,12 @@ function file_exists_in_include_path($file) {
     return false;
 }
 
+/**
+*  Serves as the global class autoloader.
+*
+*  @param string $class             The class to load.
+*  @return bool
+*/
 function autoload($class) {
     $file = str_replace("\\", "/", $class) . '.php';
     if ( file_exists_in_include_path($file) ) {
