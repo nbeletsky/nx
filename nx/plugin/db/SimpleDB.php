@@ -227,7 +227,7 @@ class SimpleDB extends \nx\core\Object {
             '"' => '""',
             "'" => "''"
         );
-        return str_replace(array_keys($replace), $replace, $val);
+        return str_replace(array_keys($replace), array_values($replace), $val);
     }
 
    /**
